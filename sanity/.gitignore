@@ -1,0 +1,31 @@
+# Dépendances
+/node_modules/
+
+# Fichiers de configuration environnementale
+.env
+.env.development
+.env.production
+
+# Fichiers de cache
+/.sanity/cache/
+/.sanity/temp/
+
+# Dossiers de build
+/dist/
+/build/
+/public/
+
+# Fichiers de journalisation
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fichiers et dossiers générés par l'éditeur
+/.vscode/
+/.idea/
+/*.sublime-workspace
+
+# Fichiers spécifiques à Sanity
+.sanity/
+sanity.json
