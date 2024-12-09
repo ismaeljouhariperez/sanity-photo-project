@@ -6,6 +6,7 @@ export interface Project {
   coverImage: string;
   images: string[];
   date: string;
+  category: 'noir-et-blanc' | 'couleur';
 }
 
 export const projects: Project[] = [
@@ -20,6 +21,7 @@ export const projects: Project[] = [
       '/images/projet-1/2.jpg',
       // ...
     ],
-    date: '2024'
+    date: '2024',
+    category: 'noir-et-blanc'
   },
 ];
