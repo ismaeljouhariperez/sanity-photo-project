@@ -2,15 +2,11 @@ import Link from 'next/link'
 
 export default function Header() {
   return (
-    <header className="py-6">
-      <nav className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold">
-          Votre Nom
-        </Link>
-        <div className="space-x-6">
-          <Link href="/projects">Projets</Link>
-          <Link href="/info">Info</Link>
-        </div>
+    <header className="py-4">
+      <nav className="mx-6 px-2 flex justify-between items-center">
+        <Link href="/" className="text-l">Ismael Ahab</Link>
+        <Link href="/index">Index</Link>
+        <Link href="/info" className="text-right">Info</Link>
       </nav>
     </header>
   )
