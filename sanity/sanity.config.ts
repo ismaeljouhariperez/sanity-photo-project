@@ -1,7 +1,9 @@
 import {defineConfig} from 'sanity'
-import {deskTool} from 'sanity/desk'
-import {structure} from './deskStructure'
+import {structureTool} from 'sanity/structure'
 import {schemaTypes} from './schemaTypes'
+import './studio.css'
+import {structure} from './deskStructure'
+import { CustomPanel } from './components/CustomPanel';
 
 export default defineConfig({
   name: 'default',
@@ -11,7 +13,7 @@ export default defineConfig({
   dataset: 'production',
 
   plugins: [
-    deskTool({
+    structureTool({
       structure
     })
   ],
@@ -19,4 +21,11 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
+  theme: {
+    '--my-black': '#1a1a1a',
+    '--my-white': '#fff',
+    '--font-family-base': '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',   
+    '--card-fg-color': 'var(--my-black)',
+    '--card-bg-color': 'var(--my-white)',
+  }
 })

@@ -1,9 +1,16 @@
-import { StructureBuilder } from 'sanity/desk'
+import {StructureBuilder} from 'sanity/structure'
+import {CustomPanel} from './components/CustomPanel'
 
 export const structure = (S: StructureBuilder) =>
   S.list()
     .title('Contenu')
     .items([
+      S.listItem()
+        .title('Dashboard')
+        .child(
+          S.component(CustomPanel)
+            .title('Mon Dashboard')
+        ),
       S.listItem()
         .title('Noir & Blanc')
         .child(
