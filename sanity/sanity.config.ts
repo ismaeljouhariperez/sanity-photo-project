@@ -1,9 +1,9 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {schemaTypes} from './schemaTypes'
-import './studio.css'
 import {structure} from './deskStructure'
 import { CustomPanel } from './components/CustomPanel';
+import './styles/styles.css'
 
 export default defineConfig({
   name: 'default',
