@@ -1,15 +1,12 @@
-import type { Metadata } from 'next'
+'use client'
+
+import React from 'react'
 import { Inter } from 'next/font/google'
-import './globals.css'
-import Header from './components/Header'
+import { AnimatePresence } from 'framer-motion'
 import { MenuProvider } from './context/MenuContext'
-
+import Header from './components/Header'
+import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'Ismael Ahab',
-  description: 'Portfolio',
-}
 
 export default function RootLayout({
   children,
@@ -21,8 +18,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <MenuProvider>
           <Header />
-          <main className="h-full">
-            {children}
+          <main>
+            <AnimatePresence mode="wait">
+              {children}
+            </AnimatePresence>
           </main>
         </MenuProvider>
       </body>
