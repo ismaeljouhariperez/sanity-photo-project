@@ -13,6 +13,8 @@
     "@sanity/client": "^6.22.1",
     "@sanity/image-url": "^1.0.2",
     "framer-motion": "^11.11.9",
+    "imagekit": "^6.0.0",
+    "imagekit-javascript": "^3.0.2",
     "next": "^15.1.0",
     "next-seo": "^6.6.0",
     "react": "^18",
@@ -22,6 +24,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@types/imagekit": "^3.1.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
