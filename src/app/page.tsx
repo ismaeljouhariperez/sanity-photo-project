@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useMenu } from './context/MenuContext'
+import ImageKitImage from './components/ImageKitImage'
 
 export default function Home() {
   const { setMenuText } = useMenu()
@@ -16,12 +17,11 @@ export default function Home() {
         onMouseEnter={() => setMenuText('Noir et Blanc')}
         onMouseLeave={() => setMenuText('Index')}>
         <Link href="/projects/noir-et-blanc">
-          <Image
-            src="https://picsum.photos/id/1011/800/1000"
-            alt="Noir et Blanc"
-            fill
-            className="object-cover"
-            priority
+          <ImageKitImage 
+            src="default-image.jpg"
+            alt="Description de l'image"
+            width={800}
+            height={600}
           />
         </Link>
       </motion.div>
@@ -32,12 +32,11 @@ export default function Home() {
         onMouseEnter={() => setMenuText('Couleur')}
         onMouseLeave={() => setMenuText('Index')}>
         <Link href="/projects/couleur">
-          <Image
-            src="https://picsum.photos/id/1015/800/1000"
-            alt="Couleur"
-            fill
-            className="object-cover"
-            priority
+        <ImageKitImage 
+            src="default-image.jpg"
+            alt="Description de l'image"
+            width={800}
+            height={600}
           />
         </Link>
       </motion.div>
