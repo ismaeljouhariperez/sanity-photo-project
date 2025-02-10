@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
+import ImageKitImage from '@/app/components/ImageKitImage'
 
 export default function ColorProjects() {
   return (
@@ -18,13 +18,13 @@ export default function ColorProjects() {
       <motion.div
         layoutId="color-image"
         className="relative w-80 aspect-[3/4]">
-        <Image
-          src="https://picsum.photos/id/1015/800/1000"
-          alt="Couleur"
-          fill
-          className="object-cover"
-          priority
-        />
+        <ImageKitImage 
+            src="default-image.jpg"
+            alt="Description de l'image"
+            width={800}
+            height={600}
+            className="object-cover"
+          />
       </motion.div>
     </div>
   )
