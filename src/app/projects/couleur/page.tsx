@@ -17,7 +17,7 @@ export default function ColorProjects() {
 
       <motion.div
         layoutId="color-image"
-        className="relative w-80 aspect-[3/4]">
+        className="relative w-80 flex items-center aspect-[3/4]">
         <ImageKitImage 
             src="default-image.jpg"
             alt="Description de l'image"
