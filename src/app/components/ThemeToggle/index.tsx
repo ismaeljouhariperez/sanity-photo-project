@@ -3,7 +3,7 @@
 import React from 'react'
 import { useTheme } from 'next-themes'
 
-const themes = ['light', 'dark', 'sepia', 'forest']
+const themes = ['light', 'dark']
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme()

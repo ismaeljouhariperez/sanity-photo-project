@@ -2,21 +2,19 @@ import React from 'react'
 import { projects } from '@/app/data/projects'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import PageTransition from '@/app/components/PageTransition'
 
 export default function ProjectPage({ params }: { params: { slug: string } }) {
   const project = projects.find(p => p.slug === params.slug)
 
   if (!project) {
-    notFound()
+    notFound() 
   }
 
   return (
-    <PageTransition>
-      <div className="container mx-auto px-4">
-        <h1>{project.title}</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {project.images.map((image, index) => (
+    <div className="container mx-auto px-4">
+      <h1>{project.title}</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {project.images.map((image, index) => (
           <Image
             key={index}
             src={image}
@@ -28,6 +26,5 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         ))}
       </div>
     </div>
-    </PageTransition>
   )
 }
