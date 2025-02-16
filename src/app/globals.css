@@ -2,11 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+body * {
+  transition: color 500ms, background-color 500ms;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100vh;
   margin: 0;
   padding: 0;

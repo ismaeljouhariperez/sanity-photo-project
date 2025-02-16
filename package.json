@@ -25,6 +25,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
     "react-query": "^3.39.3",
+    "sass": "^1.85.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {
