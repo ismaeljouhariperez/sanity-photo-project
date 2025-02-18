@@ -5,24 +5,19 @@ export const structure = (S: StructureBuilder) =>
   S.list()
     .title('Contenu')
     .items([
+      S.listItem().title('Dashboard').child(S.component(CustomPanel).title('Mon Dashboard')),
       S.listItem()
-        .title('Dashboard')
-        .child(
-          S.component(CustomPanel)
-            .title('Mon Dashboard')
-        ),
-      S.listItem()
-        .title('Noir & Blanc')
+        .title('Black & White')
         .child(
           S.documentList()
-            .title('Noir & Blanc')
-            .filter('_type == "project" && projectType == "bw"')
+            .title('Black & White')
+            .filter('_type == "project" && projectType == "bw"'),
         ),
       S.listItem()
-        .title('Couleur')
+        .title('Early Color')
         .child(
           S.documentList()
-            .title('Couleur')
-            .filter('_type == "project" && projectType == "color"')
+            .title('Early Color')
+            .filter('_type == "project" && projectType == "color"'),
         ),
-    ]) 
+    ])

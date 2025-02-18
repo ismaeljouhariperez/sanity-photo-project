@@ -1,19 +1,19 @@
 export interface Project {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  coverImage: string;
-  images: string[];
-  date: string;
-  category: 'noir-et-blanc' | 'couleur';
+  id: string
+  slug: string
+  title: string
+  description: string
+  coverImage: string
+  images: string[]
+  date: string
+  category: 'black-and-white' | 'early-color'
 }
 
 export const projects: Project[] = [
   {
     id: '1',
-    slug: 'projet-1',
-    title: 'Nom du Projet 1',
+    slug: 'les-jardins',
+    title: 'Les jardins',
     description: 'Description du projet...',
     coverImage: '/images/projet-1/cover.jpg',
     images: [
@@ -22,6 +22,6 @@ export const projects: Project[] = [
       // ...
     ],
     date: '2024',
-    category: 'noir-et-blanc'
+    category: 'black-and-white',
   },
-];
+]

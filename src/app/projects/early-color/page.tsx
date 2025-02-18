@@ -16,5 +16,5 @@ const projects = [
 ]
 
 export default function ColorProjects() {
-  return <ProjectsTemplate projects={projects} category="couleur" />
+  return <ProjectsTemplate projects={projects} category="early-color" />
 }

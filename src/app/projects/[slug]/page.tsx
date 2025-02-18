@@ -3,11 +3,17 @@ import { projects } from '@/app/data/projects'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 
-export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const project = projects.find(p => p.slug === params.slug)
+// Définir le type des paramètres
+type PageParams = {
+  params: Promise<{ slug: string }>
+}
+
+export default function ProjectPage({ params }: PageParams) {
+  const resolvedParams = React.use(params)
+  const project = projects.find((p) => p.slug === resolvedParams.slug)
 
   if (!project) {
-    notFound() 
+    notFound()
   }
 
   return (

@@ -16,5 +16,5 @@ const projects = [
 ]
 
 export default function BWProjects() {
-  return <ProjectsTemplate projects={projects} category="noir-et-blanc" />
+  return <ProjectsTemplate projects={projects} category="black-and-white" />
 }

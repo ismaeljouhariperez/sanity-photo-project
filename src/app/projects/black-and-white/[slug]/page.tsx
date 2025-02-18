@@ -21,9 +21,14 @@ const projects = [
   'Nuit blanche',
 ]
 
-export default function BWProject({ params }: Props) {
+type PageParams = {
+  params: Promise<{ slug: string }>
+}
+
+export default function BlackAndWhiteProjectPage({ params }: PageParams) {
+  const resolvedParams = React.use(params)
   const project = projects.find(
-    (p) => p.toLowerCase().replace(/\s+/g, '-') === params.slug
+    (p) => p.toLowerCase().replace(/\s+/g, '-') === resolvedParams.slug
   )
 
   if (!project) {
@@ -33,7 +38,6 @@ export default function BWProject({ params }: Props) {
   return (
     <div className="min-h-[calc(100vh-5.5rem)] p-8">
       <h1 className="text-4xl mb-8">{project}</h1>
-      {/* Contenu du projet à venir */}
     </div>
   )
 }

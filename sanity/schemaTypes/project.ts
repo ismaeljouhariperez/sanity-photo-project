@@ -7,21 +7,21 @@ export const project = {
       name: 'title',
       title: 'Titre',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'subtitle',
       title: 'Sous-titre',
-      type: 'string'
+      type: 'string',
     },
     {
       name: 'slug',
       title: 'Chemin URL',
       type: 'slug',
       options: {
-        source: 'title'
+        source: 'title',
       },
-      validation: Rule => Rule.required()
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'projectType',
@@ -29,17 +29,17 @@ export const project = {
       type: 'string',
       options: {
         list: [
-          {title: 'Noir et Blanc', value: 'bw'},
-          {title: 'Couleur', value: 'color'}
-        ]
+          {title: 'Black & White', value: 'bw'},
+          {title: 'Early Color', value: 'color'},
+        ],
       },
-      validation: Rule => Rule.required()
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'backgroundColor',
       title: 'Couleur de fond',
       type: 'string',
-      description: 'Code hexadécimal de la couleur (ex: #FFFFFF)'
+      description: 'Code hexadécimal de la couleur (ex: #FFFFFF)',
     },
     {
       name: 'layout',
@@ -49,35 +49,37 @@ export const project = {
         list: [
           {title: 'Compact', value: 'compact'},
           {title: 'Normal', value: 'normal'},
-          {title: 'Plein écran', value: 'fullscreen'}
-        ]
+          {title: 'Plein écran', value: 'fullscreen'},
+        ],
       },
-      validation: Rule => Rule.required()
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'images',
       title: 'Images',
       type: 'array',
-      of: [{
-        type: 'object',
-        fields: [
-          {
-            name: 'image',
-            title: 'Image',
-            type: 'image'
-          },
-          {
-            name: 'alt',
-            title: 'Description alternative',
-            type: 'string',
-            description: 'Description pour l\'accessibilité'
-          }
-        ]
-      }]
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+            },
+            {
+              name: 'alt',
+              title: 'Description alternative',
+              type: 'string',
+              description: "Description pour l'accessibilité",
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'order',
-      title: 'Ordre d\'affichage',
+      title: "Ordre d'affichage",
       type: 'number',
       description: 'Position du projet dans la liste (1 = premier)',
     },
@@ -86,14 +88,14 @@ export const project = {
       title: 'Date du projet',
       type: 'date',
       options: {
-        dateFormat: 'YYYY-MM-DD'
-      }
+        dateFormat: 'YYYY-MM-DD',
+      },
     },
     {
       name: 'featured',
       title: 'Projet mis en avant',
       type: 'boolean',
-      initialValue: false
+      initialValue: false,
     },
     {
       name: 'metadata',
@@ -103,19 +105,19 @@ export const project = {
         {
           name: 'location',
           title: 'Lieu',
-          type: 'string'
+          type: 'string',
         },
         {
           name: 'client',
           title: 'Client',
-          type: 'string'
+          type: 'string',
         },
         {
           name: 'year',
           title: 'Année',
-          type: 'number'
-        }
-      ]
+          type: 'number',
+        },
+      ],
     },
     {
       name: 'description',
@@ -129,22 +131,22 @@ export const project = {
       type: 'array',
       of: [{type: 'string'}],
       options: {
-        layout: 'tags'
-      }
+        layout: 'tags',
+      },
     },
     {
       name: 'nextProject',
       title: 'Projet suivant',
       type: 'reference',
       to: [{type: 'project'}],
-      description: 'Lien vers le projet suivant dans la navigation'
-    }
+      description: 'Lien vers le projet suivant dans la navigation',
+    },
   ],
   preview: {
     select: {
       title: 'title',
       subtitle: 'subtitle',
-      media: 'images.0.image'
-    }
-  }
-} 
+      media: 'images.0.image',
+    },
+  },
+}
