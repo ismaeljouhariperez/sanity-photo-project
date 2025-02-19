@@ -7,6 +7,7 @@ import Header from './components/Header'
 import ThemeToggle from './components/ThemeToggle'
 import './globals.css'
 import { aujournuit } from './fonts'
+import PageTransition from './components/PageTransition'
 
 export default function RootLayout({
   children,
@@ -19,9 +20,14 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <ThemeToggle />
-          <main>
-            <AnimatePresence mode="wait">{children}</AnimatePresence>
-          </main>
+          <PageTransition />
+          <div data-barba="wrapper">
+            <div data-barba="container">
+              <main>
+                <AnimatePresence mode="wait">{children}</AnimatePresence>
+              </main>
+            </div>
+          </div>
         </ThemeProvider>
       </body>
     </html>

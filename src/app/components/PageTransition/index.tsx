@@ -1,18 +1,31 @@
 'use client'
-import { motion } from 'framer-motion'
+import { useEffect } from 'react'
+import barba from '@barba/core'
 
-export default function PageTransition({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ clipPath: 'inset(0 100% 0 0)' }}
-      animate={{ clipPath: 'inset(0 0 0 0)' }}
-      exit={{ clipPath: 'inset(0 0 0 100%)' }}
-      transition={{ 
-        duration: 1,
-        ease: "easeInOut"
-      }}
-    >
-      {children}
-    </motion.div>
-  )
+export default function PageTransition() {
+  useEffect(() => {
+    barba.init({
+      transitions: [
+        {
+          name: 'opacity-transition',
+          leave(data) {
+            return new Promise((resolve) => {
+              const leaving = data.current.container
+              leaving.style.opacity = '0'
+              setTimeout(resolve, 300)
+            })
+          },
+          enter(data) {
+            return new Promise((resolve) => {
+              const entering = data.next.container
+              entering.style.opacity = '1'
+              setTimeout(resolve, 300)
+            })
+          },
+        },
+      ],
+    })
+  }, [])
+
+  return null
 }
