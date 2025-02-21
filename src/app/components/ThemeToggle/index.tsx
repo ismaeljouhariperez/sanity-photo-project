@@ -14,16 +14,20 @@ export default function ThemeToggle() {
     const button = buttonRef.current
     if (!button) return
 
-    const buttonWidth = button.offsetWidth
-    const buttonHeight = button.offsetHeight
-
     const moveMagnet = (event: MouseEvent) => {
       const bounding = button.getBoundingClientRect()
+      const strength = 30 // Ajustez cette valeur pour l'intensité de l'effet
 
       gsap.to(button, {
         duration: 1,
-        x: (event.clientX - bounding.left) / buttonWidth - 0.5,
-        y: (event.clientY - bounding.top) / buttonHeight - 0.5,
+        x:
+          ((event.clientX - bounding.left - bounding.width / 2) /
+            bounding.width) *
+          strength,
+        y:
+          ((event.clientY - bounding.top - bounding.height / 2) /
+            bounding.height) *
+          strength,
         ease: Power4.easeOut,
       })
     }
@@ -37,12 +41,16 @@ export default function ThemeToggle() {
       })
     }
 
-    button.addEventListener('mousemove', moveMagnet)
-    button.addEventListener('mouseout', resetMagnet)
+    const handleMouseMove = (e: MouseEvent) => {
+      requestAnimationFrame(() => moveMagnet(e))
+    }
+
+    button.addEventListener('mousemove', handleMouseMove)
+    button.addEventListener('mouseleave', resetMagnet)
 
     return () => {
-      button.removeEventListener('mousemove', moveMagnet)
-      button.removeEventListener('mouseout', resetMagnet)
+      button.removeEventListener('mousemove', handleMouseMove)
+      button.removeEventListener('mouseleave', resetMagnet)
     }
   }, [])
 
@@ -51,8 +59,8 @@ export default function ThemeToggle() {
   }
 
   return (
-    <button ref={buttonRef} onClick={toggleTheme} className={`${s.magnetic}`}>
-      <div className={`${s.circle}`}>
+    <button ref={buttonRef} onClick={toggleTheme} className={s.magnetic}>
+      <div className={s.circle}>
         <div className={s.fullMoon} />
         <motion.div
           className={s.moonOverlay}
