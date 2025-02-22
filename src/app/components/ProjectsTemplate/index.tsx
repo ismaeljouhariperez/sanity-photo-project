@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
+import AnimatedTitle from '../AnimatedTitle'
 
 interface ProjectsTemplateProps {
   projects: string[]
@@ -15,7 +16,7 @@ export default function ProjectsTemplate({
     <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
       <nav className="flex flex-wrap gap-8 justify-end">
         {projects.map((project, index) => (
-          <div key={index}>
+          <AnimatedTitle key={project} delay={index * 0.1}>
             <Link
               href={`/projects/${category}/${project
                 .toLowerCase()
@@ -24,7 +25,7 @@ export default function ProjectsTemplate({
             >
               {project}
             </Link>
-          </div>
+          </AnimatedTitle>
         ))}
       </nav>
     </div>

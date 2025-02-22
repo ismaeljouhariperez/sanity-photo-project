@@ -1,116 +1,99 @@
 'use client'
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import gsap from 'gsap'
 import ImageKitImage from './components/ImageKitImage'
-
-const baseVariants = {
-  initial: {
-    opacity: 0,
-  },
-  animate: {
-    opacity: 1,
-    transition: {
-      duration: 1,
-      delay: 0.5,
-      ease: 'easeInOut',
-    },
-  },
-}
 
 export default function Home() {
   const router = useRouter()
-  const [exitVariant, setExitVariant] = useState('exitDefault')
+  const containerRef = useRef<HTMLDivElement>(null)
+  const leftImageRef = useRef<HTMLDivElement>(null)
+  const rightImageRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    tl.set([leftImageRef.current, rightImageRef.current], {
+      opacity: 0,
+      y: 100,
+      scale: 0.9,
+    })
+      .to(containerRef.current, {
+        opacity: 1,
+        duration: 0.1,
+      })
+      .to(leftImageRef.current, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 1.2,
+      })
+      .to(
+        rightImageRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1.2,
+        },
+        '-=0.9'
+      )
+  }, [])
 
   const handleNavigate = (path: string) => {
-    console.log('Navigation vers:', path)
-    const variant = path.includes('black-and-white') ? 'exitLeft' : 'exitRight'
-    console.log('Variant choisi:', variant)
-    setExitVariant(variant)
+    // Animation de sortie
+    const tl = gsap.timeline({
+      onComplete: () => router.push(path),
+    })
 
-    setTimeout(() => {
-      console.log('Redirection effectuée')
-      router.push(path)
-    }, 3000)
-  }
+    const isLeft = path.includes('black-and-white')
+    const exitX = isLeft ? -100 : 100
 
-  const variants = {
-    ...baseVariants,
-    exitLeft: {
+    tl.to([leftImageRef.current, rightImageRef.current], {
       opacity: 0,
-      x: -100,
-      transition: {
-        duration: 0.5,
-        ease: 'easeInOut',
-      },
-    },
-    exitRight: {
-      opacity: 0,
-      x: 100,
-      transition: {
-        duration: 0.5,
-        ease: 'easeInOut',
-      },
-    },
-    exitDefault: {
-      opacity: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeInOut',
-      },
-    },
+      x: exitX,
+      scale: 0.95,
+      duration: 0.7,
+      stagger: 0.1,
+    })
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <div className="h-[calc(100vh-5.5rem)] grid grid-cols-2 gap-4 p-4 items-center justify-items-center">
-        <motion.div
-          layoutId="bw-image"
-          className="relative flex items-center w-80 aspect-[3/4] cursor-pointer"
-          variants={variants}
-          initial="initial"
-          animate="animate"
-          exit={exitVariant}
-          onAnimationStart={() => console.log('Animation start:', exitVariant)}
-          onAnimationComplete={() =>
-            console.log('Animation complete:', exitVariant)
-          }
-          onClick={() => handleNavigate('/projects/black-and-white')}
-        >
-          <Link href="/projects/black-and-white">
-            <ImageKitImage
-              src="default-image.jpg"
-              alt="Description de l'image"
-              width={800}
-              height={600}
-            />
-          </Link>
-        </motion.div>
-
-        <motion.div
-          layoutId="color-image"
-          className="relative flex items-center w-80 aspect-[3/4] cursor-pointer"
-          variants={variants}
-          initial="initial"
-          animate="animate"
-          exit={exitVariant}
-          onAnimationStart={() => console.log('Animation start:', exitVariant)}
-          onAnimationComplete={() =>
-            console.log('Animation complete:', exitVariant)
-          }
-          onClick={() => handleNavigate('/projects/early-color')}
-        >
-          <Link href="/projects/early-color">
-            <ImageKitImage
-              src="default-image.jpg"
-              alt="Description de l'image"
-              width={800}
-              height={600}
-            />
-          </Link>
-        </motion.div>
+    <div
+      ref={containerRef}
+      className="opacity-0 h-[calc(100vh-5.5rem)] grid grid-cols-2 gap-4 p-4 items-center justify-items-center"
+    >
+      <div
+        ref={leftImageRef}
+        className="relative flex items-center w-80 aspect-[3/4] cursor-pointer overflow-hidden"
+        onClick={() => handleNavigate('/projects/black-and-white')}
+      >
+        <div className="w-full h-full transform hover:scale-105 transition-transform duration-500">
+          <ImageKitImage
+            src="default-image.jpg"
+            alt="Black and White Photography"
+            width={800}
+            height={600}
+            className="object-cover w-full h-full"
+          />
+        </div>
       </div>
-    </AnimatePresence>
+
+      <div
+        ref={rightImageRef}
+        className="relative flex items-center w-80 aspect-[3/4] cursor-pointer overflow-hidden"
+        onClick={() => handleNavigate('/projects/early-color')}
+      >
+        <div className="w-full h-full transform hover:scale-105 transition-transform duration-500">
+          <ImageKitImage
+            src="default-image.jpg"
+            alt="Early Color Photography"
+            width={800}
+            height={600}
+            className="object-cover w-full h-full"
+          />
+        </div>
+      </div>
+    </div>
   )
 }

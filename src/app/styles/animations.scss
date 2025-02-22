@@ -1,0 +1,8 @@
+.title-animate {
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}

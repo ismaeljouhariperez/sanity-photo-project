@@ -10,16 +10,20 @@ declare module '@barba/core' {
 
   interface BarbaTransition {
     name: string
-    leave: (data: BarbaData) => Promise<void>
-    enter: (data: BarbaData) => Promise<void>
+    sync?: boolean
+    to?: string
+    from?: string
+    leave(data: BarbaData): Promise<void>
+    enter(data: BarbaData): Promise<void>
+    async(): () => void
   }
 
-  interface BarbaInit {
+  interface BarbaOptions {
     transitions: BarbaTransition[]
   }
 
   const barba: {
-    init: (options: BarbaInit) => void
+    init(options: BarbaOptions): void
   }
 
   export default barba

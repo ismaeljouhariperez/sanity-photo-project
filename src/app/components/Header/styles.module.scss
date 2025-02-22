@@ -1,0 +1,12 @@
+.nav {
+  @apply flex justify-between items-center w-11/12;
+}
+
+.titleWrapper {
+  overflow: hidden;
+}
+
+.title {
+  transform-origin: center;
+  will-change: transform, opacity;
+}

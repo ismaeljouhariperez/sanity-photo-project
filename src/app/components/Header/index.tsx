@@ -1,8 +1,9 @@
 'use client'
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import InfoOverlay from '../InfoOverlay'
+import AnimatedTitle from '../AnimatedTitle'
+import s from './styles.module.scss'
 
 export default function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
@@ -17,15 +18,14 @@ export default function Header() {
   const handleIndexClick = (e: React.MouseEvent) => {
     e.preventDefault()
     const link = getIndexLink()
+    console.log('link', link)
     if (link) {
       router.push(link)
     }
   }
 
-  // Détermine si nous sommes dans une page de projet
   const isProjectPage = pathname.includes('/projects/')
 
-  // Détermine le lien du menu en fonction du type de projet
   const getIndexLink = () => {
     if (pathname.includes('/projects/black-and-white')) {
       return '/projects/black-and-white'
@@ -40,11 +40,15 @@ export default function Header() {
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <header className="py-5 flex justify-center">
-        <nav className="flex justify-between items-center w-11/12">
-          <button onClick={handleAboutClick} className="text-right">
-            About
-          </button>
-          {isProjectPage && <button onClick={handleIndexClick}>Index</button>}
+        <nav className={s.nav}>
+          <button onClick={handleAboutClick}>About</button>
+          {isProjectPage && (
+            <AnimatedTitle>
+              <button onClick={handleIndexClick} className={s.title}>
+                Index
+              </button>
+            </AnimatedTitle>
+          )}
           <button onClick={() => router.push('/')} className="text-xl">
             Ismael Ahab
           </button>
