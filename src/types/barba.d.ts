@@ -2,9 +2,15 @@ declare module '@barba/core' {
   interface BarbaData {
     current: {
       container: HTMLElement
+      url: {
+        path?: string
+      }
     }
     next: {
       container: HTMLElement
+      url: {
+        path?: string
+      }
     }
   }
 
@@ -13,9 +19,9 @@ declare module '@barba/core' {
     sync?: boolean
     to?: string
     from?: string
+    async(): () => void
     leave(data: BarbaData): Promise<void>
     enter(data: BarbaData): Promise<void>
-    async(): () => void
   }
 
   interface BarbaOptions {
@@ -24,6 +30,7 @@ declare module '@barba/core' {
 
   const barba: {
     init(options: BarbaOptions): void
+    go(url: string): Promise<void>
   }
 
   export default barba
