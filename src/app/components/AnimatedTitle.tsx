@@ -17,25 +17,49 @@ export default function AnimatedTitle({
   isHeader = false,
 }: AnimatedTitleProps) {
   const titleRef = useRef<HTMLDivElement>(null)
-  const hasAnimatedRef = useRef(false)
   const {
     hasPlayedHeaderAnimation,
+    isInProjectsSection,
     setHeaderAnimationPlayed,
-    resetHeaderAnimation,
   } = useAnimationStore()
 
   useEffect(() => {
-    if (!titleRef.current || hasAnimatedRef.current) return
+    if (!titleRef.current) return
 
-    if (isHeader && hasPlayedHeaderAnimation) {
-      gsap.set(titleRef.current, {
-        y: 0,
-        opacity: 1,
-      })
+    console.log('--- AnimatedTitle Effect ---')
+    console.log('isHeader:', isHeader)
+    console.log('isInProjectsSection:', isInProjectsSection)
+    console.log('hasPlayedHeaderAnimation:', hasPlayedHeaderAnimation)
+
+    if (isHeader && isInProjectsSection) {
+      if (hasPlayedHeaderAnimation) {
+        console.log('✅ Animation déjà jouée, on garde la position')
+        gsap.set(titleRef.current, {
+          y: 0,
+          opacity: 1,
+        })
+        return
+      }
+
+      console.log('🔄 Première animation dans projects')
+      gsap.fromTo(
+        titleRef.current,
+        { y: -50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          delay: delay,
+          onComplete: () => {
+            setHeaderAnimationPlayed()
+          },
+        }
+      )
       return
     }
 
-    hasAnimatedRef.current = true
+    console.log('⚡ Animation standard')
     gsap.fromTo(
       titleRef.current,
       { y: -50, opacity: 0 },
@@ -45,25 +69,14 @@ export default function AnimatedTitle({
         duration: 0.8,
         ease: 'power3.out',
         delay: delay,
-        onComplete: () => {
-          if (isHeader) {
-            setHeaderAnimationPlayed()
-          }
-        },
       }
     )
-
-    return () => {
-      if (isHeader) {
-        resetHeaderAnimation()
-      }
-    }
   }, [
     delay,
     isHeader,
     hasPlayedHeaderAnimation,
+    isInProjectsSection,
     setHeaderAnimationPlayed,
-    resetHeaderAnimation,
   ])
 
   return (
