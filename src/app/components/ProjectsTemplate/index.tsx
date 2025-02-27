@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import AnimatedTitle from '../AnimatedTitle'
+import AnimatedElement, { AnimationType } from '../AnimatedElement'
 import { useAnimationStore } from '@/store/animationStore'
 import { useRouter } from 'next/navigation'
 
@@ -33,17 +33,20 @@ export default function ProjectsTemplate({
     <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
       <nav className="flex flex-wrap gap-8 justify-end">
         {projects.map((project, index) => (
-          <AnimatedTitle
+          <AnimatedElement
             key={project}
             delay={index * 0.1}
+            type={AnimationType.SLIDE_UP}
             playExitAnimation={true}
             entrancePatterns={['/projects']}
             exitPatterns={['/projects']}
-            playOnceOnly={false} // Rejouer l'animation à chaque fois qu'on revient sur cette page
-            fromY={-50}
-            toY={0}
-            duration={0.8}
-            ease="power3.out"
+            playOnceOnly={false}
+            customParams={{
+              fromY: -50,
+              toY: 0,
+              duration: 0.8,
+              ease: 'power3.out',
+            }}
           >
             <div
               onClick={(e) =>
@@ -57,7 +60,7 @@ export default function ProjectsTemplate({
             >
               {project}
             </div>
-          </AnimatedTitle>
+          </AnimatedElement>
         ))}
       </nav>
     </div>
