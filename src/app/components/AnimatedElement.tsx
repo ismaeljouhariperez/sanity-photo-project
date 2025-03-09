@@ -86,17 +86,41 @@ export default function AnimatedElement({
   const elementRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<gsap.core.Tween | null>(null)
   const hasPlayedRef = useRef<boolean>(false)
+  const isAnimatingRef = useRef<boolean>(false)
 
   const { hasPlayedHeaderAnimation, setHeaderAnimationPlayed, isLeavingPage } =
     useAnimationStore()
 
   const pathname = usePathname() || ''
 
+  // Générer un ID unique pour ce composant basé sur son type et son chemin
+  const componentId = useRef<string>(
+    `anim_${type}_${pathname.replace(/\//g, '_')}`
+  ).current
+
   // Vérifier si le chemin actuel correspond à un pattern d'entrée ou de sortie
   const isEntrancePath = entrancePatterns.some((pattern) =>
     pathname.includes(pattern)
   )
   const isExitPath = exitPatterns.some((pattern) => pathname.includes(pattern))
+
+  // Définir l'état initial des éléments dès le montage du composant
+  useEffect(() => {
+    if (elementRef.current) {
+      // Appliquer immédiatement l'état initial pour éviter le flash
+      gsap.set(elementRef.current, getInitialParams())
+    }
+  }, []) // Exécuter une seule fois au montage
+
+  // Vérifier si l'animation a déjà été jouée (persistant entre les rechargements)
+  useEffect(() => {
+    // Vérifier si nous sommes dans un environnement avec sessionStorage
+    if (typeof window !== 'undefined') {
+      const hasPlayed = sessionStorage.getItem(componentId) === 'true'
+      hasPlayedRef.current = hasPlayed
+      console.log(`🔍 Initialisation: ${componentId} - déjà joué: ${hasPlayed}`)
+    }
+  }, [componentId])
 
   // Fonction pour obtenir les paramètres d'animation en fonction du type
   const getAnimationParams = (isExit = false) => {
@@ -166,7 +190,132 @@ export default function AnimatedElement({
     }
   }
 
-  // Effet pour gérer l'animation de sortie
+  // Effet principal pour l'animation d'entrée
+  useEffect(() => {
+    console.log(`🏁 Montage du composant: ${componentId}`)
+
+    // S'assurer que l'élément est dans son état initial avant de commencer l'animation
+    if (elementRef.current) {
+      gsap.set(elementRef.current, getInitialParams())
+    }
+
+    // Fonction pour jouer l'animation
+    const playAnimation = () => {
+      if (!elementRef.current) {
+        console.log(`❌ Élément non disponible: ${componentId}`)
+        return
+      }
+
+      if (isAnimatingRef.current) {
+        console.log(`⏸️ Animation déjà en cours: ${componentId}`)
+        return
+      }
+
+      // Si on est en train de quitter la page, ne pas jouer d'animation d'entrée
+      if (isLeavingPage) {
+        console.log(`🚪 Page en cours de sortie: ${componentId}`)
+        return
+      }
+
+      // Pour les éléments avec playOnceOnly=true, vérifier si l'animation a déjà été jouée
+      if (hasPlayedRef.current && playOnceOnly) {
+        console.log(`🔒 Animation déjà jouée (skip): ${componentId}`)
+        // Définir directement l'état final
+        gsap.set(elementRef.current, {
+          opacity: toOpacity,
+          y: toY,
+          x: toX,
+          scale: toScale,
+        })
+        return
+      }
+
+      // Marquer comme en cours d'animation pour éviter les doubles animations
+      isAnimatingRef.current = true
+      console.log(`▶️ Démarrage animation: ${componentId}`)
+
+      // Pour les éléments de header, utiliser la logique spécifique
+      if (isHeader) {
+        // Si nous sommes sur un chemin d'entrée
+        if (isEntrancePath) {
+          // Si l'animation a déjà été jouée et qu'on ne doit la jouer qu'une fois
+          if (hasPlayedHeaderAnimation && playOnceOnly) {
+            console.log('✅ Animation déjà jouée, on garde la position')
+            gsap.set(elementRef.current, {
+              opacity: toOpacity,
+              y: toY,
+              x: toX,
+              scale: toScale,
+            })
+            isAnimatingRef.current = false
+            return
+          }
+
+          // Si l'animation n'a pas encore été jouée ou si on doit la rejouer
+          console.log(`🔄 Animation d'entrée (${type})`)
+          animationRef.current = gsap.fromTo(
+            elementRef.current,
+            getInitialParams(),
+            {
+              ...getAnimationParams(),
+              onComplete: () => {
+                if (playOnceOnly) {
+                  setHeaderAnimationPlayed()
+                }
+                hasPlayedRef.current = true
+                isAnimatingRef.current = false
+              },
+            }
+          )
+          return
+        } else {
+          // Si nous ne sommes pas sur un chemin d'entrée, cacher l'élément
+          gsap.set(elementRef.current, getInitialParams())
+          isAnimatingRef.current = false
+          return
+        }
+      }
+
+      // Pour les éléments non-header, animation standard
+      console.log(`⚡ Animation standard (${type}): ${componentId}`)
+      animationRef.current = gsap.fromTo(
+        elementRef.current,
+        getInitialParams(),
+        {
+          ...getAnimationParams(),
+          onComplete: () => {
+            console.log(`✅ Animation terminée: ${componentId}`)
+            // Seulement mettre à jour hasPlayedRef si playOnceOnly est true
+            if (playOnceOnly) {
+              hasPlayedRef.current = true
+              // Sauvegarder l'état dans sessionStorage pour persister uniquement pendant la session
+              if (typeof window !== 'undefined') {
+                sessionStorage.setItem(componentId, 'true')
+              }
+            } else {
+              // Pour les animations qui doivent toujours se jouer, réinitialiser hasPlayedRef
+              hasPlayedRef.current = false
+            }
+            isAnimatingRef.current = false
+          },
+        }
+      )
+    }
+
+    // Jouer l'animation après un court délai pour éviter les problèmes de timing
+    const timeoutId = setTimeout(playAnimation, 50)
+
+    // Nettoyer l'animation et le timeout lors du démontage
+    return () => {
+      console.log(`🧹 Nettoyage du composant: ${componentId}`)
+      clearTimeout(timeoutId)
+      if (animationRef.current) {
+        animationRef.current.kill()
+      }
+    }
+  }, [pathname]) // Ajouter pathname comme dépendance pour rejouer l'animation à chaque changement de route
+
+  // Effet séparé pour gérer l'animation de sortie
   useEffect(() => {
     if (!elementRef.current || !playExitAnimation) return
 
@@ -190,74 +339,7 @@ export default function AnimatedElement({
         animationRef.current.kill()
       }
     }
-  }, [isLeavingPage, playExitAnimation, isExitPath, type])
-
-  // Effet principal pour l'animation d'entrée
-  useEffect(() => {
-    if (!elementRef.current) return
-
-    // Si on est en train de quitter la page, ne pas jouer d'animation d'entrée
-    if (isLeavingPage) return
-
-    // Pour les éléments de header, utiliser la logique spécifique
-    if (isHeader) {
-      // Si nous sommes sur un chemin d'entrée
-      if (isEntrancePath) {
-        // Si l'animation a déjà été jouée et qu'on ne doit la jouer qu'une fois
-        if (hasPlayedHeaderAnimation && playOnceOnly) {
-          console.log('✅ Animation déjà jouée, on garde la position')
-          gsap.set(elementRef.current, {
-            opacity: toOpacity,
-            y: toY,
-            x: toX,
-            scale: toScale,
-          })
-          return
-        }
-
-        // Si l'animation n'a pas encore été jouée ou si on doit la rejouer
-        console.log(`🔄 Animation d'entrée (${type})`)
-        animationRef.current = gsap.fromTo(
-          elementRef.current,
-          getInitialParams(),
-          {
-            ...getAnimationParams(),
-            onComplete: () => {
-              if (playOnceOnly) {
-                setHeaderAnimationPlayed()
-              }
-            },
-          }
-        )
-        return
-      } else {
-        // Si nous ne sommes pas sur un chemin d'entrée, cacher l'élément
-        gsap.set(elementRef.current, getInitialParams())
-        return
-      }
-    }
-
-    // Pour les éléments non-header, animation standard
-    // Vérifier si l'animation a déjà été jouée pour les animations à jouer une seule fois
-    if (playOnceOnly && hasPlayedRef.current) return
-
-    console.log(`⚡ Animation standard (${type})`)
-    animationRef.current = gsap.fromTo(elementRef.current, getInitialParams(), {
-      ...getAnimationParams(),
-      onComplete: () => {
-        hasPlayedRef.current = true
-      },
-    })
-  }, [
-    delay,
-    isHeader,
-    hasPlayedHeaderAnimation,
-    isEntrancePath,
-    isLeavingPage,
-    setHeaderAnimationPlayed,
-    playOnceOnly,
-    type,
-  ])
+  }, [isLeavingPage, playExitAnimation, isExitPath])
 
   return (
     <div className="overflow-hidden">
