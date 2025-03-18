@@ -7,7 +7,7 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
-      required: true,
+      validation: (Rule) => Rule.required(),
     },
     {
       name: 'slug',
@@ -17,11 +17,13 @@ export default {
         source: 'title',
         maxLength: 96,
       },
+      validation: (Rule) => Rule.required(),
     },
     {
       name: 'description',
       title: 'Description',
       type: 'text',
+      rows: 3,
     },
     {
       name: 'coverImage',
@@ -32,10 +34,36 @@ export default {
       },
     },
     {
+      name: 'projects',
+      title: 'Projets',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'project'}],
+        },
+      ],
+      description: 'Sélectionnez les projets à inclure dans cette collection',
+    },
+    {
       name: 'order',
       title: 'Order',
       type: 'number',
-      description: 'Order in which this collection appears'
-    }
+      description: 'Ordre dans lequel cette collection apparaît',
+      initialValue: 0,
+    },
+    {
+      name: 'active',
+      title: 'Active',
+      type: 'boolean',
+      description: 'Cette collection est-elle visible sur le site ?',
+      initialValue: true,
+    },
   ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'coverImage',
+    },
+  },
 }
