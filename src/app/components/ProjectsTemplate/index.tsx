@@ -49,7 +49,7 @@ export default function ProjectsTemplate({
             exitPatterns={['/projects']}
             playOnceOnly={false}
             customParams={{
-              fromY: -50,
+              fromY: -100,
               toY: 0,
               duration: 0.8,
               ease: 'power3.out',
@@ -62,7 +62,7 @@ export default function ProjectsTemplate({
                   project.toLowerCase().replace(/\s+/g, '-')
                 )
               }
-              className="text-6xl hover:text-gray-500 transition-colors duration-300 font-wide cursor-pointer"
+              className="text-6xl leading-[1.3] hover:text-gray-500 transition-colors duration-300 font-wide cursor-pointer"
               data-barba-trigger
             >
               {project}
