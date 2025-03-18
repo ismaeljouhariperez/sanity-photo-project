@@ -3,6 +3,8 @@ import React from 'react'
 import AnimatedElement, { AnimationType } from '../AnimatedElement'
 import { useAnimationStore } from '@/store/animationStore'
 import { useRouter } from 'next/navigation'
+import { NextNavigationAdapter } from '@/adapters/navigation'
+import { ZustandAnimationAdapter } from '@/adapters/animation'
 
 interface ProjectsTemplateProps {
   projects: string[]
@@ -16,16 +18,21 @@ export default function ProjectsTemplate({
   const router = useRouter()
   const { setLeavingPage } = useAnimationStore()
 
-  const handleProjectClick = (e: React.MouseEvent, projectSlug: string) => {
+  const navigationService = new NextNavigationAdapter(router)
+  const animationService = new ZustandAnimationAdapter({ setLeavingPage })
+
+  const handleProjectClick = async (
+    e: React.MouseEvent,
+    projectSlug: string
+  ) => {
     e.preventDefault()
 
-    // Activer l'animation de sortie
-    setLeavingPage(true)
+    // Utilisation des adapters au lieu des appels directs
+    animationService.setPageTransition(true)
 
-    // Attendre que l'animation se termine avant de naviguer
-    setTimeout(() => {
-      setLeavingPage(false)
-      router.push(`/projects/${category}/${projectSlug}`)
+    setTimeout(async () => {
+      animationService.setPageTransition(false)
+      await navigationService.navigateTo(`/projects/${category}/${projectSlug}`)
     }, 600)
   }
 

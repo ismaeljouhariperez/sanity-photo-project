@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface AnimationState {
+export interface AnimationState {
   hasPlayedHeaderAnimation: boolean
   isInProjectsSection: boolean
   isLeavingPage: boolean
