@@ -1,10 +1,27 @@
 import {StructureBuilder} from 'sanity/structure'
-import {MdPhotoLibrary, MdPhoto, MdCollections, MdInvertColors, MdColorLens} from 'react-icons/md'
+import {
+  MdPhotoLibrary,
+  MdPhoto,
+  MdCollections,
+  MdInvertColors,
+  MdColorLens,
+  MdSettings,
+} from 'react-icons/md'
+
+// Liste des types de documents que nous voulons cacher dans la liste par défaut
+const hiddenDocTypes = (listItem: any) => !['siteSettings'].includes(listItem.getId())
 
 export const structure = (S: StructureBuilder) =>
   S.list()
     .title('Contenu')
     .items([
+      S.listItem()
+        .title('Paramètres du site')
+        .icon(MdSettings)
+        .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+
+      S.divider(),
+
       S.listItem()
         .title('Collections')
         .icon(MdCollections)
@@ -26,7 +43,7 @@ export const structure = (S: StructureBuilder) =>
                   S.documentList()
                     .title('Projets Noir et Blanc')
                     .filter('_type == "project" && category == "black-and-white"')
-                    .sortBy([{field: 'order', direction: 'asc'}]),
+                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
                 ),
               S.listItem()
                 .title('Couleur')
@@ -35,28 +52,20 @@ export const structure = (S: StructureBuilder) =>
                   S.documentList()
                     .title('Projets Couleur')
                     .filter('_type == "project" && category == "early-color"')
-                    .sortBy([{field: 'order', direction: 'asc'}]),
+                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
                 ),
               S.divider(),
               S.listItem()
                 .title('Tous les projets')
                 .icon(MdPhotoLibrary)
-                .child(
-                  S.documentTypeList('project')
-                    .title('Tous les projets')
-                    .sortBy([{field: 'order', direction: 'asc'}]),
-                ),
+                .child(S.documentTypeList('project').title('Tous les projets')),
             ]),
         ),
 
       S.listItem()
         .title('Photos')
         .icon(MdPhoto)
-        .child(
-          S.documentTypeList('photo')
-            .title('Toutes les photos')
-            .sortBy([{field: 'title', direction: 'asc'}]),
-        ),
+        .child(S.documentTypeList('photo').title('Toutes les photos')),
 
       // Ajouter d'autres types de documents ici si nécessaire
     ])

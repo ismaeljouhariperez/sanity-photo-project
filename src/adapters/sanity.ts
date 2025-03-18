@@ -1,13 +1,25 @@
 import { createClient } from 'next-sanity'
+import imageUrlBuilder from '@sanity/image-url'
+import {
+  Collection,
+  Photo,
+  Project,
+  SanityImage,
+  SiteSettings,
+} from '@/lib/sanity.types'
 
 export interface ISanityService {
-  fetchProjects(category?: string): Promise<any[]>
-  fetchProjectBySlug(slug: string, category: string): Promise<any>
-  fetchPhotos(projectId: string): Promise<any[]>
+  fetchProjects(category?: string): Promise<Project[]>
+  fetchProjectBySlug(slug: string, category: string): Promise<Project>
+  fetchPhotos(projectId: string): Promise<Photo[]>
+  fetchSiteSettings(): Promise<SiteSettings>
+  fetchCollections(active?: boolean): Promise<Collection[]>
+  urlFor(source: SanityImage): any
 }
 
 export class SanityAdapter implements ISanityService {
   private client
+  private builder
 
   constructor() {
     this.client = createClient({
@@ -16,34 +28,56 @@ export class SanityAdapter implements ISanityService {
       apiVersion: '2023-05-03',
       useCdn: process.env.NODE_ENV === 'production',
     })
+
+    this.builder = imageUrlBuilder(this.client)
   }
 
-  async fetchProjects(category?: string): Promise<any[]> {
+  urlFor(source: SanityImage) {
+    return this.builder.image(source)
+  }
+
+  async fetchProjects(category?: string): Promise<Project[]> {
     const query = `*[_type == "project"${
       category ? ` && category == "${category}"` : ''
     }] | order(order asc) {
       _id,
+      _type,
+      _createdAt,
+      _updatedAt,
       title,
-      slug,
+      "slug": slug.current,
       description,
       category,
-      "coverImage": coverImage.asset->url
+      "coverImage": coverImage,
+      order
     }`
 
     return this.client.fetch(query)
   }
 
-  async fetchProjectBySlug(slug: string, category: string): Promise<any> {
+  async fetchProjectBySlug(slug: string, category: string): Promise<Project> {
     const query = `*[_type == "project" && slug.current == $slug && category == $category][0] {
       _id,
+      _type,
+      _createdAt,
+      _updatedAt,
       title,
       slug,
       description,
       category,
-      "coverImage": coverImage.asset->url,
+      coverImage,
+      order,
       "photos": photos[]->{ 
         _id, 
+        _type,
+        _createdAt,
+        _updatedAt,
         title, 
+        image,
+        alt,
+        description,
+        order,
+        tags,
         "url": image.asset->url,
         "dimensions": image.asset->metadata.dimensions
       }
@@ -52,11 +86,19 @@ export class SanityAdapter implements ISanityService {
     return this.client.fetch(query, { slug, category })
   }
 
-  async fetchPhotos(projectId: string): Promise<any[]> {
+  async fetchPhotos(projectId: string): Promise<Photo[]> {
     const query = `*[_type == "project" && _id == $projectId][0] {
       "photos": photos[]->{ 
         _id, 
+        _type,
+        _createdAt,
+        _updatedAt,
         title, 
+        image,
+        alt,
+        description,
+        order,
+        tags,
         "url": image.asset->url,
         "dimensions": image.asset->metadata.dimensions
       }
@@ -65,5 +107,38 @@ export class SanityAdapter implements ISanityService {
     return this.client
       .fetch(query, { projectId })
       .then((result) => result?.photos || [])
+  }
+
+  async fetchSiteSettings(): Promise<SiteSettings> {
+    const query = `*[_type == "siteSettings"][0]`
+    return this.client.fetch(query)
+  }
+
+  async fetchCollections(active?: boolean): Promise<Collection[]> {
+    const query = `*[_type == "collection"${
+      active ? ' && active == true' : ''
+    }] | order(order asc) {
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      title,
+      slug,
+      description,
+      coverImage,
+      order,
+      active,
+      "projects": projects[]->{ 
+        _id, 
+        _type,
+        title,
+        slug,
+        category,
+        coverImage,
+        order
+      }
+    }`
+
+    return this.client.fetch(query)
   }
 }
