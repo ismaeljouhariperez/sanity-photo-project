@@ -1,5 +1,6 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
 import {
   Collection,
   Photo,
@@ -14,7 +15,9 @@ export interface ISanityService {
   fetchPhotos(projectId: string): Promise<Photo[]>
   fetchSiteSettings(): Promise<SiteSettings>
   fetchCollections(active?: boolean): Promise<Collection[]>
-  urlFor(source: SanityImage): any
+  urlFor(
+    source: SanityImage
+  ): ReturnType<typeof imageUrlBuilder.prototype.image>
 }
 
 export class SanityAdapter implements ISanityService {
@@ -33,7 +36,7 @@ export class SanityAdapter implements ISanityService {
   }
 
   urlFor(source: SanityImage) {
-    return this.builder.image(source)
+    return this.builder.image(source as SanityImageSource)
   }
 
   async fetchProjects(category?: string): Promise<Project[]> {
@@ -106,7 +109,7 @@ export class SanityAdapter implements ISanityService {
 
     return this.client
       .fetch(query, { projectId })
-      .then((result) => result?.photos || [])
+      .then((result: { photos?: Photo[] }) => result?.photos || [])
   }
 
   async fetchSiteSettings(): Promise<SiteSettings> {

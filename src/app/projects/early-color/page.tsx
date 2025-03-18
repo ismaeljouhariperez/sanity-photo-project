@@ -1,20 +1,20 @@
 'use client'
 import React from 'react'
-import ProjectsTemplate from '@/app/components/ProjectsTemplate'
+import ProjectsList from '@/app/components/ProjectsList'
+import { Metadata } from 'next'
 
-const projects = [
-  'Les jardins',
-  'Méditerranée',
-  'Rouge vif',
-  'Les serres',
-  'Printemps',
-  'La ville dorée',
-  'Fleurs sauvages',
-  "L'aube",
-  'Rivages',
-  'Le marché',
-]
+export const metadata: Metadata = {
+  title: 'Projets Couleur | Photography Portfolio',
+  description: 'Découvrez ma collection de projets photographiques en couleur.',
+}
 
-export default function ColorProjects() {
-  return <ProjectsTemplate projects={projects} category="early-color" />
+export default function ColorProjectsPage() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between">
+      <div className="w-full max-w-7xl mx-auto py-12">
+        <h1 className="text-4xl font-bold mb-8 px-8">Projets Couleur</h1>
+        <ProjectsList category="early-color" />
+      </div>
+    </main>
+  )
 }

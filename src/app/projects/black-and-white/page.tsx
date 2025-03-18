@@ -1,20 +1,20 @@
-'use client'
 import React from 'react'
-import ProjectsTemplate from '@/app/components/ProjectsTemplate'
+import ProjectsList from '@/app/components/ProjectsList'
+import { Metadata } from 'next'
 
-const projects = [
-  "L'herbe des nuits",
-  'New York',
-  'La grande plage',
-  'Les toits',
-  'Brumes',
-  'Solitude',
-  'Les falaises',
-  "Portraits d'hiver",
-  'Le port',
-  'Nuit blanche',
-]
+export const metadata: Metadata = {
+  title: 'Projets Noir et Blanc | Photography Portfolio',
+  description:
+    'Découvrez ma collection de projets photographiques en noir et blanc.',
+}
 
-export default function BWProjects() {
-  return <ProjectsTemplate projects={projects} category="black-and-white" />
+export default function BlackAndWhiteProjectsPage() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between">
+      <div className="w-full max-w-7xl mx-auto py-12">
+        <h1 className="text-4xl font-bold mb-8 px-8">Projets Noir et Blanc</h1>
+        <ProjectsList category="black-and-white" />
+      </div>
+    </main>
+  )
 }
