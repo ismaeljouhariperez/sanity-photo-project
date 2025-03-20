@@ -1,6 +1,5 @@
 'use client'
-import { useEffect } from 'react'
-import barba from '@barba/core'
+import { useEffect, useState } from 'react'
 import gsap from 'gsap'
 import { useAnimationStore } from '@/store/animationStore'
 
@@ -10,6 +9,7 @@ interface PreventElement extends Element {
 
 export default function PageTransition() {
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
+  const [barba, setBarba] = useState<any>(null)
 
   // Initialize state based on current URL
   useEffect(() => {
@@ -17,7 +17,24 @@ export default function PageTransition() {
     setInProjectsSection(isInProjects)
   }, [setInProjectsSection])
 
+  // Dynamically import barba.js only on the client
   useEffect(() => {
+    const loadBarba = async () => {
+      try {
+        const barbaModule = await import('@barba/core')
+        setBarba(barbaModule.default)
+      } catch (error) {
+        console.error('Failed to load barba.js:', error)
+      }
+    }
+
+    loadBarba()
+  }, [])
+
+  // Initialize barba after it's loaded
+  useEffect(() => {
+    if (!barba) return
+
     barba.init({
       // @ts-expect-error - Barba types are incomplete
       prevent: ({ el }: { el: PreventElement }) => {
@@ -91,7 +108,7 @@ export default function PageTransition() {
         },
       ],
     })
-  }, [resetHeaderAnimation, setInProjectsSection])
+  }, [barba, resetHeaderAnimation, setInProjectsSection])
 
   return null
 }
