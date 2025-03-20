@@ -1,9 +1,10 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import InfoOverlay from '../InfoOverlay'
 import { SlideUp } from '@/lib/animations'
 import { useAnimationStore } from '@/store/animationStore'
+import { BarbaContext } from '@/app/layout'
 import s from './styles.module.scss'
 
 export default function Header() {
@@ -12,6 +13,8 @@ export default function Header() {
   const router = useRouter()
   const { resetHeaderAnimation, setInProjectsSection, setLeavingPage } =
     useAnimationStore()
+  // Utiliser le contexte Barba pour désactiver les transitions pendant la navigation
+  const { disableBarba } = useContext(BarbaContext)
 
   const handleAboutClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -37,6 +40,10 @@ export default function Header() {
 
     // Si nous sommes dans la section projects, jouer l'animation de sortie avant de naviguer
     if (pathname.includes('/projects')) {
+      // Désactiver barba pendant la navigation pour éviter les requêtes inutiles
+      disableBarba()
+      console.log('⚠️ Barba.js désactivé pour navigation vers accueil')
+
       // Activer l'état de sortie de page
       setLeavingPage(true)
 
@@ -44,7 +51,10 @@ export default function Header() {
       setTimeout(() => {
         resetHeaderAnimation()
         setLeavingPage(false)
-        router.push('/')
+
+        // Forcer une navigation "dure" en changeant directement la location
+        // Cette approche contourne Barba.js complètement
+        window.location.href = '/'
       }, 600) // Délai légèrement supérieur à la durée de l'animation (0.5s)
     } else {
       // Navigation directe si nous ne sommes pas dans projects

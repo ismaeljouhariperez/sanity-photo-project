@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import { useAnimationStore } from '@/store/animationStore'
 
@@ -7,9 +7,36 @@ interface PreventElement extends Element {
   href?: string
 }
 
-export default function PageTransition() {
+interface BarbaData {
+  current: {
+    container: HTMLElement
+    url: {
+      path?: string
+    }
+  }
+  next: {
+    container: HTMLElement
+    url: {
+      path?: string
+    }
+  }
+}
+
+interface PageTransitionProps {
+  isEnabled?: boolean
+}
+
+export default function PageTransition({
+  isEnabled = true,
+}: PageTransitionProps) {
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
   const [barba, setBarba] = useState<any>(null)
+
+  // Traquer si on est déjà en train de naviguer pour éviter les actions multiples
+  const [isNavigating, setIsNavigating] = useState(false)
+
+  // useRef pour éviter les problèmes liés aux fermetures (closures)
+  const isNavigatingRef = useRef(false)
 
   // Initialize state based on current URL
   useEffect(() => {
@@ -28,28 +55,74 @@ export default function PageTransition() {
       }
     }
 
-    loadBarba()
-  }, [])
+    if (isEnabled) {
+      loadBarba()
+    }
+  }, [isEnabled])
 
   // Initialize barba after it's loaded
   useEffect(() => {
-    if (!barba) return
+    // Si barba n'est pas chargé ou est désactivé, ne pas initialiser
+    if (!barba || !isEnabled) {
+      console.log('Barba.js est', !barba ? 'non chargé' : 'désactivé')
+      return
+    }
+
+    console.log('Initialisation de Barba.js')
+
+    // Réinitialiser l'état de navigation au début
+    setIsNavigating(false)
+    isNavigatingRef.current = false
 
     barba.init({
-      // @ts-expect-error - Barba types are incomplete
       prevent: ({ el }: { el: PreventElement }) => {
-        // Prevent Barba from handling links with apostrophes
+        // Vérifier si une navigation est déjà en cours
+        if (isNavigatingRef.current) {
+          console.log(
+            '⚠️ Navigation déjà en cours - prévention de transition supplémentaire'
+          )
+          return true
+        }
+
+        // Prevent Barba from handling links with apostrophes or project links
         const href = el.href || ''
-        return href.includes("'")
+        const preventForApostrophe = href.includes("'")
+
+        // Désactiver Barba pour les pages de projet
+        const isProjectDetailPage =
+          href.includes('/projects/') &&
+          (href.includes('/black-and-white/') || href.includes('/early-color/'))
+
+        // Désactiver Barba pour les navigations vers la page d'accueil
+        const isHomePage = href.endsWith('/') && !href.includes('/projects/')
+
+        if (isProjectDetailPage) {
+          console.log(
+            'Barba.js est désactivé pour cette navigation vers projet:',
+            href
+          )
+        }
+
+        if (isHomePage) {
+          console.log(
+            'Barba.js est désactivé pour cette navigation vers accueil'
+          )
+        }
+
+        return preventForApostrophe || isProjectDetailPage || isHomePage
       },
       transitions: [
         {
           name: 'default-transition',
-          async: function () {
+          async: function (): Promise<() => void> {
             return this.async()
           },
-          async leave(data) {
+          async leave(data: BarbaData) {
             const done = this.async()
+
+            // Marquer que nous sommes en train de naviguer
+            setIsNavigating(true)
+
             const isLeavingProjects =
               data.current.url.path?.includes('/projects')
             const isGoingToProjects = data.next.url.path?.includes('/projects')
@@ -57,16 +130,18 @@ export default function PageTransition() {
             console.log('--- LEAVE ---')
             console.log('Current URL:', data.current.url.path)
             console.log('Next URL:', data.next.url.path)
-            console.log('isLeavingProjects:', isLeavingProjects)
-            console.log('isGoingToProjects:', isGoingToProjects)
 
             if (isLeavingProjects && !isGoingToProjects) {
               console.log('⚠️ Réinitialisation des animations')
-              await gsap.to(data.current.container.querySelector('.title'), {
-                opacity: 0,
-                y: -50,
-                duration: 0.5,
-              })
+              const titleElement =
+                data.current.container.querySelector('.title')
+              if (titleElement) {
+                await gsap.to(titleElement, {
+                  opacity: 0,
+                  y: -50,
+                  duration: 0.5,
+                })
+              }
               resetHeaderAnimation()
               setInProjectsSection(false)
             }
@@ -78,7 +153,7 @@ export default function PageTransition() {
               onComplete: done,
             })
           },
-          async enter(data) {
+          async enter(data: BarbaData) {
             const done = this.async()
             const isEnteringProjects = data.next.url.path?.includes('/projects')
 
@@ -101,14 +176,31 @@ export default function PageTransition() {
                 opacity: 1,
                 y: 0,
                 duration: 0.8,
-                onComplete: done,
+                onComplete: () => {
+                  // Marquer que la navigation est terminée
+                  setIsNavigating(false)
+                  done()
+                },
               }
             )
           },
         },
       ],
     })
-  }, [barba, resetHeaderAnimation, setInProjectsSection])
+
+    return () => {
+      if (barba && barba.destroy) {
+        console.log('Destruction de Barba.js')
+        barba.destroy()
+      }
+    }
+  }, [
+    barba,
+    resetHeaderAnimation,
+    setInProjectsSection,
+    isEnabled,
+    isNavigating,
+  ])
 
   return null
 }

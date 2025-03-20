@@ -9,6 +9,9 @@ import {
   SiteSettings,
 } from '@/lib/sanity.types'
 
+// Définir la constante localement pour éviter les dépendances circulaires
+export const SANITY_CACHE_CLEAR_EVENT = 'clear-sanity-cache'
+
 export interface ISanityService {
   fetchProjects(category?: string): Promise<Project[]>
   fetchProjectBySlug(slug: string, category: string): Promise<Project>
@@ -22,6 +25,44 @@ export interface ISanityService {
 
 // Cache des requêtes pour éviter des appels répétés à l'API
 const cache = new Map()
+// Tracker les requêtes en cours
+const pendingRequests = new Map()
+// Tracker si l'écouteur d'événement a déjà été ajouté
+let eventListenerAdded = false
+
+// Si on est dans un environnement client (navigateur)
+if (typeof window !== 'undefined' && !eventListenerAdded) {
+  // Écouter l'événement de nettoyage de cache au changement de route
+  window.addEventListener(SANITY_CACHE_CLEAR_EVENT, () => {
+    console.log(
+      '🧹 Nettoyage du cache Sanity - Requêtes pendantes:',
+      pendingRequests.size,
+      'Entrées en cache:',
+      cache.size
+    )
+
+    // Ne vider que les requêtes liées aux projets pour garder les settings et autres
+    const keysToRemove: string[] = []
+
+    cache.forEach((_, key) => {
+      if (
+        key.includes('project') ||
+        key.includes('black-and-white') ||
+        key.includes('early-color')
+      ) {
+        keysToRemove.push(key)
+      }
+    })
+
+    // Supprimer les entrées de cache liées aux projets
+    keysToRemove.forEach((key) => cache.delete(key))
+
+    console.log('✅ Cache nettoyé - Entrées restantes:', cache.size)
+  })
+
+  // Marquer que l'écouteur a été ajouté
+  eventListenerAdded = true
+}
 
 export class SanityAdapter implements ISanityService {
   private client
@@ -44,25 +85,52 @@ export class SanityAdapter implements ISanityService {
     return this.builder.image(source as SanityImageSource)
   }
 
-  async fetchWithCache(query: string, params?: any): Promise<any> {
+  async fetchWithCache<T>(query: string, params?: any): Promise<T> {
     const cacheKey = JSON.stringify({ query, params })
 
+    // Si la requête est déjà dans le cache, retourner le résultat mis en cache
     if (cache.has(cacheKey)) {
+      console.log('🔵 Résultat récupéré du cache')
       return cache.get(cacheKey)
     }
 
-    try {
-      const result = await this.client.fetch(query, params)
-      cache.set(cacheKey, result)
-      return result
-    } catch (error) {
-      console.error('Sanity fetch error:', error)
-      throw error
+    // Si la même requête est déjà en cours, attendre son résultat au lieu d'en créer une nouvelle
+    if (pendingRequests.has(cacheKey)) {
+      console.log('🟡 Requête déjà en cours, attente du résultat...')
+      return pendingRequests.get(cacheKey)
     }
+
+    // Créer une nouvelle promesse pour cette requête
+    const requestPromise = (async () => {
+      try {
+        console.log('🟢 Nouvelle requête Sanity')
+        const result = await this.client.fetch<T>(query, params)
+
+        // Stocker le résultat dans le cache
+        cache.set(cacheKey, result)
+
+        // La requête est terminée, la supprimer des requêtes en cours
+        pendingRequests.delete(cacheKey)
+
+        return result
+      } catch (error) {
+        // En cas d'erreur, supprimer également la requête des requêtes en cours
+        pendingRequests.delete(cacheKey)
+        console.error('Sanity fetch error:', error)
+        throw error
+      }
+    })()
+
+    // Enregistrer cette promesse comme requête en cours
+    pendingRequests.set(cacheKey, requestPromise)
+
+    return requestPromise
   }
 
   async fetchProjects(category?: string): Promise<Project[]> {
-    console.log('Fetching projects for category:', category)
+    const fetchId = Math.floor(Math.random() * 10000)
+    console.log(`Fetching projects for category: ${category} [ID:${fetchId}]`)
+
     const query = `*[_type == "project"${
       category ? ` && category == "${category}"` : ''
     }] | order(order asc) {
@@ -78,7 +146,21 @@ export class SanityAdapter implements ISanityService {
       order
     }`
 
-    return this.fetchWithCache(query)
+    try {
+      const result = await this.fetchWithCache<Project[]>(query)
+      console.log(
+        `Fetch complete for category: ${category} [ID:${fetchId}] - Results: ${
+          result?.length || 0
+        }`
+      )
+      return result
+    } catch (error) {
+      console.error(
+        `Fetch failed for category: ${category} [ID:${fetchId}]`,
+        error
+      )
+      throw error
+    }
   }
 
   async fetchProjectBySlug(slug: string, category: string): Promise<Project> {
@@ -130,7 +212,9 @@ export class SanityAdapter implements ISanityService {
       }
     }`
 
-    const result = await this.fetchWithCache(query, { projectId })
+    const result = await this.fetchWithCache<{ photos?: Photo[] }>(query, {
+      projectId,
+    })
     return result?.photos || []
   }
 
