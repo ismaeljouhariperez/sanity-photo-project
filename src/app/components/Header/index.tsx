@@ -53,9 +53,9 @@ export default function Header() {
 
   // Variants pour l'animation de l'Index
   const indexVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    exit: { opacity: 0, y: -50, transition: { duration: 0.3 } },
+    hidden: { y: -20 },
+    visible: { y: 0, transition: { duration: 0.5 } },
+    exit: { y: -20, transition: { duration: 0.3 } },
   }
 
   return (
@@ -66,14 +66,16 @@ export default function Header() {
           <button onClick={handleAboutClick}>About</button>
           {isProjectPage && (
             <motion.div
+              className="overflow-hidden h-[24px] flex items-center"
               initial="hidden"
               animate="visible"
               exit="exit"
-              variants={indexVariants}
             >
-              <button onClick={handleIndexClick} className={s.title}>
-                Index
-              </button>
+              <motion.div variants={indexVariants}>
+                <button onClick={handleIndexClick} className={s.title}>
+                  Index
+                </button>
+              </motion.div>
             </motion.div>
           )}
           <button onClick={handleHomeClick} className="text-xl">
