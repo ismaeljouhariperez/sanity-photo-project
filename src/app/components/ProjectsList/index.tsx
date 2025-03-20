@@ -7,10 +7,6 @@ import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import PageTransition from '@/components/transitions/PageTransition'
 
-// Map global pour suivre l'état des catégories avec ou sans projets
-// Cette approche permet de conserver l'information entre les rendus
-const categoriesWithoutProjects = new Map<string, boolean>()
-
 interface ProjectsListProps {
   category: 'black-and-white' | 'early-color'
 }
@@ -21,141 +17,62 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const fetchInProgress = useRef(false)
   const mounted = useRef(true)
-  const hasRunInitialFetch = useRef(false)
+  const initialFetchDone = useRef(false)
 
-  useEffect(() => {
-    console.log(`📡 ProjectsList monté - category: ${category}`)
-
-    // Réinitialiser le ref à true au montage
-    mounted.current = true
-
-    // Créer un controller pour pouvoir annuler la requête
-    const controller = new AbortController()
-
-    // Vérifier si nous savons déjà que cette catégorie n'a pas de projets
-    const isEmptyCategory = categoriesWithoutProjects.get(category) || false
-
-    async function fetchProjects() {
-      // Si on sait déjà que cette catégorie n'a pas de projets et que ce n'est pas le premier chargement,
-      // on évite de refaire le fetch
-      if (isEmptyCategory && hasRunInitialFetch.current) {
-        console.log(`⏭️ Catégorie ${category} connue comme vide, skip fetch`)
-        setLoading(false)
-        setProjects([])
-        return
-      }
-
-      // Éviter de déclencher plusieurs requêtes simultanées
-      if (fetchInProgress.current) {
-        console.log(`⏸️ Fetch déjà en cours pour ${category} - ignoré`)
-        return
-      }
-
-      fetchInProgress.current = true
-      hasRunInitialFetch.current = true
-      console.log(`🔄 Début du fetch des projets - category: ${category}`)
-
-      try {
-        setLoading(true)
-        setError(null)
-
-        const data = await sanity.fetchProjects(category)
-
-        if (mounted.current) {
-          const projectCount = data?.length || 0
-          console.log(
-            `✅ Projets récupérés - category: ${category} - count:`,
-            projectCount
-          )
-
-          // Si aucun projet trouvé, marquer cette catégorie comme vide pour éviter des refetch inutiles
-          if (projectCount === 0) {
-            console.log(
-              `📝 Marquage de la catégorie ${category} comme vide (${projectCount} projets)`
-            )
-            categoriesWithoutProjects.set(category, true)
-
-            // Enregistrer dans le localStorage pour persister entre les sessions
-            try {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem(`category-empty-${category}`, 'true')
-              }
-            } catch (e) {
-              console.warn('Impossible de sauvegarder dans localStorage:', e)
-            }
-          } else {
-            categoriesWithoutProjects.set(category, false)
-            // Supprimer du localStorage si des projets existent maintenant
-            try {
-              if (typeof window !== 'undefined') {
-                localStorage.removeItem(`category-empty-${category}`)
-              }
-            } catch (e) {
-              console.warn('Impossible de modifier localStorage:', e)
-            }
-          }
-
-          setProjects(data || [])
-        } else {
-          console.log(
-            `⚠️ Composant démonté avant fin du fetch - category: ${category}`
-          )
-        }
-      } catch (err) {
-        if (mounted.current) {
-          console.error(`❌ Erreur fetch - category: ${category}:`, err)
-          setError(
-            'Erreur lors de la récupération des projets. Veuillez réessayer.'
-          )
-        }
-      } finally {
-        if (mounted.current) {
-          console.log(`🏁 Fin du fetch - category: ${category}`)
-          setLoading(false)
-        }
-        fetchInProgress.current = false
-      }
-    }
-
-    // Charger les informations du localStorage au montage
-    if (typeof window !== 'undefined' && !hasRunInitialFetch.current) {
-      try {
-        const savedEmpty = localStorage.getItem(`category-empty-${category}`)
-        if (savedEmpty === 'true') {
-          console.log(
-            `🗂️ Catégorie ${category} restaurée comme vide depuis localStorage`
-          )
-          categoriesWithoutProjects.set(category, true)
-        }
-      } catch (e) {
-        console.warn('Impossible de lire localStorage:', e)
-      }
-    }
-
-    // Démarrer le fetch seulement si le composant est monté
-    if (mounted.current) {
-      fetchProjects()
-    }
-
-    // Nettoyage lors du démontage
-    return () => {
-      console.log(`🗑️ ProjectsList démonté - category: ${category}`)
-      mounted.current = false
-      controller.abort()
-
-      // Force reset de l'état du fetch
-      fetchInProgress.current = false
-    }
-  }, [category, sanity]) // Suppression de isEmptyCategory des dépendances
-
+  // Gestionnaire d'événements pour la navigation
   const handleProjectClick = (e: React.MouseEvent, projectSlug: string) => {
     e.preventDefault()
     navigateTo(`/projects/${category}/${projectSlug}`)
   }
 
-  // Variants pour l'animation des projets
+  // Fetch des données - utilise une approche simplifiée
+  useEffect(() => {
+    console.log(`🔄 Initialisation de l'effet pour la catégorie: ${category}`)
+
+    // Initialiser les refs
+    mounted.current = true
+    const controller = new AbortController()
+
+    // Simple fonction pour récupérer les projets
+    async function getProjects() {
+      if (!mounted.current || initialFetchDone.current) return
+
+      try {
+        console.log(`🚀 Début du fetch - category: ${category}`)
+        setLoading(true)
+        setError(null)
+
+        const data = await sanity.fetchProjects(category)
+
+        // Uniquement mettre à jour l'état si le composant est toujours monté
+        if (mounted.current) {
+          console.log(`✅ Projets récupérés - count: ${data?.length || 0}`)
+          setProjects(data || [])
+          setLoading(false)
+          initialFetchDone.current = true
+        }
+      } catch (err) {
+        if (mounted.current) {
+          console.error(`❌ Erreur fetch:`, err)
+          setError('Une erreur est survenue lors du chargement des projets.')
+          setLoading(false)
+        }
+      }
+    }
+
+    // Lancer la récupération des données
+    getProjects()
+
+    // Nettoyage lors du démontage
+    return () => {
+      console.log(`🧹 Nettoyage pour la catégorie: ${category}`)
+      mounted.current = false
+      controller.abort()
+    }
+  }, [category, sanity]) // Uniquement ces deux dépendances
+
+  // Variants pour l'animation
   const containerVariants = {
     initial: { opacity: 0 },
     animate: {
@@ -174,27 +91,50 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   }
 
   const itemVariants = {
-    initial: { opacity: 0, y: 50 },
+    initial: { opacity: 0 },
     animate: {
       opacity: 1,
-      y: 0,
       transition: {
         duration: 0.5,
       },
     },
     exit: {
       opacity: 0,
-      y: -20,
       transition: {
         duration: 0.3,
       },
     },
   }
 
+  const textVariants = {
+    initial: { y: '100%' },
+    animate: {
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+    exit: {
+      y: '-100%',
+      transition: {
+        duration: 0.6,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  }
+
+  // Rendu conditionnel
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
-        Chargement...
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          Chargement...
+        </motion.div>
       </div>
     )
   }
@@ -215,6 +155,7 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     )
   }
 
+  // Rendu principal avec animations
   return (
     <PageTransition>
       <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
@@ -235,9 +176,14 @@ export default function ProjectsList({ category }: ProjectsListProps) {
                   project.slug.current || String(project.slug)
                 )
               }
-              className="text-6xl hover:text-gray-500 transition-colors duration-300 font-wide cursor-pointer"
+              className="text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer"
             >
-              {project.title}
+              <motion.div
+                className="transition-all duration-300"
+                variants={textVariants}
+              >
+                {project.title}
+              </motion.div>
             </motion.div>
           ))}
         </motion.nav>
