@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import InfoOverlay from '../InfoOverlay'
-import AnimatedElement, { AnimationType } from '../AnimatedElement'
+import { SlideUp } from '@/lib/animations'
 import { useAnimationStore } from '@/store/animationStore'
 import s from './styles.module.scss'
 
@@ -72,24 +72,18 @@ export default function Header() {
         <nav className={s.nav}>
           <button onClick={handleAboutClick}>About</button>
           {isProjectPage && (
-            <AnimatedElement
+            <SlideUp
               isHeader
-              type={AnimationType.SLIDE_UP}
               playExitAnimation={true}
               entrancePatterns={['/projects']}
               exitPatterns={['/projects']}
               playOnceOnly={true}
-              customParams={{
-                fromY: -50,
-                toY: 0,
-                duration: 0.8,
-                ease: 'power3.out',
-              }}
+              distance={50}
             >
               <button onClick={handleIndexClick} className={s.title}>
                 Index
               </button>
-            </AnimatedElement>
+            </SlideUp>
           )}
           <button onClick={handleHomeClick} className="text-xl">
             Ismael Ahab

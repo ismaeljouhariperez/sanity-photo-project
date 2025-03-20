@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useServices } from '@/hooks/useServices'
 import { Project } from '@/lib/sanity.types'
-import AnimatedElement, { AnimationType } from '../AnimatedElement'
+import { SlideUp } from '@/lib/animations'
 
 interface ProjectsListProps {
   category: 'black-and-white' | 'early-color'
@@ -78,20 +78,14 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
       <nav className="flex flex-wrap gap-8 justify-end">
         {projects.map((project, index) => (
-          <AnimatedElement
+          <SlideUp
             key={project._id}
             delay={index * 0.1}
-            type={AnimationType.SLIDE_UP}
             playExitAnimation={true}
             entrancePatterns={['/projects']}
             exitPatterns={['/projects']}
             playOnceOnly={false}
-            customParams={{
-              fromY: -50,
-              toY: 0,
-              duration: 0.8,
-              ease: 'power3.out',
-            }}
+            distance={50}
           >
             <div
               onClick={(e) =>
@@ -104,7 +98,7 @@ export default function ProjectsList({ category }: ProjectsListProps) {
             >
               {project.title}
             </div>
-          </AnimatedElement>
+          </SlideUp>
         ))}
       </nav>
     </div>
