@@ -1,0 +1,49 @@
+# Fichiers liés à Barba.js et GSAP qui ont été supprimés lors de la migration à Framer Motion
+
+## Fichiers supprimés ✅
+- src/lib/animations/ (répertoire complet)
+- src/hooks/useSafeNavigation.ts
+- src/hooks/useAnimation.ts
+- src/adapters/animation.ts
+- Classe SafeNavigationAdapter dans src/hooks/useServices.ts
+- Références à l'adaptateur d'animation dans src/adapters/index.ts
+- src/example/AnimationExample.tsx
+- GSAP dans InfoOverlay
+- GSAP dans ThemeToggle
+- src/types/barba.d.ts
+
+## Styles CSS nettoyés ✅
+- Suppression des styles Barba.js dans src/app/globals.css
+
+## Composants mis à jour ✅
+- src/app/projects/black-and-white/[slug]/page.tsx
+- src/app/projects/early-color/[slug]/page.tsx
+- src/app/components/ProjectsTemplate/index.tsx
+
+## Adaptateurs nettoyés ✅
+- ZustandAnimationAdapter supprimé de l'index
+
+## Paquets npm désinstallés ✅
+```
+yarn remove @barba/core gsap @gsap/react
+```
+
+## Contextes nettoyés ✅
+- BarbaContext remplacé par AnimationProvider dans src/app/layout.tsx
+
+## Résumé de la migration
+1. Migration des animations de GSAP à Framer Motion ✅
+2. Suppression des dépendances sur Barba.js et GSAP ✅
+3. Nettoyage des fichiers et adaptateurs liés aux anciennes bibliothèques ✅
+4. Mise à jour des composants pour utiliser Framer Motion ✅
+5. Implémentation d'une transition de page plus simple et plus fluide avec Framer Motion ✅
+6. Mise à jour du composant InfoOverlay pour utiliser Framer Motion ✅
+7. Mise à jour du composant ThemeToggle pour utiliser Framer Motion ✅
+8. Mise à jour des pages de projet individuelles pour utiliser Framer Motion ✅
+
+## Nouveaux composants créés
+- src/components/transitions/PageTransition.tsx
+- src/components/transitions/SlideUp.tsx
+
+## Migration terminée
+La migration de GSAP et Barba.js vers Framer Motion est maintenant terminée. Le code est plus propre, plus facile à maintenir et offre une meilleure expérience utilisateur. 

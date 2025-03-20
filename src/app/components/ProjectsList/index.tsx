@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { useServices } from '@/hooks/useServices'
 import { Project } from '@/lib/sanity.types'
-import { SlideUp } from '@/lib/animations'
-import { useSafeNavigation } from '@/hooks/useSafeNavigation'
+import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
+import PageTransition from '@/components/transitions/PageTransition'
 
 // Map global pour suivre l'état des catégories avec ou sans projets
 // Cette approche permet de conserver l'information entre les rendus
@@ -15,17 +16,14 @@ interface ProjectsListProps {
 }
 
 export default function ProjectsList({ category }: ProjectsListProps) {
-  const { sanity, animation } = useServices()
-  const { navigateSafely } = useSafeNavigation()
+  const { sanity } = useServices()
+  const { navigateTo } = useTransitionNavigation()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const fetchInProgress = useRef(false)
   const mounted = useRef(true)
   const hasRunInitialFetch = useRef(false)
-
-  // Vérifier si nous savons déjà que cette catégorie n'a pas de projets
-  const isEmptyCategory = categoriesWithoutProjects.get(category) || false
 
   useEffect(() => {
     console.log(`📡 ProjectsList monté - category: ${category}`)
@@ -35,6 +33,9 @@ export default function ProjectsList({ category }: ProjectsListProps) {
 
     // Créer un controller pour pouvoir annuler la requête
     const controller = new AbortController()
+
+    // Vérifier si nous savons déjà que cette catégorie n'a pas de projets
+    const isEmptyCategory = categoriesWithoutProjects.get(category) || false
 
     async function fetchProjects() {
       // Si on sait déjà que cette catégorie n'a pas de projets et que ce n'est pas le premier chargement,
@@ -147,20 +148,47 @@ export default function ProjectsList({ category }: ProjectsListProps) {
       // Force reset de l'état du fetch
       fetchInProgress.current = false
     }
-  }, [category, sanity, isEmptyCategory])
+  }, [category, sanity]) // Suppression de isEmptyCategory des dépendances
 
   const handleProjectClick = (e: React.MouseEvent, projectSlug: string) => {
     e.preventDefault()
+    navigateTo(`/projects/${category}/${projectSlug}`)
+  }
 
-    // Utilisation des adapters pour l'animation et la navigation
-    animation.setPageTransition(true)
+  // Variants pour l'animation des projets
+  const containerVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+      },
+    },
+  }
 
-    setTimeout(() => {
-      animation.setPageTransition(false)
-      // Utiliser la navigation sécurisée vers le projet, sans contourner Barba.js
-      // car nous voulons les animations de transition pour cette navigation
-      navigateSafely(`/projects/${category}/${projectSlug}`, false)
-    }, 600)
+  const itemVariants = {
+    initial: { opacity: 0, y: 50 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+      },
+    },
   }
 
   if (loading) {
@@ -188,19 +216,19 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   }
 
   return (
-    <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
-      <nav className="flex flex-wrap gap-8 justify-end">
-        {projects.map((project, index) => (
-          <SlideUp
-            key={project._id}
-            delay={index * 0.1}
-            playExitAnimation={true}
-            entrancePatterns={['/projects']}
-            exitPatterns={['/projects']}
-            playOnceOnly={false}
-            distance={50}
-          >
-            <div
+    <PageTransition>
+      <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
+        <motion.nav
+          className="flex flex-wrap gap-8 justify-end"
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+        >
+          {projects.map((project) => (
+            <motion.div
+              key={project._id}
+              variants={itemVariants}
               onClick={(e) =>
                 handleProjectClick(
                   e,
@@ -210,10 +238,10 @@ export default function ProjectsList({ category }: ProjectsListProps) {
               className="text-6xl hover:text-gray-500 transition-colors duration-300 font-wide cursor-pointer"
             >
               {project.title}
-            </div>
-          </SlideUp>
-        ))}
-      </nav>
-    </div>
+            </motion.div>
+          ))}
+        </motion.nav>
+      </div>
+    </PageTransition>
   )
 }

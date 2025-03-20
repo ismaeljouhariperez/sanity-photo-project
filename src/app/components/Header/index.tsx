@@ -1,17 +1,17 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
 import InfoOverlay from '../InfoOverlay'
-import { SlideUp } from '@/lib/animations'
 import { useAnimationStore } from '@/store/animationStore'
-import { useSafeNavigation } from '@/hooks/useSafeNavigation'
+import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import s from './styles.module.scss'
 
 export default function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
-  const { navigateSafely } = useSafeNavigation()
+  const { navigateTo } = useTransitionNavigation()
 
   const handleAboutClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -25,11 +25,9 @@ export default function Header() {
     if (pathname.includes('/projects/')) {
       const projectType = pathname.split('/projects/')[1]?.split('/')[0]
       if (projectType) {
-        // Contourner Barba.js pour les navigations depuis des pages de projet spécifique
-        const navigatingFromProjectDetail = pathname.split('/').length > 3
-        navigateSafely(`/projects/${projectType}`, navigatingFromProjectDetail)
+        navigateTo(`/projects/${projectType}`)
       } else {
-        navigateSafely('/projects')
+        navigateTo('/projects')
       }
     }
   }
@@ -37,9 +35,7 @@ export default function Header() {
   // Réinitialise l'animation quand on quitte la page projects
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault()
-
-    // Pour la page d'accueil, on contourne Barba.js si on vient de projects
-    navigateSafely('/', pathname.includes('/projects'))
+    navigateTo('/')
   }
 
   // Surveille les changements de pathname pour mettre à jour l'état
@@ -55,6 +51,13 @@ export default function Header() {
 
   const isProjectPage = pathname.includes('/projects')
 
+  // Variants pour l'animation de l'Index
+  const indexVariants = {
+    hidden: { opacity: 0, y: -50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    exit: { opacity: 0, y: -50, transition: { duration: 0.3 } },
+  }
+
   return (
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
@@ -62,18 +65,16 @@ export default function Header() {
         <nav className={s.nav}>
           <button onClick={handleAboutClick}>About</button>
           {isProjectPage && (
-            <SlideUp
-              isHeader
-              playExitAnimation={true}
-              entrancePatterns={['/projects']}
-              exitPatterns={['/projects']}
-              playOnceOnly={true}
-              distance={50}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={indexVariants}
             >
               <button onClick={handleIndexClick} className={s.title}>
                 Index
               </button>
-            </SlideUp>
+            </motion.div>
           )}
           <button onClick={handleHomeClick} className="text-xl">
             Ismael Ahab

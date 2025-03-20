@@ -1,10 +1,11 @@
 'use client'
-import React, { useEffect, useState, useContext, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { useServices } from '@/hooks/useServices'
 import { Project } from '@/lib/sanity.types'
-import { BarbaContext } from '@/app/layout'
+import { motion } from 'framer-motion'
+import PageTransition from '@/components/transitions/PageTransition'
 
 type PageParams = {
   params: Promise<{ slug: string }>
@@ -15,11 +16,7 @@ export default function BlackAndWhiteProjectPage({ params }: PageParams) {
   const { sanity } = useServices()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
-  const [hasBarba, setHasBarba] = useState(false)
   const mounted = useRef(true)
-
-  // Utiliser le contexte pour désactiver barba pendant le chargement
-  const { disableBarba, enableBarba } = useContext(BarbaContext)
 
   // S'assurer que nous nettoyons correctement au démontage
   useEffect(() => {
@@ -31,31 +28,6 @@ export default function BlackAndWhiteProjectPage({ params }: PageParams) {
       mounted.current = false
     }
   }, [resolvedParams.slug])
-
-  // Désactiver barba.js dès le chargement de la page
-  useEffect(() => {
-    disableBarba()
-    console.log('⚠️ Barba.js désactivé pour le chargement du projet')
-
-    // Vérifier si barba est déjà chargé
-    const checkBarba = async () => {
-      try {
-        await import('@barba/core')
-        if (mounted.current) {
-          setHasBarba(true)
-        }
-      } catch {
-        // Ignoré intentionnellement
-      }
-    }
-    checkBarba()
-
-    // Réactiver barba à la sortie du composant
-    return () => {
-      console.log('♻️ Réactivation de Barba.js')
-      enableBarba()
-    }
-  }, [disableBarba, enableBarba])
 
   useEffect(() => {
     console.log('🚀 Début fetch:', resolvedParams.slug)
@@ -93,37 +65,90 @@ export default function BlackAndWhiteProjectPage({ params }: PageParams) {
   }, [resolvedParams.slug, sanity])
 
   if (loading) {
-    return <div className="min-h-[calc(100vh-5.5rem)] p-8">Chargement...</div>
+    return (
+      <div className="min-h-[calc(100vh-5.5rem)] p-8 flex justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          Chargement...
+        </motion.div>
+      </div>
+    )
   }
 
   if (!project) {
     notFound()
   }
 
-  return (
-    <div className="min-h-[calc(100vh-5.5rem)] p-8">
-      <h1 className="text-4xl mb-8">{project.title}</h1>
-      {hasBarba && (
-        <div className="mb-4 p-2 bg-yellow-100 text-yellow-800 rounded">
-          Barba.js déactivé pendant le chargement du projet pour éviter les
-          conflits
-        </div>
-      )}
-      {project.description && <p className="mb-8">{project.description}</p>}
+  // Animation variants pour Framer Motion
+  const containerVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {project.photos?.map((photo) => (
-          <div key={photo._id} className="aspect-w-16 aspect-h-9 relative">
-            <Image
-              src={photo.url || ''}
-              alt={photo.alt || photo.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
-            />
-          </div>
-        ))}
+  const itemVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 },
+    },
+  }
+
+  return (
+    <PageTransition>
+      <div className="min-h-[calc(100vh-5.5rem)] p-8">
+        <motion.h1
+          className="text-4xl mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {project.title}
+        </motion.h1>
+
+        {project.description && (
+          <motion.p
+            className="mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {project.description}
+          </motion.p>
+        )}
+
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+        >
+          {project.photos?.map((photo) => (
+            <motion.div
+              key={photo._id}
+              className="aspect-w-16 aspect-h-9 relative"
+              variants={itemVariants}
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            >
+              <Image
+                src={photo.url || ''}
+                alt={photo.alt || photo.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+              />
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
-    </div>
+    </PageTransition>
   )
 }

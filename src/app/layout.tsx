@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { ThemeProvider } from 'next-themes'
 import { usePathname } from 'next/navigation'
@@ -8,26 +8,15 @@ import Header from './components/Header'
 import ThemeToggle from './components/ThemeToggle'
 import './globals.css'
 import { aujournuit } from './fonts'
-import PageTransition from './components/PageTransition'
 import { SANITY_CACHE_CLEAR_EVENT } from '@/adapters/sanity'
-
-// Création d'un contexte pour gérer l'état de Barba.js
-export const BarbaContext = createContext({
-  isBarbaEnabled: true,
-  disableBarba: () => {},
-  enableBarba: () => {},
-})
+import { AnimationProvider } from '@/providers/AnimationProvider'
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [isBarbaEnabled, setIsBarbaEnabled] = useState(true)
   const pathname = usePathname()
-
-  const disableBarba = () => setIsBarbaEnabled(false)
-  const enableBarba = () => setIsBarbaEnabled(true)
 
   // Émettre un événement pour vider le cache lors des changements de route
   useEffect(() => {
@@ -48,23 +37,13 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <BarbaContext.Provider
-            value={{ isBarbaEnabled, disableBarba, enableBarba }}
-          >
+          <AnimationProvider>
             <Header />
             <ThemeToggle />
-            <PageTransition isEnabled={isBarbaEnabled} />
-            <div
-              data-barba="wrapper"
-              className={!isBarbaEnabled ? 'barba-disabled' : ''}
-            >
-              <div data-barba="container">
-                <main>
-                  <AnimatePresence mode="wait">{children}</AnimatePresence>
-                </main>
-              </div>
-            </div>
-          </BarbaContext.Provider>
+            <main>
+              <AnimatePresence mode="wait">{children}</AnimatePresence>
+            </main>
+          </AnimationProvider>
         </ThemeProvider>
       </body>
     </html>

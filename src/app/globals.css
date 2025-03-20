@@ -18,37 +18,3 @@ body {
   overflow: hidden;
   box-sizing: border-box;
 }
-
-.barba-container {
-  position: relative;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
-
-[data-barba='container'] {
-  position: relative;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* Style pour désactiver barba.js temporairement */
-.barba-disabled [data-barba='container'],
-.barba-disabled [data-barba='wrapper'] {
-  transition: none !important;
-  animation: none !important;
-}
-
-/* Style de débogage pour visualiser quand barba est désactivé */
-.barba-disabled::before {
-  content: 'Barba disabled';
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(255, 0, 0, 0.1);
-  color: #ff0000;
-  padding: 4px 8px;
-  font-size: 10px;
-  border-radius: 4px;
-  z-index: 9999;
-  pointer-events: none;
-}
