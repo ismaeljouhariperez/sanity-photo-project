@@ -1,17 +1,15 @@
-import React from 'react'
-import ProjectsList from '@/app/components/ProjectsList'
+// metadata.ts - export statique des métadonnées
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Projets Noir et Blanc | Photography Portfolio',
+  title: 'Projets N&B | Photography Portfolio',
   description:
     'Découvrez ma collection de projets photographiques en noir et blanc.',
 }
 
-export default function BlackAndWhiteProjectsPage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
-      <ProjectsList category="black-and-white" />
-    </main>
-  )
+// Composant client séparé dans un autre fichier
+import ClientPage from './client-page'
+
+export default function BWProjectsPage() {
+  return <ClientPage />
 }

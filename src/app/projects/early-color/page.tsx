@@ -1,5 +1,3 @@
-import React from 'react'
-import ProjectsList from '@/app/components/ProjectsList'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -7,10 +5,9 @@ export const metadata: Metadata = {
   description: 'Découvrez ma collection de projets photographiques en couleur.',
 }
 
+// Composant client séparé dans un autre fichier
+import ClientPage from './client-page'
+
 export default function ColorProjectsPage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
-      <ProjectsList category="early-color" />
-    </main>
-  )
+  return <ClientPage />
 }

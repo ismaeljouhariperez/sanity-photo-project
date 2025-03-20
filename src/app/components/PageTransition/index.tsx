@@ -96,6 +96,17 @@ export default function PageTransition({
         // Désactiver Barba pour les navigations vers la page d'accueil
         const isHomePage = href.endsWith('/') && !href.includes('/projects/')
 
+        // Désactiver Barba pour les navigations entre catégories de projets
+        // pour éviter des problèmes de montage/démontage cyclique
+        const isProjectCategoryPage =
+          href.includes('/projects/black-and-white') ||
+          href.includes('/projects/early-color')
+
+        const isNavigatingBetweenCategories =
+          window.location.pathname.includes('/projects/') &&
+          isProjectCategoryPage &&
+          !window.location.pathname.includes(href)
+
         if (isProjectDetailPage) {
           console.log(
             'Barba.js est désactivé pour cette navigation vers projet:',
@@ -109,7 +120,21 @@ export default function PageTransition({
           )
         }
 
-        return preventForApostrophe || isProjectDetailPage || isHomePage
+        if (isNavigatingBetweenCategories) {
+          console.log(
+            'Barba.js est désactivé pour cette navigation entre catégories:',
+            window.location.pathname,
+            '->',
+            href
+          )
+        }
+
+        return (
+          preventForApostrophe ||
+          isProjectDetailPage ||
+          isHomePage ||
+          isNavigatingBetweenCategories
+        )
       },
       transitions: [
         {
