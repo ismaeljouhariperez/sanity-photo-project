@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 export default function BlackAndWhiteProjectsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
-      <div className="w-full max-w-7xl mx-auto py-12">
-        <h1 className="text-4xl font-bold mb-8 px-8">Projets Noir et Blanc</h1>
-        <ProjectsList category="black-and-white" />
-      </div>
+      <ProjectsList category="black-and-white" />
     </main>
   )
 }

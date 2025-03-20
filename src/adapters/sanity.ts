@@ -20,6 +20,9 @@ export interface ISanityService {
   ): ReturnType<typeof imageUrlBuilder.prototype.image>
 }
 
+// Cache des requêtes pour éviter des appels répétés à l'API
+const cache = new Map()
+
 export class SanityAdapter implements ISanityService {
   private client
   private builder
@@ -28,8 +31,10 @@ export class SanityAdapter implements ISanityService {
     this.client = createClient({
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '5ynkrt2t',
       dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-      apiVersion: '2023-05-03',
+      apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03',
       useCdn: process.env.NODE_ENV === 'production',
+      // Utiliser un token si disponible
+      token: process.env.SANITY_API_TOKEN || undefined,
     })
 
     this.builder = imageUrlBuilder(this.client)
@@ -39,7 +44,25 @@ export class SanityAdapter implements ISanityService {
     return this.builder.image(source as SanityImageSource)
   }
 
+  async fetchWithCache(query: string, params?: any): Promise<any> {
+    const cacheKey = JSON.stringify({ query, params })
+
+    if (cache.has(cacheKey)) {
+      return cache.get(cacheKey)
+    }
+
+    try {
+      const result = await this.client.fetch(query, params)
+      cache.set(cacheKey, result)
+      return result
+    } catch (error) {
+      console.error('Sanity fetch error:', error)
+      throw error
+    }
+  }
+
   async fetchProjects(category?: string): Promise<Project[]> {
+    console.log('Fetching projects for category:', category)
     const query = `*[_type == "project"${
       category ? ` && category == "${category}"` : ''
     }] | order(order asc) {
@@ -51,11 +74,11 @@ export class SanityAdapter implements ISanityService {
       "slug": slug.current,
       description,
       category,
-      "coverImage": coverImage,
+      coverImage,
       order
     }`
 
-    return this.client.fetch(query)
+    return this.fetchWithCache(query)
   }
 
   async fetchProjectBySlug(slug: string, category: string): Promise<Project> {
@@ -86,7 +109,7 @@ export class SanityAdapter implements ISanityService {
       }
     }`
 
-    return this.client.fetch(query, { slug, category })
+    return this.fetchWithCache(query, { slug, category })
   }
 
   async fetchPhotos(projectId: string): Promise<Photo[]> {
@@ -107,14 +130,13 @@ export class SanityAdapter implements ISanityService {
       }
     }`
 
-    return this.client
-      .fetch(query, { projectId })
-      .then((result: { photos?: Photo[] }) => result?.photos || [])
+    const result = await this.fetchWithCache(query, { projectId })
+    return result?.photos || []
   }
 
   async fetchSiteSettings(): Promise<SiteSettings> {
     const query = `*[_type == "siteSettings"][0]`
-    return this.client.fetch(query)
+    return this.fetchWithCache(query)
   }
 
   async fetchCollections(active?: boolean): Promise<Collection[]> {
@@ -142,6 +164,6 @@ export class SanityAdapter implements ISanityService {
       }
     }`
 
-    return this.client.fetch(query)
+    return this.fetchWithCache(query)
   }
 }

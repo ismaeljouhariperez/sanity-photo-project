@@ -3,26 +3,30 @@
 import React, { useEffect, useState } from 'react'
 import { useServices } from '@/hooks/useServices'
 import { Project } from '@/lib/sanity.types'
-import Link from 'next/link'
-import Image from 'next/image'
+import AnimatedElement, { AnimationType } from '../AnimatedElement'
 
 interface ProjectsListProps {
   category: 'black-and-white' | 'early-color'
 }
 
 export default function ProjectsList({ category }: ProjectsListProps) {
-  const { sanity } = useServices()
+  const { sanity, navigation, animation } = useServices()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchProjects() {
       try {
         setLoading(true)
+        setError(null)
         const data = await sanity.fetchProjects(category)
         setProjects(data)
-      } catch (error) {
-        console.error('Error fetching projects:', error)
+      } catch (err) {
+        console.error('Error fetching projects:', err)
+        setError(
+          'Erreur lors de la récupération des projets. Veuillez réessayer.'
+        )
       } finally {
         setLoading(false)
       }
@@ -30,6 +34,21 @@ export default function ProjectsList({ category }: ProjectsListProps) {
 
     fetchProjects()
   }, [category, sanity])
+
+  const handleProjectClick = async (
+    e: React.MouseEvent,
+    projectSlug: string
+  ) => {
+    e.preventDefault()
+
+    // Utilisation des adapters pour l'animation et la navigation
+    animation.setPageTransition(true)
+
+    setTimeout(async () => {
+      animation.setPageTransition(false)
+      await navigation.navigateTo(`/projects/${category}/${projectSlug}`)
+    }, 600)
+  }
 
   if (loading) {
     return (
@@ -39,7 +58,15 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     )
   }
 
-  if (!projects.length) {
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[70vh] text-red-500">
+        {error}
+      </div>
+    )
+  }
+
+  if (!projects?.length) {
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
         Aucun projet trouvé dans cette catégorie.
@@ -48,34 +75,38 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8">
-      {projects.map((project) => (
-        <Link
-          key={project._id}
-          href={`/projects/${category}/${project.slug.current}`}
-          className="group"
-        >
-          <div className="overflow-hidden rounded-md">
-            {project.coverImage && (
-              <div className="relative aspect-[3/2] w-full overflow-hidden">
-                <Image
-                  src={sanity.urlFor(project.coverImage).width(800).url()}
-                  alt={project.title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
-              </div>
-            )}
-          </div>
-          <h3 className="mt-3 text-2xl font-medium">{project.title}</h3>
-          {project.description && (
-            <p className="mt-1 text-gray-700 line-clamp-2">
-              {project.description}
-            </p>
-          )}
-        </Link>
-      ))}
+    <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
+      <nav className="flex flex-wrap gap-8 justify-end">
+        {projects.map((project, index) => (
+          <AnimatedElement
+            key={project._id}
+            delay={index * 0.1}
+            type={AnimationType.SLIDE_UP}
+            playExitAnimation={true}
+            entrancePatterns={['/projects']}
+            exitPatterns={['/projects']}
+            playOnceOnly={false}
+            customParams={{
+              fromY: -50,
+              toY: 0,
+              duration: 0.8,
+              ease: 'power3.out',
+            }}
+          >
+            <div
+              onClick={(e) =>
+                handleProjectClick(
+                  e,
+                  project.slug.current || String(project.slug)
+                )
+              }
+              className="text-6xl hover:text-gray-500 transition-colors duration-300 font-wide cursor-pointer"
+            >
+              {project.title}
+            </div>
+          </AnimatedElement>
+        ))}
+      </nav>
     </div>
   )
 }
