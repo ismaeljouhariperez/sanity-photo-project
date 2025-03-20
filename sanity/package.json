@@ -28,7 +28,7 @@
     "@sanity/vision": "^3.67.1",
     "@tanstack/react-virtual": "^3.11.1",
     "codemirror": "^6.0.0",
-    "next": "^15.1.0",
+    "next": "^15.1.2",
     "next-sanity": "^9.9.5",
     "prismjs": "^1.30.0",
     "react": "^18.0.0",

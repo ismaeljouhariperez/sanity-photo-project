@@ -16,7 +16,7 @@ interface ProjectDetailProps {
 export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
   const { sanity } = useServices()
   const [project, setProject] = useState<Project | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
@@ -89,13 +89,13 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     exit: { opacity: 0, y: -10 },
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        Chargement...
-      </div>
-    )
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-[70vh]">
+  //       Chargement...
+  //     </div>
+  //   )
+  // }
 
   if (!project) {
     return (

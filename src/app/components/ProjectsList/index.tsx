@@ -6,6 +6,7 @@ import { useServices } from '@/hooks/useServices'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import PageTransition from '@/components/transitions/PageTransition'
+import DelayedLoader from '@/components/ui/DelayedLoader'
 
 interface ProjectsListProps {
   category: 'black-and-white' | 'early-color'
@@ -124,20 +125,20 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     },
   }
 
-  // Rendu conditionnel
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          Chargement...
-        </motion.div>
-      </div>
-    )
-  }
+  // // Rendu conditionnel
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-[70vh]">
+  //       <motion.div
+  //         initial={{ opacity: 0 }}
+  //         animate={{ opacity: 1 }}
+  //         transition={{ duration: 0.5 }}
+  //       >
+  //         Chargement...
+  //       </motion.div>
+  //     </div>
+  //   )
+  // }
 
   if (error) {
     return (
@@ -147,10 +148,28 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     )
   }
 
-  if (!projects?.length) {
+  // Attendre que le chargement soit terminé avant d'afficher "Aucun projet trouvé"
+  if (!loading && !projects?.length) {
+    return (
+      <motion.div
+        className="flex justify-center items-center min-h-[70vh]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        Aucun projet trouvé dans cette catégorie.
+      </motion.div>
+    )
+  }
+
+  // Afficher un écran de chargement pendant le chargement initial
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
-        Aucun projet trouvé dans cette catégorie.
+        <DelayedLoader
+          isLoading={loading}
+          message="Chargement des projets..."
+        />
       </div>
     )
   }

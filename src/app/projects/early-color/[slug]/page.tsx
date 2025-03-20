@@ -6,6 +6,7 @@ import { useServices } from '@/hooks/useServices'
 import { Project } from '@/lib/sanity.types'
 import { motion } from 'framer-motion'
 import PageTransition from '@/components/transitions/PageTransition'
+import DelayedLoader from '@/components/ui/DelayedLoader'
 
 type PageParams = {
   params: Promise<{ slug: string }>
@@ -67,13 +68,7 @@ export default function EarlyColorProjectPage({ params }: PageParams) {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-5.5rem)] p-8 flex justify-center items-center">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          Chargement...
-        </motion.div>
+        <DelayedLoader isLoading={loading} message="Chargement du projet..." />
       </div>
     )
   }
