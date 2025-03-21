@@ -79,13 +79,13 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     animate: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: 0.3,
       },
     },
     exit: {
       opacity: 0,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.2,
         staggerDirection: -1,
       },
     },
@@ -112,33 +112,18 @@ export default function ProjectsList({ category }: ProjectsListProps) {
     animate: {
       y: 0,
       transition: {
-        duration: 0.8,
+        duration: 1,
         ease: [0.16, 1, 0.3, 1],
       },
     },
     exit: {
       y: '-100%',
       transition: {
-        duration: 0.6,
+        duration: 1,
         ease: [0.16, 1, 0.3, 1],
       },
     },
   }
-
-  // // Rendu conditionnel
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center min-h-[70vh]">
-  //       <motion.div
-  //         initial={{ opacity: 0 }}
-  //         animate={{ opacity: 1 }}
-  //         transition={{ duration: 0.5 }}
-  //       >
-  //         Chargement...
-  //       </motion.div>
-  //     </div>
-  //   )
-  // }
 
   if (error) {
     return (
@@ -195,14 +180,9 @@ export default function ProjectsList({ category }: ProjectsListProps) {
                   project.slug.current || String(project.slug)
                 )
               }
-              className="text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer"
+              className="text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50"
             >
-              <motion.div
-                className="transition-all duration-300"
-                variants={textVariants}
-              >
-                {project.title}
-              </motion.div>
+              <motion.div variants={textVariants}>{project.title}</motion.div>
             </motion.div>
           ))}
         </motion.nav>

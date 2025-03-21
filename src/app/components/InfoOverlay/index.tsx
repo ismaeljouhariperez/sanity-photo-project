@@ -46,6 +46,7 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
             className="absolute top-8 right-8 text-white"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
+            variants={contentVariants}
           >
             Fermer
           </motion.button>
