@@ -4,7 +4,13 @@ import ProjectsList from '@/app/components/ProjectsList'
 import { useAnimationStore } from '@/store/animationStore'
 import PageTransition from '@/components/transitions/PageTransition'
 
-export default function ClientPage() {
+type ClientCategoryPageProps = {
+  category: 'black-and-white' | 'early-color'
+}
+
+export default function ClientCategoryPage({
+  category,
+}: ClientCategoryPageProps) {
   // État local pour éviter le re-rendu infini
   const [loaded, setLoaded] = useState(false)
   const { setInProjectsSection } = useAnimationStore()
@@ -28,7 +34,7 @@ export default function ClientPage() {
   return (
     <PageTransition>
       <main className="flex min-h-screen flex-col items-center justify-between">
-        {loaded && <ProjectsList category="black-and-white" />}
+        {loaded && <ProjectsList category={category} />}
       </main>
     </PageTransition>
   )

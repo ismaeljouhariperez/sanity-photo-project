@@ -7,6 +7,7 @@ import { Photo, Project } from '@/lib/sanity.types'
 import Image from 'next/image'
 import Link from 'next/link'
 import PageTransition from '@/components/transitions/PageTransition'
+import DelayedLoader from '@/components/ui/DelayedLoader'
 
 interface ProjectDetailProps {
   slug: string
@@ -16,9 +17,13 @@ interface ProjectDetailProps {
 export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
   const { sanity } = useServices()
   const [project, setProject] = useState<Project | null>(null)
-  const [, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+
+  // Déterminer le titre de la catégorie pour l'affichage
+  const categoryTitle =
+    category === 'black-and-white' ? 'noir et blanc' : 'couleur'
 
   useEffect(() => {
     async function fetchProject() {
@@ -89,13 +94,13 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     exit: { opacity: 0, y: -10 },
   }
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center min-h-[70vh]">
-  //       Chargement...
-  //     </div>
-  //   )
-  // }
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[70vh]">
+        <DelayedLoader isLoading={loading} message="Chargement du projet..." />
+      </div>
+    )
+  }
 
   if (!project) {
     return (
@@ -124,8 +129,7 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
             href={`/projects/${category}`}
             className="text-gray-600 hover:text-gray-900 transition-colors mb-4 inline-block"
           >
-            &larr; Retour aux projets{' '}
-            {category === 'black-and-white' ? 'noir et blanc' : 'couleur'}
+            &larr; Retour aux projets {categoryTitle}
           </Link>
           <h1 className="text-4xl font-bold mt-2">{project.title}</h1>
           {project.description && (
