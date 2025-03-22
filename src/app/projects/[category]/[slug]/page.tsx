@@ -4,11 +4,16 @@ import { createClient } from 'next-sanity'
 import ProjectDetail from '@/app/components/ProjectDetail'
 
 type Props = {
-  params: { slug: string; category: 'black-and-white' | 'early-color' }
+  params: Promise<{ slug: string; category: 'black-and-white' | 'early-color' }>
 }
 
 // Fonction pour générer les métadonnées dynamiques
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // Attendre l'objet params entier
+  const resolvedParams = await params
+  const category = resolvedParams.category
+  const slug = resolvedParams.slug
+
   const client = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '5ynkrt2t',
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
@@ -22,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title,
         description
       }`,
-      { slug: params.slug, category: params.category }
+      { slug, category }
     )
 
     if (!project) {
@@ -45,6 +50,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Page du projet
-export default function ProjectPage({ params }: Props) {
-  return <ProjectDetail slug={params.slug} category={params.category} />
+export default async function ProjectPage({ params }: Props) {
+  // Attendre l'objet params entier
+  const resolvedParams = await params
+  const category = resolvedParams.category
+  const slug = resolvedParams.slug
+
+  return <ProjectDetail slug={slug} category={category} />
 }

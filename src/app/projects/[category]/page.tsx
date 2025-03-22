@@ -1,15 +1,18 @@
 import { Metadata } from 'next'
-import { createClient } from 'next-sanity'
 import ClientCategoryPage from './client-page'
 
 type Props = {
-  params: { category: 'black-and-white' | 'early-color' }
+  params: Promise<{ category: 'black-and-white' | 'early-color' }>
 }
 
 // Fonction pour générer les métadonnées dynamiques
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // Attendre l'objet params entier
+  const resolvedParams = await params
+  const category = resolvedParams.category
+
   const categoryTitle =
-    params.category === 'black-and-white' ? 'Noir et Blanc' : 'Couleur'
+    category === 'black-and-white' ? 'Noir et Blanc' : 'Couleur'
 
   return {
     title: `Projets ${categoryTitle} | Photography Portfolio`,
@@ -18,6 +21,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Page des projets par catégorie
-export default function CategoryPage({ params }: Props) {
-  return <ClientCategoryPage category={params.category} />
+export default async function CategoryPage({ params }: Props) {
+  // Attendre l'objet params entier
+  const resolvedParams = await params
+  const category = resolvedParams.category
+
+  return <ClientCategoryPage category={category} />
 }

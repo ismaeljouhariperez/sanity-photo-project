@@ -42,6 +42,42 @@ Utilisation des routes dynamiques Next.js pour gérer les catégories et projets
 - `/projects/[category]` - Liste des projets d'une catégorie
 - `/projects/[category]/[slug]` - Détail d'un projet spécifique
 
+#### Utilisation des paramètres dynamiques
+
+Dans Next.js 15, l'objet `params` lui-même est une Promise qu'il faut attendre avant d'accéder à ses propriétés :
+
+```tsx
+// ✅ Bonne pratique pour Next.js 15 - Attendre l'objet params complet
+export default async function CategoryPage({ params }: Props) {
+  // Attendre l'objet params entier
+  const resolvedParams = await params
+  const category = resolvedParams.category
+
+  return <ClientCategoryPage category={category} />
+}
+
+// ❌ À éviter - Accéder directement aux propriétés de params
+export default async function CategoryPage({ params }: Props) {
+  const category = await params.category // Erreur dans Next.js 15
+  return <ClientCategoryPage category={category} />
+}
+
+// ❌ À éviter - Utiliser params sans await du tout
+export default function CategoryPage({ params }: Props) {
+  return <ClientCategoryPage category={params.category} />
+}
+```
+
+Pour la définition du type, spécifiez que params est une Promise :
+
+```tsx
+type Props = {
+  params: Promise<{ category: 'black-and-white' | 'early-color' }>
+}
+```
+
+Cette approche est nécessaire car, dans Next.js 15, les paramètres de route sont fournis de manière asynchrone pour optimiser le rendu statique et le streaming.
+
 ### 2. Composants Réutilisables
 
 - Chaque composant est conçu pour être réutilisable
