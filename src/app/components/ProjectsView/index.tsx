@@ -30,34 +30,41 @@ const ProjectsView = memo(function ProjectsView({
     navigateTo(`/projects/${category}/${projectSlug}`, { delay: 0 }) // Transition immédiate
   }
 
-  // Variants pour l'animation
+  // Variants pour l'animation du conteneur
   const containerVariants: Variants = {
-    initial: { opacity: 1 },
-    animate: { opacity: 1 },
-    exit: { opacity: 1 }, // Éviter le fade-out pour une transition plus fluide
+    initial: {},
+    animate: {
+      transition: {
+        staggerChildren: 0.3, // Délai entre chaque enfant
+        delayChildren: 0.1, // Délai initial avant de commencer les animations des enfants
+      },
+    },
+    exit: {}, // Pas d'animation de sortie
   }
 
-  // Simplifier les variants pour éviter les animations qui peuvent causer des scintillements
-  const itemVariants: Variants = disableAnimations
+  // Variants pour les conteneurs de titre
+  const titleContainerVariants: Variants = disableAnimations
     ? { initial: {}, animate: {} }
     : {
-        initial: { opacity: 0 },
+        initial: {},
         animate: {
-          opacity: 1,
-          transition: { duration: 0.5 },
+          transition: {
+            duration: 0.7,
+            ease: [0.16, 1, 0.3, 1], // Courbe d'accélération fluide (cubic-bezier)
+          },
         },
       }
 
+  // Variants pour l'animation du texte (slide up depuis le bas)
   const textVariants: Variants = disableAnimations
     ? { initial: {}, animate: {} }
     : {
-        initial: { y: '100%' },
+        initial: { y: '100%' }, // Commence caché en dessous
         animate: {
-          y: 0,
+          y: 0, // Remonte à sa position normale
           transition: {
-            duration: 1.5,
-            staggerChildren: 0.3,
-            ease: [0.16, 1, 0.3, 1],
+            duration: 1,
+            ease: [0.16, 1, 0.3, 1], // Courbe d'accélération fluide
           },
         },
       }
@@ -71,7 +78,6 @@ const ProjectsView = memo(function ProjectsView({
         animate="animate"
         layoutId="projects-container"
         layout
-        // Supprimer exit pour éviter de créer un effet visuel lors des transitions
       >
         {projects.map((project) => {
           const projectSlug =
@@ -83,7 +89,7 @@ const ProjectsView = memo(function ProjectsView({
           return (
             <motion.div
               key={project._id}
-              variants={itemVariants}
+              variants={titleContainerVariants}
               onClick={(e) => handleProjectClick(e, projectSlug)}
               className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50 ${
                 isActive ? 'text-gray-500' : ''
