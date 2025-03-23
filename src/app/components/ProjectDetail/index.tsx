@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useEffect, useState, useRef, useMemo } from 'react'
-import { useServices } from '@/hooks/useServices'
-import { Project } from '@/lib/sanity.types'
+import React, { useEffect, useMemo } from 'react'
+import { useProjectsStore } from '@/store'
 import Link from 'next/link'
 import DelayedLoader from '@/components/ui/DelayedLoader'
 import ProjectsView from '../ProjectsView'
@@ -13,76 +12,37 @@ interface ProjectDetailProps {
 }
 
 export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
-  const { sanity } = useServices()
-  const [allProjects, setAllProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
-  const hasFetched = useRef(false)
-  const controllerRef = useRef<AbortController | null>(null)
+  // Utiliser le store pour accéder aux projets et gérer l'état
+  const {
+    projectsList,
+    isLoading,
+    loadProjects,
+    setActiveProject,
+    hasFetched,
+    activeCategory,
+    activeSlug,
+  } = useProjectsStore()
 
   // Mémoriser le slug actif pour éviter des re-rendus inutiles
   const activeSlugs = useMemo(() => [slug], [slug])
 
-  // Un seul effet pour récupérer tous les projets
+  // Un seul effet pour initialiser l'état
   useEffect(() => {
-    // Éviter les appels multiples avec une référence
-    if (hasFetched.current) return
+    // Mettre à jour le projet actif
+    setActiveProject(category, slug)
 
-    // Pour les annulations propres
-    controllerRef.current = new AbortController()
-
-    // Fonction pour récupérer les projets
-    async function fetchAllProjects() {
-      try {
-        setLoading(true)
-
-        // Si on a un signal d'annulation, l'utiliser
-        if (controllerRef.current?.signal?.aborted) {
-          return
-        }
-
-        const data = await sanity.fetchProjects(category)
-
-        // Vérifier si le composant est toujours monté
-        if (controllerRef.current?.signal?.aborted) {
-          return
-        }
-
-        // Traitement des données
-        const processedData =
-          data?.map((project) => ({
-            ...project,
-            normalizedSlug: project.slug.current || String(project.slug),
-          })) || []
-
-        setAllProjects(processedData)
-      } catch (error) {
-        // Ne loguer l'erreur que si le composant est toujours monté
-        if (!controllerRef.current?.signal?.aborted) {
-          console.error('Error fetching projects:', error)
-        }
-      } finally {
-        // Ne mettre à jour le state que si le composant est toujours monté
-        if (!controllerRef.current?.signal?.aborted) {
-          setLoading(false)
-        }
-      }
+    // Charger les projets si nécessaire
+    if (!hasFetched[category]) {
+      loadProjects(category)
     }
+  }, [category, slug, loadProjects, setActiveProject, hasFetched])
 
-    // Lancer la récupération une seule fois
-    hasFetched.current = true
-    fetchAllProjects()
-
-    // Nettoyage propre
-    return () => {
-      if (controllerRef.current) {
-        controllerRef.current.abort()
-        controllerRef.current = null
-      }
-    }
-  }, [category, sanity])
+  // Vérifier que le projet et la catégorie actifs sont bien ceux attendus
+  const isCorrectActiveProject =
+    activeCategory === category && activeSlug === slug
 
   // Affichage pendant le chargement
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
         <DelayedLoader isLoading={true} message="Chargement du projet..." />
@@ -90,8 +50,11 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     )
   }
 
+  // Filtrer les projets pour la catégorie actuelle
+  const filteredProjects = projectsList.filter((p) => p.category === category)
+
   // Si pas de projets trouvés
-  if (!allProjects.length) {
+  if (!filteredProjects.length) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[70vh]">
         <p className="mb-4">Aucun projet trouvé.</p>
@@ -105,7 +68,7 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
   // Afficher la même vue que dans ProjectsList, avec le projet actuel en surbrillance
   return (
     <ProjectsView
-      projects={allProjects}
+      projects={filteredProjects}
       category={category}
       activeSlugs={activeSlugs}
       disableAnimations={true}

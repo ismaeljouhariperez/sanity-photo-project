@@ -1,11 +1,19 @@
 'use client'
 import { useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useProjectsStore } from '@/store'
 
+/**
+ * Hook pour gérer les transitions de navigation entre les pages
+ * Utilise le ProjectsStore pour optimiser les transitions entre projets
+ */
 export function useTransitionNavigation() {
   const router = useRouter()
   const [isNavigating, setIsNavigating] = useState(false)
   const navigatingRef = useRef(false) // Pour éviter les problèmes de closure
+
+  // Accéder au store de projets
+  const { activeCategory, hasFetched } = useProjectsStore()
 
   const navigateTo = useCallback(
     (url: string, options = { delay: 600 }) => {
@@ -20,13 +28,25 @@ export function useTransitionNavigation() {
       navigatingRef.current = true
       setIsNavigating(true)
 
-      // Détecter si c'est une navigation entre projets
-      const isProjectNavigation =
-        url.includes('/projects/') &&
-        window.location.pathname.includes('/projects/')
+      // Analyser l'URL pour le pattern de projet
+      const projectUrlPattern = /\/projects\/([^/]+)\/([^/]+)/
+      const match = url.match(projectUrlPattern)
 
-      // Pour les navigations entre projets, utiliser une transition immédiate
-      if (isProjectNavigation || options.delay === 0) {
+      // Vérifier si c'est une URL de projet et extraire la catégorie
+      const isProjectUrl = match !== null
+      const targetCategory = isProjectUrl ? match[1] : null
+
+      // Déterminer si c'est une transition rapide
+      const isFastTransition =
+        isProjectUrl &&
+        // Même catégorie que celle active actuellement
+        (targetCategory === activeCategory ||
+          // Ou bien, si les données sont déjà en cache
+          (targetCategory &&
+            hasFetched[targetCategory as 'black-and-white' | 'early-color']))
+
+      // Pour les navigations immédiates
+      if (isFastTransition || options.delay === 0) {
         try {
           router.push(url)
         } catch (error) {
@@ -57,7 +77,7 @@ export function useTransitionNavigation() {
         }, 100)
       }, options.delay)
     },
-    [router, isNavigating]
+    [router, isNavigating, activeCategory, hasFetched]
   )
 
   return {
