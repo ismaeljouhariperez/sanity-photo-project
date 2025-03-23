@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { ThemeProvider } from 'next-themes'
 import { usePathname } from 'next/navigation'
+import { ThemeProvider } from 'next-themes'
+import { AnimatePresence } from 'framer-motion'
 import Header from './components/Header'
 import ThemeToggle from './components/ThemeToggle'
 import './globals.css'
 import { aujournuit } from './fonts'
-import { SANITY_CACHE_CLEAR_EVENT } from '@/adapters/sanity'
 import { AnimationProvider } from '@/providers/AnimationProvider'
+import { SANITY_CACHE_CLEAR_EVENT } from '@/adapters/sanity'
 
 export default function RootLayout({
   children,
@@ -18,15 +18,39 @@ export default function RootLayout({
 }) {
   const pathname = usePathname()
 
-  // Émettre un événement pour vider le cache lors des changements de route
+  // Effet pour nettoyer le cache Sanity quand la route change
   useEffect(() => {
+    // Clé pour stocker le chemin précédent
+    const PREV_PATH_KEY = 'prev_sanity_path'
+
+    // Récupérer le chemin précédent
+    const prevPath = sessionStorage.getItem(PREV_PATH_KEY) || ''
+
+    // Vérifier si la navigation est entre pages de projets
+    const isCurrentProjectPath = pathname?.includes('/projects/')
+    const isPrevProjectPath = prevPath?.includes('/projects/')
+
+    // Stocker le chemin actuel pour la prochaine navigation
+    sessionStorage.setItem(PREV_PATH_KEY, pathname || '')
+
+    // Déterminer s'il faut nettoyer le cache
+    const shouldClearCache = !(isCurrentProjectPath && isPrevProjectPath)
+
     console.log(
-      '🧹 Changement de route détecté, nettoyage du cache Sanity possible'
+      `🔄 Route changée de ${prevPath} → ${pathname}${
+        shouldClearCache ? ' (nettoyage cache)' : ' (préservation cache)'
+      }`
     )
-    // Création et dispatch l'événement global pour que l'adapter Sanity puisse le capter
-    if (typeof window !== 'undefined') {
-      const clearCacheEvent = new CustomEvent(SANITY_CACHE_CLEAR_EVENT)
-      window.dispatchEvent(clearCacheEvent)
+
+    // Émettre l'événement seulement si nécessaire
+    if (shouldClearCache) {
+      // Créer un événement personnalisé pour nettoyer le cache avec des informations sur le chemin
+      const event = new CustomEvent(SANITY_CACHE_CLEAR_EVENT, {
+        detail: { path: pathname },
+      })
+
+      // Déclencher l'événement
+      window.dispatchEvent(event)
     }
   }, [pathname])
 
