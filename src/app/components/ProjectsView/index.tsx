@@ -4,6 +4,7 @@ import React, { memo } from 'react'
 import { motion, Variants } from 'framer-motion'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
+import { createStaggerContainer, EASE, DURATIONS } from '@/animations'
 
 interface ProjectsViewProps {
   projects: Project[]
@@ -18,6 +19,7 @@ const ProjectsView = memo(function ProjectsView({
   activeSlugs = [],
 }: ProjectsViewProps) {
   const { navigateTo } = useTransitionNavigation()
+  const isDetailPage = activeSlugs.length > 0
 
   // Gestionnaire d'événements pour la navigation
   const handleProjectClick = (e: React.MouseEvent, projectSlug: string) => {
@@ -28,23 +30,15 @@ const ProjectsView = memo(function ProjectsView({
     navigateTo(`/projects/${category}/${projectSlug}`, { delay: 0 }) // Transition immédiate
   }
 
-  // Animation uniquement pour la page de détail
-  const isDetailPage = activeSlugs.length > 0
+  // Configuration du conteneur avec stagger
+  const containerVariants = createStaggerContainer({
+    staggerChildren: 0.15,
+    delayChildren: 0.3,
+  })
 
-  // Variants pour l'animation du conteneur
-  const containerVariants: Variants = {
-    initial: {},
-    animate: {
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.3,
-      },
-    },
-  }
-
-  // Animation pour les conteneurs de titre
+  // Animation du conteneur externe
   const getTitleContainerVariants = (isActive: boolean): Variants => {
-    // Sur la page de liste, le conteneur n'a pas d'animation
+    // Sur la page de liste, pas d'animation pour le conteneur
     if (!isDetailPage) {
       return {
         initial: {},
@@ -58,37 +52,37 @@ const ProjectsView = memo(function ProjectsView({
       animate: {
         y: isActive ? 0 : -100,
         transition: {
-          duration: 1.5,
-          ease: [0.16, 1, 0.3, 1],
+          duration: DURATIONS.slow,
+          ease: EASE.default,
         },
       },
     }
   }
 
-  // Animation du texte
-  const getTextVariants = (isActive: boolean): Variants | undefined => {
-    // Sur la page de liste
+  // Animation du texte interne
+  const getTextVariants = (isActive: boolean): Variants => {
+    // Sur la page de liste, slide up depuis le bas
     if (!isDetailPage) {
       return {
         initial: { y: '100%' },
         animate: {
           y: 0,
           transition: {
-            duration: 1.5,
-            ease: [0.16, 1, 0.3, 1],
+            duration: DURATIONS.slow,
+            ease: EASE.default,
           },
         },
       }
     }
 
-    // Sur la page de détail
+    // Sur la page de détail, même animation que le conteneur
     return {
       initial: { y: 0 },
       animate: {
         y: isActive ? 0 : -100,
         transition: {
-          duration: 1.5,
-          ease: [0.16, 1, 0.3, 1],
+          duration: DURATIONS.slow,
+          ease: EASE.default,
         },
       },
     }
