@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { useProjectsStore } from '@/store'
 import DelayedLoader from '@/components/ui/DelayedLoader'
 import ProjectsView from '../ProjectsView'
+import Link from 'next/link'
 
 interface ProjectsListProps {
   category: 'black-and-white' | 'early-color'
@@ -37,7 +37,7 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   // Afficher un écran de chargement pendant le chargement initial
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[70vh]">
+      <div className="flex flex-col justify-center items-center min-h-[70vh]">
         <DelayedLoader isLoading={true} message="Chargement des projets..." />
       </div>
     )
@@ -46,14 +46,12 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   // Attendre que le chargement soit terminé avant d'afficher "Aucun projet trouvé"
   if (!filteredProjects?.length) {
     return (
-      <motion.div
-        className="flex justify-center items-center min-h-[70vh]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        Aucun projet trouvé dans cette catégorie.
-      </motion.div>
+      <div className="flex flex-col justify-center items-center min-h-[70vh]">
+        <p className="mb-4">Aucun projet trouvé dans cette catégorie.</p>
+        <Link href="/projects" className="text-blue-500 hover:underline">
+          Retour aux projets
+        </Link>
+      </div>
     )
   }
 

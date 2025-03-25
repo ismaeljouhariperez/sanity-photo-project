@@ -19,8 +19,6 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     loadProjects,
     setActiveProject,
     hasFetched,
-    activeCategory,
-    activeSlug,
   } = useProjectsStore()
 
   // Mémoriser le slug actif pour éviter des re-rendus inutiles
@@ -36,10 +34,6 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
       loadProjects(category)
     }
   }, [category, slug, loadProjects, setActiveProject, hasFetched])
-
-  // Vérifier que le projet et la catégorie actifs sont bien ceux attendus
-  const isCorrectActiveProject =
-    activeCategory === category && activeSlug === slug
 
   // Affichage pendant le chargement
   if (isLoading) {

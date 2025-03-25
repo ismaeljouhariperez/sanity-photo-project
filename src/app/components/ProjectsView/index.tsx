@@ -9,7 +9,6 @@ interface ProjectsViewProps {
   projects: Project[]
   category: 'black-and-white' | 'early-color'
   activeSlugs?: string[] // Pour pouvoir mettre en évidence un projet actif
-  disableAnimations?: boolean // Option pour désactiver les animations
 }
 
 // Utilisation de React.memo pour éviter les re-rendus inutiles
@@ -17,7 +16,6 @@ const ProjectsView = memo(function ProjectsView({
   projects,
   category,
   activeSlugs = [],
-  disableAnimations = false,
 }: ProjectsViewProps) {
   const { navigateTo } = useTransitionNavigation()
 
@@ -30,44 +28,71 @@ const ProjectsView = memo(function ProjectsView({
     navigateTo(`/projects/${category}/${projectSlug}`, { delay: 0 }) // Transition immédiate
   }
 
+  // Animation uniquement pour la page de détail
+  const isDetailPage = activeSlugs.length > 0
+
   // Variants pour l'animation du conteneur
   const containerVariants: Variants = {
     initial: {},
     animate: {
       transition: {
-        staggerChildren: 0.3, // Délai entre chaque enfant
-        delayChildren: 0.1, // Délai initial avant de commencer les animations des enfants
+        staggerChildren: 0.15,
+        delayChildren: 0.3,
       },
     },
-    exit: {}, // Pas d'animation de sortie
   }
 
-  // Variants pour les conteneurs de titre
-  const titleContainerVariants: Variants = disableAnimations
-    ? { initial: {}, animate: {} }
-    : {
+  // Animation pour les conteneurs de titre
+  const getTitleContainerVariants = (isActive: boolean): Variants => {
+    // Sur la page de liste, le conteneur n'a pas d'animation
+    if (!isDetailPage) {
+      return {
         initial: {},
-        animate: {
-          transition: {
-            duration: 0.7,
-            ease: [0.16, 1, 0.3, 1], // Courbe d'accélération fluide (cubic-bezier)
-          },
-        },
+        animate: {},
       }
+    }
 
-  // Variants pour l'animation du texte (slide up depuis le bas)
-  const textVariants: Variants = disableAnimations
-    ? { initial: {}, animate: {} }
-    : {
-        initial: { y: '100%' }, // Commence caché en dessous
+    // Sur la page de détail
+    return {
+      initial: { y: 0 },
+      animate: {
+        y: isActive ? 0 : -100,
+        transition: {
+          duration: 1.5,
+          ease: [0.16, 1, 0.3, 1],
+        },
+      },
+    }
+  }
+
+  // Animation du texte
+  const getTextVariants = (isActive: boolean): Variants | undefined => {
+    // Sur la page de liste
+    if (!isDetailPage) {
+      return {
+        initial: { y: '100%' },
         animate: {
-          y: 0, // Remonte à sa position normale
+          y: 0,
           transition: {
-            duration: 1,
-            ease: [0.16, 1, 0.3, 1], // Courbe d'accélération fluide
+            duration: 1.5,
+            ease: [0.16, 1, 0.3, 1],
           },
         },
       }
+    }
+
+    // Sur la page de détail
+    return {
+      initial: { y: 0 },
+      animate: {
+        y: isActive ? 0 : -100,
+        transition: {
+          duration: 1.5,
+          ease: [0.16, 1, 0.3, 1],
+        },
+      },
+    }
+  }
 
   return (
     <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
@@ -76,8 +101,6 @@ const ProjectsView = memo(function ProjectsView({
         variants={containerVariants}
         initial="initial"
         animate="animate"
-        layoutId="projects-container"
-        layout
       >
         {projects.map((project) => {
           const projectSlug =
@@ -89,26 +112,13 @@ const ProjectsView = memo(function ProjectsView({
           return (
             <motion.div
               key={project._id}
-              variants={titleContainerVariants}
+              variants={getTitleContainerVariants(isActive)}
               onClick={(e) => handleProjectClick(e, projectSlug)}
               className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50 ${
                 isActive ? 'text-gray-500' : ''
               }`}
-              layoutId={`project-title-${projectSlug}`}
-              layout="position"
-              transition={{
-                layout: {
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 25,
-                  duration: 0.1,
-                },
-              }}
             >
-              <motion.div
-                variants={textVariants}
-                layoutId={`project-text-${projectSlug}`}
-              >
+              <motion.div variants={getTextVariants(isActive)}>
                 {project.title}
               </motion.div>
             </motion.div>
