@@ -18,16 +18,19 @@ function useProjectDetail(
   category: ProjectDetailProps['category'],
   slug: string
 ) {
-  const { isLoading, hasFetched, loadProjects, setActiveProject } =
-    useProjectsStore((state) => ({
-      isLoading: state.isLoading,
-      hasFetched: state.hasFetched,
-      loadProjects: state.loadProjects,
-      setActiveProject: state.setActiveProject,
-    }))
+  // Utiliser des sélecteurs individuels pour éviter la création d'un nouvel objet à chaque rendu
+  const isLoading = useProjectsStore((state) => state.isLoading)
+  const hasFetched = useProjectsStore((state) => state.hasFetched)
+  const loadProjects = useProjectsStore((state) => state.loadProjects)
+  const setActiveProject = useProjectsStore((state) => state.setActiveProject)
+  const getProjectsByCategory = useProjectsStore(
+    (state) => state.getProjectsByCategory
+  )
 
-  const projects = useProjectsStore((state) =>
-    state.projectsList.filter((p) => p.category === category)
+  // Récupérer les projets avec mémorisation
+  const projects = useMemo(
+    () => getProjectsByCategory(category),
+    [getProjectsByCategory, category]
   )
 
   const { navigateTo } = useTransitionNavigation()
