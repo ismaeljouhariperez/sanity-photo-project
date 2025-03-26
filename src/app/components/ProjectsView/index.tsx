@@ -111,7 +111,7 @@ function useProjectAnimations({
   const getTitleVariants = (isActive: boolean): Variants => {
     if (!isDetailPage) {
       return {
-        initial: { opacity: 0, y: 30 },
+        initial: { opacity: 0, y: -30 },
         animate: {
           opacity: 1,
           y: 0,
@@ -120,7 +120,7 @@ function useProjectAnimations({
             ease: EASE.default,
           },
         },
-        exit: { opacity: 0, y: 30 },
+        exit: { opacity: 0, y: -30 },
       }
     }
 
@@ -139,7 +139,7 @@ function useProjectAnimations({
   const getTextVariants = (isActive: boolean): Variants => {
     if (!isDetailPage) {
       return {
-        initial: { y: '100%' },
+        initial: { y: '-100%' },
         animate: {
           y: 0,
           transition: {
@@ -147,7 +147,7 @@ function useProjectAnimations({
             ease: EASE.default,
           },
         },
-        exit: { y: '100%' },
+        exit: { y: '-100%' },
       }
     }
 
