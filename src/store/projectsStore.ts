@@ -10,6 +10,7 @@ export interface ProjectsState {
   // État
   activeCategory: Category
   activeSlug: string | null
+  previousSlug: string | null
   projectsList: Project[]
   isLoading: boolean
   hasFetched: {
@@ -47,6 +48,7 @@ export const useProjectsStore = create<ProjectsState>()(
         // État initial
         activeCategory: null,
         activeSlug: null,
+        previousSlug: null,
         projectsList: [],
         isLoading: false,
         hasFetched: {
@@ -56,7 +58,11 @@ export const useProjectsStore = create<ProjectsState>()(
 
         // Actions
         setActiveProject: (category, slug) =>
-          set({ activeCategory: category, activeSlug: slug }),
+          set((state) => ({
+            activeCategory: category,
+            previousSlug: state.activeSlug,
+            activeSlug: slug,
+          })),
 
         setActiveCategory: (category) => set({ activeCategory: category }),
 
@@ -145,6 +151,7 @@ export const useProjectsStore = create<ProjectsState>()(
           set({
             activeCategory: null,
             activeSlug: null,
+            previousSlug: null,
             projectsList: [],
             isLoading: false,
             hasFetched: {
@@ -178,6 +185,7 @@ export const useProjectsStore = create<ProjectsState>()(
       partialize: (state) => ({
         activeCategory: state.activeCategory,
         activeSlug: state.activeSlug,
+        previousSlug: state.previousSlug,
         projectsList: state.projectsList,
         hasFetched: state.hasFetched,
       }),

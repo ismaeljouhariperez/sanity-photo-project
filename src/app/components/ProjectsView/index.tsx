@@ -6,6 +6,7 @@ import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import { createStaggerContainer, EASE, DURATIONS } from '@/animations'
 import { usePathname } from 'next/navigation'
+import { useProjectsStore } from '@/store'
 
 interface ProjectsViewProps {
   projects: Project[]
@@ -28,6 +29,7 @@ const ProjectsView = memo(function ProjectsView({
   const [isPresent, safeToRemove] = usePresence()
   const comingFromDetailPage =
     isPresent && !isDetailPage && pathname.includes(`/projects/${category}`)
+  const previousSlug = useProjectsStore((state) => state.previousSlug)
 
   // Nettoyage après l'animation
   useEffect(() => {
@@ -65,17 +67,26 @@ const ProjectsView = memo(function ProjectsView({
         {projects.map((project) => {
           const projectSlug = getNormalizedSlug(project)
           const isActive = activeSlugs.includes(projectSlug)
+          const wasPreviouslyActive = projectSlug === previousSlug
 
           return (
             <motion.div
               key={project._id}
-              variants={animations.getTitleVariants(isActive)}
+              variants={animations.getTitleVariants(
+                isActive,
+                wasPreviouslyActive && comingFromDetailPage
+              )}
               onClick={(e) => handleProjectClick(e, projectSlug)}
               className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50 ${
                 isActive ? 'text-gray-500' : ''
               }`}
             >
-              <motion.div variants={animations.getTextVariants(isActive)}>
+              <motion.div
+                variants={animations.getTextVariants(
+                  isActive,
+                  wasPreviouslyActive && comingFromDetailPage
+                )}
+              >
                 {project.title}
               </motion.div>
             </motion.div>
@@ -108,7 +119,19 @@ function useProjectAnimations({
     delayChildren: comingFromDetailPage ? 0 : 0.3,
   })
 
-  const getTitleVariants = (isActive: boolean): Variants => {
+  const getTitleVariants = (
+    isActive: boolean,
+    skipAnimation: boolean
+  ): Variants => {
+    // Si on doit éviter l'animation, retourner un état statique
+    if (skipAnimation) {
+      return {
+        initial: { opacity: 1, y: 0 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 1, y: 0 },
+      }
+    }
+
     if (!isDetailPage) {
       return {
         initial: { opacity: 0, y: -30 },
@@ -136,7 +159,19 @@ function useProjectAnimations({
     }
   }
 
-  const getTextVariants = (isActive: boolean): Variants => {
+  const getTextVariants = (
+    isActive: boolean,
+    skipAnimation: boolean
+  ): Variants => {
+    // Si on doit éviter l'animation, retourner un état statique
+    if (skipAnimation) {
+      return {
+        initial: { y: 0 },
+        animate: { y: 0 },
+        exit: { y: 0 },
+      }
+    }
+
     if (!isDetailPage) {
       return {
         initial: { y: '-100%' },
