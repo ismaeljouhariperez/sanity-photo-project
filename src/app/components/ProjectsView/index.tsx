@@ -1,10 +1,11 @@
 'use client'
 
-import React, { memo } from 'react'
-import { motion, Variants } from 'framer-motion'
+import React, { memo, useEffect } from 'react'
+import { motion, Variants, usePresence } from 'framer-motion'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import { createStaggerContainer, EASE, DURATIONS } from '@/animations'
+import { usePathname } from 'next/navigation'
 
 interface ProjectsViewProps {
   projects: Project[]
@@ -20,6 +21,19 @@ const ProjectsView = memo(function ProjectsView({
 }: ProjectsViewProps) {
   const { navigateTo } = useTransitionNavigation()
   const isDetailPage = activeSlugs.length > 0
+  const pathname = usePathname()
+  const [isPresent, safeToRemove] = usePresence()
+
+  // Détecter si on vient d'une page détail
+  const comingFromDetailPage =
+    isPresent && !isDetailPage && pathname.includes(`/projects/${category}`)
+
+  // Nettoyage après l'animation
+  useEffect(() => {
+    if (!isPresent) {
+      setTimeout(safeToRemove, 1000)
+    }
+  }, [isPresent, safeToRemove])
 
   // Gestionnaire d'événements pour la navigation
   const handleProjectClick = (e: React.MouseEvent, projectSlug: string) => {
@@ -32,8 +46,8 @@ const ProjectsView = memo(function ProjectsView({
 
   // Configuration du conteneur avec stagger
   const containerVariants = createStaggerContainer({
-    staggerChildren: 0.15,
-    delayChildren: 0.3,
+    staggerChildren: comingFromDetailPage ? 0.05 : 0.15,
+    delayChildren: comingFromDetailPage ? 0 : 0.3,
   })
 
   // Animation du conteneur externe
@@ -64,11 +78,11 @@ const ProjectsView = memo(function ProjectsView({
     // Sur la page de liste, slide up depuis le bas
     if (!isDetailPage) {
       return {
-        initial: { y: '100%' },
+        initial: { y: comingFromDetailPage ? 0 : '100%' },
         animate: {
           y: 0,
           transition: {
-            duration: DURATIONS.slow,
+            duration: comingFromDetailPage ? DURATIONS.fast : DURATIONS.slow,
             ease: EASE.default,
           },
         },
@@ -95,6 +109,7 @@ const ProjectsView = memo(function ProjectsView({
         variants={containerVariants}
         initial="initial"
         animate="animate"
+        exit={comingFromDetailPage ? 'initial' : 'exit'}
       >
         {projects.map((project) => {
           const projectSlug =

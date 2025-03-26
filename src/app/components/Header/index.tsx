@@ -21,11 +21,12 @@ export default function Header() {
   const handleIndexClick = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    // Logique pour naviguer vers l'index du projet
+    // Logique pour naviguer vers l'index du projet avec notre hook personnalisé
     if (pathname.includes('/projects/')) {
       const projectType = pathname.split('/projects/')[1]?.split('/')[0]
       if (projectType) {
-        navigateTo(`/projects/${projectType}`)
+        // Utiliser le hook avec délai 0 pour transition immédiate
+        navigateTo(`/projects/${projectType}`, { delay: 0 })
       } else {
         navigateTo('/projects')
       }

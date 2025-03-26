@@ -28,22 +28,41 @@ export function useTransitionNavigation() {
       navigatingRef.current = true
       setIsNavigating(true)
 
-      // Analyser l'URL pour le pattern de projet
+      // Analyser l'URL actuelle et l'URL cible
+      const currentPath =
+        typeof window !== 'undefined' ? window.location.pathname : ''
       const projectUrlPattern = /\/projects\/([^/]+)\/([^/]+)/
-      const match = url.match(projectUrlPattern)
+      const categoryUrlPattern = /\/projects\/([^/]+)$/
+
+      // Déterminer si on est sur une page détail actuellement
+      const isCurrentlyOnDetailPage = projectUrlPattern.test(currentPath)
+
+      // Analyser l'URL de destination
+      const projectMatch = url.match(projectUrlPattern)
+      const categoryMatch = url.match(categoryUrlPattern)
 
       // Vérifier si c'est une URL de projet et extraire la catégorie
-      const isProjectUrl = match !== null
-      const targetCategory = isProjectUrl ? match[1] : null
+      const isProjectUrl = projectMatch !== null
+      const isCategoryUrl = categoryMatch !== null
+      const targetCategory = isProjectUrl
+        ? projectMatch[1]
+        : isCategoryUrl
+        ? categoryMatch[1]
+        : null
 
       // Déterminer si c'est une transition rapide
       const isFastTransition =
-        isProjectUrl &&
-        // Même catégorie que celle active actuellement
-        (targetCategory === activeCategory ||
-          // Ou bien, si les données sont déjà en cache
-          (targetCategory &&
-            hasFetched[targetCategory as 'black-and-white' | 'early-color']))
+        // Navigation détail projet vers liste de projets de même catégorie
+        (isCurrentlyOnDetailPage &&
+          isCategoryUrl &&
+          targetCategory === activeCategory) ||
+        // Navigation entre projets de même catégorie
+        (isProjectUrl &&
+          // Même catégorie que celle active actuellement
+          (targetCategory === activeCategory ||
+            // Ou bien, si les données sont déjà en cache
+            (targetCategory &&
+              hasFetched[targetCategory as 'black-and-white' | 'early-color'])))
 
       // Pour les navigations immédiates
       if (isFastTransition || options.delay === 0) {
