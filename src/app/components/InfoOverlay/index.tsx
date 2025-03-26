@@ -1,5 +1,6 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
+import { DURATIONS, EASE } from '@/animations'
 
 interface InfoOverlayProps {
   isOpen: boolean
@@ -7,51 +8,68 @@ interface InfoOverlayProps {
 }
 
 export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
-  // Animation variants pour Framer Motion
-  const overlayVariants = {
-    closed: {
+  // Utilisation des constantes d'animation standardisées
+  const overlayAnimations = {
+    initial: {
       width: 0,
-      transition: { duration: 0.8, ease: [0.6, 0.05, 0.01, 0.9] },
     },
-    open: {
+    animate: {
       width: '40%',
-      transition: { duration: 0.8, ease: [0.6, 0.05, 0.01, 0.9] },
+      transition: {
+        duration: DURATIONS.normal,
+        ease: EASE.default,
+      },
+    },
+    exit: {
+      width: 0,
+      transition: {
+        duration: DURATIONS.normal,
+        ease: EASE.default,
+        delay: DURATIONS.fast,
+      },
     },
   }
 
-  const contentVariants = {
-    closed: { opacity: 0, transition: { duration: 0.3 } },
-    open: {
+  // Animation pour les éléments de contenu avec délai
+  const contentAnimations = {
+    initial: {
+      opacity: 0,
+    },
+    animate: {
       opacity: 1,
       transition: {
-        duration: 0.6,
+        duration: DURATIONS.normal,
         delay: 0.6,
-        ease: [0.6, 0.05, 0.01, 0.9],
+        ease: EASE.default,
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: DURATIONS.fast,
       },
     },
   }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
           className="fixed top-0 left-0 h-full bg-black z-50 text-white overflow-hidden"
-          initial="closed"
-          animate="open"
-          exit="closed"
-          variants={overlayVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={overlayAnimations}
         >
           <motion.button
             onClick={onClose}
             className="absolute top-8 right-8 text-white"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            variants={contentVariants}
+            variants={contentAnimations}
           >
             Fermer
           </motion.button>
 
-          <motion.div className="mt-16 p-8" variants={contentVariants}>
+          <motion.div className="mt-16 p-8" variants={contentAnimations}>
             <h2 className="text-2xl mb-4">À propos</h2>
             {/* Ajoutez ici votre contenu */}
             <p>Votre contenu ici...</p>

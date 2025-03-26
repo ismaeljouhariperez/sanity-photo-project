@@ -11,70 +11,86 @@ interface ProjectDetailProps {
   category: 'black-and-white' | 'early-color'
 }
 
-export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
-  // Utiliser le store pour accéder aux projets et gérer l'état
-  const {
-    projectsList,
-    isLoading,
-    loadProjects,
-    setActiveProject,
-    hasFetched,
-  } = useProjectsStore()
+/**
+ * Custom hook that manages project data fetching and navigation
+ */
+function useProjectDetail(
+  category: ProjectDetailProps['category'],
+  slug: string
+) {
+  const { isLoading, hasFetched, loadProjects, setActiveProject } =
+    useProjectsStore((state) => ({
+      isLoading: state.isLoading,
+      hasFetched: state.hasFetched,
+      loadProjects: state.loadProjects,
+      setActiveProject: state.setActiveProject,
+    }))
 
-  // Utiliser notre hook de navigation personnalisé
+  const projects = useProjectsStore((state) =>
+    state.projectsList.filter((p) => p.category === category)
+  )
+
   const { navigateTo } = useTransitionNavigation()
-
-  // Mémoriser le slug actif pour éviter des re-rendus inutiles
   const activeSlugs = useMemo(() => [slug], [slug])
 
-  // Un seul effet pour initialiser l'état
   useEffect(() => {
-    // Mettre à jour le projet actif
     setActiveProject(category, slug)
 
-    // Charger les projets si nécessaire
     if (!hasFetched[category]) {
       loadProjects(category)
     }
   }, [category, slug, loadProjects, setActiveProject, hasFetched])
 
-  // Gestionnaire d'événements pour retourner à la liste des projets
   const handleBackToProjects = (e: React.MouseEvent) => {
     e.preventDefault()
     navigateTo(`/projects/${category}`)
   }
 
-  // Affichage pendant le chargement
+  return {
+    isLoading,
+    projects,
+    activeSlugs,
+    handleBackToProjects,
+  }
+}
+
+const ProjectNotFound = ({
+  onBackClick,
+}: {
+  onBackClick: (e: React.MouseEvent) => void
+}) => (
+  <div className="flex flex-col justify-center items-center min-h-[70vh]">
+    <p className="mb-4">Aucun projet trouvé.</p>
+    <button onClick={onBackClick} className="text-blue-500 hover:underline">
+      Retour aux projets
+    </button>
+  </div>
+)
+
+const LoadingState = () => (
+  <div className="flex justify-center items-center min-h-[70vh]">
+    <DelayedLoader isLoading={true} message="Chargement du projet..." />
+  </div>
+)
+
+/**
+ * Displays project details with a visual emphasis on the active project
+ */
+export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
+  const { isLoading, projects, activeSlugs, handleBackToProjects } =
+    useProjectDetail(category, slug)
+
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[70vh]">
-        <DelayedLoader isLoading={true} message="Chargement du projet..." />
-      </div>
-    )
+    return <LoadingState />
   }
 
-  // Filtrer les projets pour la catégorie actuelle
-  const filteredProjects = projectsList.filter((p) => p.category === category)
-
-  // Si pas de projets trouvés
-  if (!filteredProjects.length) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-[70vh]">
-        <p className="mb-4">Aucun projet trouvé.</p>
-        <button
-          onClick={handleBackToProjects}
-          className="text-blue-500 hover:underline"
-        >
-          Retour aux projets
-        </button>
-      </div>
-    )
+  if (!projects.length) {
+    return <ProjectNotFound onBackClick={handleBackToProjects} />
   }
 
-  // Afficher la même vue que dans ProjectsList, avec le projet actuel en surbrillance
   return (
     <ProjectsView
-      projects={filteredProjects}
+      projects={projects}
       category={category}
       activeSlugs={activeSlugs}
     />
