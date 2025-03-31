@@ -6,6 +6,9 @@ import {
 } from './constants'
 import { TransitionAnimation, AnimationOptions, Direction } from './types'
 
+/**
+ * Calcule les valeurs de transformation selon la direction et la distance
+ */
 const getDirectionValue = (direction: Direction, distance: number | string) => {
   switch (direction) {
     case 'up':
@@ -19,6 +22,9 @@ const getDirectionValue = (direction: Direction, distance: number | string) => {
   }
 }
 
+/**
+ * Crée une animation de glissement (slide) avec entrée et sortie
+ */
 export const createSlideAnimation: TransitionAnimation = (
   direction,
   options = DEFAULT_ANIMATION_OPTIONS
@@ -48,6 +54,9 @@ export const createSlideAnimation: TransitionAnimation = (
   }
 }
 
+/**
+ * Crée un conteneur d'animations avec effets décalés pour les enfants
+ */
 export const createStaggerContainer = (
   options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
 ) => {
@@ -66,6 +75,9 @@ export const createStaggerContainer = (
   }
 }
 
+/**
+ * Crée une animation de révélation complète (entrée et sortie)
+ */
 export const createRevealAnimation = (
   options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
 ) => {
@@ -90,6 +102,56 @@ export const createRevealAnimation = (
       transition: {
         duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
         ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+      },
+    },
+  }
+}
+
+/**
+ * Crée une animation de dévoilement (de bas en haut)
+ */
+export const createEntranceRevealAnimation = (
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
+) => {
+  const { speed, ease, delay } = options
+
+  return {
+    initial: {
+      height: '100%',
+      bottom: 0,
+    },
+    animate: {
+      height: '0%',
+      bottom: 0,
+      transition: {
+        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
+        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+        delay,
+      },
+    },
+  }
+}
+
+/**
+ * Crée une animation de recouvrement (de haut en bas)
+ */
+export const createExitCoverAnimation = (
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
+) => {
+  const { speed, ease, delay } = options
+
+  return {
+    initial: {
+      height: 0,
+      top: 0,
+    },
+    animate: {
+      height: '100%',
+      top: 0,
+      transition: {
+        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
+        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+        delay,
       },
     },
   }
