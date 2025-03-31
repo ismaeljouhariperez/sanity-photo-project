@@ -65,3 +65,32 @@ export const createStaggerContainer = (
     exit: {},
   }
 }
+
+export const createRevealAnimation = (
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
+) => {
+  const { speed, ease, delay } = options
+
+  return {
+    initial: {
+      bottom: 0,
+      height: DISTANCES.full,
+    },
+    animate: {
+      height: 0,
+      transition: {
+        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
+        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+        delay,
+      },
+    },
+    exit: {
+      height: DISTANCES.full,
+      bottom: 0,
+      transition: {
+        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
+        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+      },
+    },
+  }
+}

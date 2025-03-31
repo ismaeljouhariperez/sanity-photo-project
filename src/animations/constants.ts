@@ -4,6 +4,7 @@ export const DURATIONS: Record<AnimationSpeed, number> = {
   fast: 0.3,
   normal: 0.8,
   slow: 1.5,
+  slower: 2,
 }
 
 export const EASE: Record<EaseType, number[]> = {
