@@ -18,7 +18,7 @@
     "framer-motion": "^12.5.0",
     "imagekit": "^6.0.0",
     "imagekit-javascript": "^3.0.2",
-    "next": "^15.2.3",
+    "next": "^15.2.4",
     "next-sanity": "^9.9.5",
     "next-seo": "^6.6.0",
     "next-themes": "^0.4.4",
