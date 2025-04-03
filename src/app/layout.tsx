@@ -57,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
       <body
-        className="transition-colors duration-200 bg-white dark:bg-gray-900 text-black dark:text-white"
+        className="transition-colors duration-200 bg-gray-50 dark:bg-gray-900 text-black dark:text-white"
         suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

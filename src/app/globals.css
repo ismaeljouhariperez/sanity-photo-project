@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body * {
-  transition: color 500ms, background-color 500ms;
+  transition: color 200ms, background-color 200ms;
 }
 
 body {

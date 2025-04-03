@@ -73,7 +73,7 @@ const ProjectImage: React.FC<ProjectImageProps> = ({
             variants={entranceVariants}
             initial="initial"
             animate="animate"
-            className="absolute bottom-0 left-0 w-full bg-white dark:bg-gray-900 z-10"
+            className="absolute bottom-0 left-0 w-full bg-gray-50 dark:bg-gray-900 z-10"
           />
         )}
       </AnimatePresence>
@@ -86,7 +86,7 @@ const ProjectImage: React.FC<ProjectImageProps> = ({
             variants={exitVariants}
             initial="initial"
             animate="animate"
-            className="absolute top-0 left-0 w-full bg-white dark:bg-gray-900 z-10"
+            className="absolute top-0 left-0 w-full bg-gray-50 dark:bg-gray-900 z-10"
           />
         )}
       </AnimatePresence>
@@ -107,7 +107,7 @@ function useNavigateToProject() {
     if (targetUrl) {
       const timer = setTimeout(() => {
         navigateTo(targetUrl)
-      }, 2100) // Délai pour permettre aux animations de sortie de se terminer
+      }, 1000) // Délai réduit pour permettre aux animations de sortie de se terminer
 
       return () => clearTimeout(timer)
     }

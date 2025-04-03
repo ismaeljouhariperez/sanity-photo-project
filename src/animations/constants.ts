@@ -1,10 +1,10 @@
 import { EaseType, AnimationSpeed } from './types'
 
 export const DURATIONS: Record<AnimationSpeed, number> = {
-  fast: 0.3,
-  normal: 0.8,
-  slow: 1.5,
-  slower: 2,
+  fast: 0.2,
+  normal: 0.5,
+  slow: 0.9,
+  slower: 1.2,
 }
 
 export const EASE: Record<EaseType, number[]> = {
