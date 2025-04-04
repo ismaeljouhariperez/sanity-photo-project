@@ -2,6 +2,8 @@
 import { motion } from 'framer-motion'
 import { ReactNode, useEffect } from 'react'
 import { useAnimationStore } from '@/store/animationStore'
+import { usePathname } from 'next/navigation'
+import { useProjectsStore } from '@/store'
 
 interface PageTransitionProps {
   children: ReactNode
@@ -15,6 +17,14 @@ export default function PageTransition({
   overrideTransition = false,
 }: PageTransitionProps) {
   const { isLeavingPage } = useAnimationStore()
+  const pathname = usePathname()
+  const previousSlug = useProjectsStore((state) => state.previousSlug)
+
+  // Vérifier si on revient d'une page de détail à une liste de projets
+  const isReturningFromDetail =
+    previousSlug &&
+    pathname?.includes('/projects/') &&
+    !pathname?.includes(`/${previousSlug}`)
 
   // Reset le flag isLeavingPage lors du démontage
   useEffect(() => {
@@ -22,6 +32,11 @@ export default function PageTransition({
       // Nettoyage lors du démontage
     }
   }, [])
+
+  // Si on revient de détail à liste, ne pas animer
+  if (isReturningFromDetail) {
+    return <div className={className}>{children}</div>
+  }
 
   const variants = {
     initial: { opacity: 0, y: 20 },
