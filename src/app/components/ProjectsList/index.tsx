@@ -11,11 +11,8 @@ interface ProjectsListProps {
 }
 
 /**
- * Composant qui affiche la liste des projets d'une catégorie spécifique.
- * Gère le chargement des données depuis le store et affiche différents états:
- * - Chargement
- * - Liste vide
- * - Liste des projets
+ * Container component for projects of a specific category
+ * Manages data loading and provides appropriate views based on loading state
  */
 export default function ProjectsList({ category }: ProjectsListProps) {
   const {
@@ -47,7 +44,7 @@ export default function ProjectsList({ category }: ProjectsListProps) {
   return <ProjectsView projects={filteredProjects} category={category} />
 }
 
-// Composants d'UI extraits pour améliorer la lisibilité
+// UI Components
 
 const LoadingView = () => (
   <div className="flex flex-col justify-center items-center min-h-[70vh]">

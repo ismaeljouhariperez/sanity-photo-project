@@ -15,8 +15,8 @@ interface ProjectsViewProps {
 }
 
 /**
- * Affiche une liste interactive des projets photographiques
- * Gère les animations de transition entre la vue liste et la vue détail
+ * Interactive list of photography projects with transition animations
+ * Handles smooth transitions between list and detail views
  */
 const ProjectsView = memo(function ProjectsView({
   projects,
@@ -68,13 +68,15 @@ const ProjectsView = memo(function ProjectsView({
           const projectSlug = getNormalizedSlug(project)
           const isActive = activeSlugs.includes(projectSlug)
           const wasPreviouslyActive = projectSlug === previousSlug
+          const shouldPreservePosition =
+            wasPreviouslyActive && comingFromDetailPage
 
           return (
             <motion.div
               key={project._id}
               variants={animations.getTitleVariants(
                 isActive,
-                wasPreviouslyActive && comingFromDetailPage
+                shouldPreservePosition
               )}
               onClick={(e) => handleProjectClick(e, projectSlug)}
               className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50 ${
@@ -84,7 +86,7 @@ const ProjectsView = memo(function ProjectsView({
               <motion.div
                 variants={animations.getTextVariants(
                   isActive,
-                  wasPreviouslyActive && comingFromDetailPage
+                  shouldPreservePosition
                 )}
               >
                 {project.title}
@@ -105,7 +107,8 @@ function getNormalizedSlug(project: Project): string {
 }
 
 /**
- * Hook personnalisé pour gérer les animations de projet
+ * Manages project animations based on navigation context
+ * Controls transitions, timing, and visual effects for project titles
  */
 function useProjectAnimations({
   isDetailPage,
@@ -115,7 +118,7 @@ function useProjectAnimations({
   comingFromDetailPage: boolean
 }) {
   const container = createStaggerContainer({
-    staggerChildren: comingFromDetailPage ? 0.4 : 0.3,
+    staggerChildren: 0.3,
     delayChildren: comingFromDetailPage ? 0 : 0.3,
   })
 
@@ -123,8 +126,7 @@ function useProjectAnimations({
     isActive: boolean,
     skipAnimation: boolean
   ): Variants => {
-    // Si on doit éviter l'animation, retourner un état statique
-    if (skipAnimation) {
+    if (skipAnimation || comingFromDetailPage) {
       return {
         initial: { opacity: 1, y: 0 },
         animate: { opacity: 1, y: 0 },
@@ -163,8 +165,7 @@ function useProjectAnimations({
     isActive: boolean,
     skipAnimation: boolean
   ): Variants => {
-    // Si on doit éviter l'animation, retourner un état statique
-    if (skipAnimation) {
+    if (skipAnimation || comingFromDetailPage) {
       return {
         initial: { y: 0 },
         animate: { y: 0 },

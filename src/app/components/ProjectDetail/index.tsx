@@ -12,13 +12,13 @@ interface ProjectDetailProps {
 }
 
 /**
- * Custom hook that manages project data fetching and navigation
+ * Custom hook for project data management and navigation
+ * Handles project loading, state tracking, and navigation between views
  */
 function useProjectDetail(
   category: ProjectDetailProps['category'],
   slug: string
 ) {
-  // Utiliser des sélecteurs individuels pour éviter la création d'un nouvel objet à chaque rendu
   const isLoading = useProjectsStore((state) => state.isLoading)
   const hasFetched = useProjectsStore((state) => state.hasFetched)
   const loadProjects = useProjectsStore((state) => state.loadProjects)
@@ -27,7 +27,6 @@ function useProjectDetail(
     (state) => state.getProjectsByCategory
   )
 
-  // Récupérer les projets avec mémorisation
   const projects = useMemo(
     () => getProjectsByCategory(category),
     [getProjectsByCategory, category]
@@ -46,6 +45,10 @@ function useProjectDetail(
 
   const handleBackToProjects = (e: React.MouseEvent) => {
     e.preventDefault()
+
+    // Mark this project as previously active for better transition experience
+    setActiveProject(category, slug)
+
     navigateTo(`/projects/${category}`)
   }
 
@@ -77,7 +80,8 @@ const LoadingState = () => (
 )
 
 /**
- * Displays project details with a visual emphasis on the active project
+ * Project detail view that displays a specific project
+ * Uses ProjectsView but focuses on the active project
  */
 export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
   const { isLoading, projects, activeSlugs, handleBackToProjects } =

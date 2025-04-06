@@ -7,7 +7,7 @@ import { Project } from '@/lib/sanity.types'
 type Category = 'black-and-white' | 'early-color' | null
 
 export interface ProjectsState {
-  // État
+  // State
   activeCategory: Category
   activeSlug: string | null
   previousSlug: string | null
@@ -26,26 +26,25 @@ export interface ProjectsState {
   setLoading: (isLoading: boolean) => void
   resetState: () => void
 
-  // Sélecteurs
+  // Selectors
   getProjectsByCategory: (category: Category) => Project[]
 }
 
-// Création d'une instance d'adaptateur Sanity à l'extérieur du store
-// pour éviter de créer une nouvelle instance à chaque utilisation
+// Singleton Sanity adapter to avoid repeated instantiation
 const sanityAdapter = new SanityAdapter()
 
 /**
- * Store Zustand pour la gestion des projets
- * Gère le chargement, la mise en cache et l'accès aux projets par catégorie
+ * Zustand store for projects management
+ * Handles loading, caching, and accessing projects by category
  */
 export const useProjectsStore = create<ProjectsState>()(
   persist(
     (set, get) => {
-      // Mise en cache des résultats de filtrage pour éviter des re-rendus en chaîne
+      // Cache for filtered projects to prevent chain re-renders
       const categoryProjectsCache: Record<string, Project[]> = {}
 
       return {
-        // État initial
+        // Initial state
         activeCategory: null,
         activeSlug: null,
         previousSlug: null,
@@ -69,36 +68,36 @@ export const useProjectsStore = create<ProjectsState>()(
         loadProjects: async (category) => {
           if (!category) return []
 
-          // Vérifier si les projets pour cette catégorie ont déjà été chargés
+          // Check if projects for this category are already loaded
           const { hasFetched } = get()
 
           if (hasFetched[category]) {
-            // Retourner les projets filtrés par catégorie du cache interne
+            // Return filtered projects from internal cache
             return get().getProjectsByCategory(category)
           }
 
-          // Sinon, charger depuis l'API
+          // Load from API if not cached
           try {
             set({ isLoading: true })
 
             const projects = await sanityAdapter.fetchProjects(category)
 
-            // Traiter les projets pour normaliser les slugs
+            // Process projects to normalize slugs
             const processedProjects = projects.map((project) => ({
               ...project,
               normalizedSlug: project.slug.current || String(project.slug),
             }))
 
-            // Mettre à jour l'état
+            // Update state
             set((state) => {
-              // Réinitialiser le cache pour cette catégorie
+              // Reset cache for this category
               if (category) delete categoryProjectsCache[category]
 
               return {
                 projectsList: [
-                  // Conserver les projets des autres catégories
+                  // Keep projects from other categories
                   ...state.projectsList.filter((p) => p.category !== category),
-                  // Ajouter les nouveaux projets
+                  // Add new projects
                   ...processedProjects,
                 ],
                 hasFetched: {
@@ -111,10 +110,7 @@ export const useProjectsStore = create<ProjectsState>()(
 
             return processedProjects
           } catch (error) {
-            console.error(
-              `Erreur lors du chargement des projets (${category}):`,
-              error
-            )
+            console.error(`Error loading projects (${category}):`, error)
             set({ isLoading: false })
             return []
           }
@@ -124,7 +120,7 @@ export const useProjectsStore = create<ProjectsState>()(
           if (!category) return
 
           set((state) => {
-            // Réinitialiser le cache pour cette catégorie
+            // Reset cache for this category
             if (category) delete categoryProjectsCache[category]
 
             return {
@@ -143,7 +139,7 @@ export const useProjectsStore = create<ProjectsState>()(
         setLoading: (isLoading) => set({ isLoading }),
 
         resetState: () => {
-          // Vider complètement le cache
+          // Clear the entire cache
           Object.keys(categoryProjectsCache).forEach((key) => {
             delete categoryProjectsCache[key]
           })
@@ -161,16 +157,16 @@ export const useProjectsStore = create<ProjectsState>()(
           })
         },
 
-        // Sélecteur optimisé pour filtrer les projets par catégorie
+        // Optimized selector to filter projects by category
         getProjectsByCategory: (category) => {
           if (!category) return []
 
-          // Utiliser le cache si disponible
+          // Use cache if available
           if (categoryProjectsCache[category]) {
             return categoryProjectsCache[category]
           }
 
-          // Sinon, filtrer et mettre en cache
+          // Filter and cache results
           const filtered = get().projectsList.filter(
             (p) => p.category === category
           )
@@ -181,7 +177,7 @@ export const useProjectsStore = create<ProjectsState>()(
     },
     {
       name: 'projects-storage',
-      // On ne persiste que les données essentielles pour éviter de surcharger le stockage
+      // Only persist essential data to avoid storage bloat
       partialize: (state) => ({
         activeCategory: state.activeCategory,
         activeSlug: state.activeSlug,

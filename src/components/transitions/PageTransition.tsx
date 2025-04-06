@@ -11,6 +11,10 @@ interface PageTransitionProps {
   overrideTransition?: boolean
 }
 
+/**
+ * Wrapper component that provides page transition animations
+ * Intelligently detects return navigation to disable animations when needed
+ */
 export default function PageTransition({
   children,
   className = '',
@@ -20,20 +24,20 @@ export default function PageTransition({
   const pathname = usePathname()
   const previousSlug = useProjectsStore((state) => state.previousSlug)
 
-  // Vérifier si on revient d'une page de détail à une liste de projets
+  // Check if returning from a project detail to a project list
   const isReturningFromDetail =
     previousSlug &&
     pathname?.includes('/projects/') &&
     !pathname?.includes(`/${previousSlug}`)
 
-  // Reset le flag isLeavingPage lors du démontage
+  // Reset isLeavingPage flag on unmount
   useEffect(() => {
     return () => {
-      // Nettoyage lors du démontage
+      // Cleanup on unmount
     }
   }, [])
 
-  // Si on revient de détail à liste, ne pas animer
+  // If returning from detail to list, skip animations
   if (isReturningFromDetail) {
     return <div className={className}>{children}</div>
   }
@@ -44,10 +48,10 @@ export default function PageTransition({
     exit: { opacity: 0, y: -20 },
   }
 
-  // Ajuster les transitions pour les rendre plus fluides
+  // Adjust transitions for smoother animations
   const transition = {
     duration: overrideTransition || isLeavingPage ? 0.2 : 0.5,
-    ease: [0.22, 1, 0.36, 1], // Équivalent de l'ease-out-cubic de GSAP
+    ease: [0.22, 1, 0.36, 1], // Equivalent to GSAP's ease-out-cubic
   }
 
   return (
