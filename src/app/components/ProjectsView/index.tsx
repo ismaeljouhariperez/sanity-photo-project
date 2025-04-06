@@ -68,15 +68,13 @@ const ProjectsView = memo(function ProjectsView({
           const projectSlug = getNormalizedSlug(project)
           const isActive = activeSlugs.includes(projectSlug)
           const wasPreviouslyActive = projectSlug === previousSlug
-          const shouldPreservePosition =
-            wasPreviouslyActive && comingFromDetailPage
 
           return (
             <motion.div
               key={project._id}
               variants={animations.getTitleVariants(
                 isActive,
-                shouldPreservePosition
+                wasPreviouslyActive && comingFromDetailPage
               )}
               onClick={(e) => handleProjectClick(e, projectSlug)}
               className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50 ${
@@ -86,7 +84,7 @@ const ProjectsView = memo(function ProjectsView({
               <motion.div
                 variants={animations.getTextVariants(
                   isActive,
-                  shouldPreservePosition
+                  wasPreviouslyActive && comingFromDetailPage
                 )}
               >
                 {project.title}
@@ -118,7 +116,7 @@ function useProjectAnimations({
   comingFromDetailPage: boolean
 }) {
   const container = createStaggerContainer({
-    staggerChildren: 0.3,
+    staggerChildren: comingFromDetailPage ? 0.4 : 0.3,
     delayChildren: comingFromDetailPage ? 0 : 0.3,
   })
 
@@ -126,7 +124,7 @@ function useProjectAnimations({
     isActive: boolean,
     skipAnimation: boolean
   ): Variants => {
-    if (skipAnimation || comingFromDetailPage) {
+    if (skipAnimation) {
       return {
         initial: { opacity: 1, y: 0 },
         animate: { opacity: 1, y: 0 },
@@ -165,7 +163,7 @@ function useProjectAnimations({
     isActive: boolean,
     skipAnimation: boolean
   ): Variants => {
-    if (skipAnimation || comingFromDetailPage) {
+    if (skipAnimation) {
       return {
         initial: { y: 0 },
         animate: { y: 0 },
