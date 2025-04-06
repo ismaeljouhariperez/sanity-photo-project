@@ -4,14 +4,16 @@ import ClientCategoryPage from './client-page'
 type Category = 'black-and-white' | 'early-color'
 
 type Props = {
-  params: { category: Category }
+  params: Promise<{ category: Category }> | { category: Category }
 }
 
 /**
  * Génère les métadonnées dynamiques pour les pages de catégorie de projets
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category } = params
+  // Attendre la résolution des paramètres s'ils sont une Promise
+  const resolvedParams = await Promise.resolve(params)
+  const { category } = resolvedParams
 
   const categoryTitle =
     category === 'black-and-white' ? 'Noir et Blanc' : 'Couleur'
@@ -22,8 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function CategoryPage({ params }: Props) {
-  const { category } = params
+export default async function CategoryPage({ params }: Props) {
+  // Attendre la résolution des paramètres s'ils sont une Promise
+  const resolvedParams = await Promise.resolve(params)
+  const { category } = resolvedParams
 
   return <ClientCategoryPage category={category} />
 }
