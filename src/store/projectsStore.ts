@@ -17,11 +17,18 @@ export interface ProjectsState {
     'black-and-white': boolean
     'early-color': boolean
   }
+  lastFetchTimestamp: {
+    'black-and-white': number
+    'early-color': number
+  }
 
   // Actions
   setActiveProject: (category: Category, slug: string | null) => void
   setActiveCategory: (category: Category) => void
-  loadProjects: (category: Category) => Promise<Project[]>
+  loadProjects: (
+    category: Category,
+    forceReload?: boolean
+  ) => Promise<Project[]>
   setProjects: (projects: Project[], category: Category) => void
   setLoading: (isLoading: boolean) => void
   resetState: () => void
@@ -32,6 +39,9 @@ export interface ProjectsState {
 
 // Singleton Sanity adapter to avoid repeated instantiation
 const sanityAdapter = new SanityAdapter()
+
+// Définir un seuil de fraîcheur pour les données (en ms)
+const CACHE_FRESHNESS_THRESHOLD = 5 * 60 * 1000 // 5 minutes
 
 /**
  * Zustand store for projects management
@@ -54,6 +64,10 @@ export const useProjectsStore = create<ProjectsState>()(
           'black-and-white': false,
           'early-color': false,
         },
+        lastFetchTimestamp: {
+          'black-and-white': 0,
+          'early-color': 0,
+        },
 
         // Actions
         setActiveProject: (category, slug) =>
@@ -65,18 +79,25 @@ export const useProjectsStore = create<ProjectsState>()(
 
         setActiveCategory: (category) => set({ activeCategory: category }),
 
-        loadProjects: async (category) => {
+        loadProjects: async (category, forceReload = false) => {
           if (!category) return []
 
           // Check if projects for this category are already loaded
-          const { hasFetched } = get()
+          const { hasFetched, lastFetchTimestamp } = get()
+          const now = Date.now()
+          const dataAge = now - (lastFetchTimestamp[category] || 0)
+          const isCacheFresh = dataAge < CACHE_FRESHNESS_THRESHOLD
 
-          if (hasFetched[category]) {
+          // Skip loading if data is already loaded and fresh, unless forceReload is true
+          if (hasFetched[category] && isCacheFresh && !forceReload) {
+            console.log(
+              `Using cached projects for ${category}, age: ${dataAge}ms`
+            )
             // Return filtered projects from internal cache
             return get().getProjectsByCategory(category)
           }
 
-          // Load from API if not cached
+          // Load from API if not cached or force reload
           try {
             set({ isLoading: true })
 
@@ -103,6 +124,10 @@ export const useProjectsStore = create<ProjectsState>()(
                 hasFetched: {
                   ...state.hasFetched,
                   [category]: true,
+                },
+                lastFetchTimestamp: {
+                  ...state.lastFetchTimestamp,
+                  [category]: Date.now(),
                 },
                 isLoading: false,
               }
@@ -132,6 +157,10 @@ export const useProjectsStore = create<ProjectsState>()(
                 ...state.hasFetched,
                 [category]: true,
               },
+              lastFetchTimestamp: {
+                ...state.lastFetchTimestamp,
+                [category]: Date.now(),
+              },
             }
           })
         },
@@ -153,6 +182,10 @@ export const useProjectsStore = create<ProjectsState>()(
             hasFetched: {
               'black-and-white': false,
               'early-color': false,
+            },
+            lastFetchTimestamp: {
+              'black-and-white': 0,
+              'early-color': 0,
             },
           })
         },
@@ -184,6 +217,7 @@ export const useProjectsStore = create<ProjectsState>()(
         previousSlug: state.previousSlug,
         projectsList: state.projectsList,
         hasFetched: state.hasFetched,
+        lastFetchTimestamp: state.lastFetchTimestamp,
       }),
     }
   )

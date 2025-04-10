@@ -46,7 +46,7 @@ type CacheEntry<T> = {
 }
 
 type PendingRequest = {
-  promise: Promise<any>
+  promise: Promise<unknown>
   controllers: AbortController[]
 }
 
@@ -54,15 +54,16 @@ type PendingRequest = {
 interface SanityCacheClearEvent extends Event {
   detail?: {
     path?: string
+    key?: string // pour invalider une clé spécifique
   }
 }
 
 // Classe de cache client
 class ClientCache {
-  private cache = new Map<string, CacheEntry<any>>()
+  private cache = new Map<string, CacheEntry<unknown>>()
   private pendingRequests = new Map<string, PendingRequest>()
-  private readonly DEFAULT_TTL = 5 * 60 * 1000 // 5 minutes par défaut
-  private readonly PROJECT_TTL = 10 * 60 * 1000 // 10 minutes pour les projets
+  private readonly DEFAULT_TTL = 2 * 60 * 1000 // 2 minutes par défaut (réduit)
+  private readonly PROJECT_TTL = 5 * 60 * 1000 // 5 minutes pour les projets (réduit)
 
   constructor() {
     // Écouteur d'événement pour le nettoyage du cache
@@ -70,8 +71,35 @@ class ClientCache {
       window.addEventListener(SANITY_CACHE_CLEAR_EVENT, ((
         e: SanityCacheClearEvent
       ) => {
-        this.handleCacheClearing(e.detail?.path || '')
+        if (e.detail?.key) {
+          // Invalider une clé spécifique
+          this.invalidateKey(e.detail.key)
+        } else {
+          // Sinon, comportement habituel
+          this.handleCacheClearing(e.detail?.path || '')
+        }
       }) as EventListener)
+    }
+  }
+
+  // Invalider une clé spécifique ou un pattern de clés
+  invalidateKey(keyPattern: string) {
+    console.log(`🔑 Invalidation du cache pour: ${keyPattern}`)
+
+    // Si la clé contient un wildcard, on invalide toutes les clés qui correspondent
+    if (keyPattern.includes('*')) {
+      const regex = new RegExp(`^${keyPattern.replace('*', '.*')}$`)
+
+      for (const key of this.cache.keys()) {
+        if (regex.test(key)) {
+          console.log(`  ↪ Suppression de: ${key}`)
+          this.cache.delete(key)
+        }
+      }
+    } else if (this.cache.has(keyPattern)) {
+      // Sinon on invalide juste la clé spécifique
+      this.cache.delete(keyPattern)
+      console.log(`  ↪ Clé supprimée`)
     }
   }
 
@@ -172,7 +200,7 @@ class ClientCache {
       // Ajouter un nouveau contrôleur pour cette demande existante
       const controller = new AbortController()
       pendingRequest.controllers.push(controller)
-      return pendingRequest.promise
+      return pendingRequest.promise as T
     }
 
     // Créer un nouveau contrôleur pour cette requête
@@ -194,7 +222,7 @@ class ClientCache {
     const promise = request()
     this.pendingRequests.set(key, { promise, controllers: [controller] })
 
-    return promise
+    return promise as T
   }
 }
 
@@ -318,5 +346,26 @@ export class SanityAdapter implements ISanityService {
 
 // Création d'une instance de l'adaptateur
 const sanityAdapter = new SanityAdapter()
+
+/**
+ * Fonction utilitaire pour invalider le cache des projets
+ * @param category Catégorie spécifique à invalider, ou undefined pour invalider toutes les catégories
+ */
+export function invalidateProjectsCache(category?: string): void {
+  if (typeof window === 'undefined') return
+
+  const key = category
+    ? `${CACHE_KEYS.PROJECTS}_${category}`
+    : `${CACHE_KEYS.PROJECTS}*`
+
+  const event = new CustomEvent(SANITY_CACHE_CLEAR_EVENT, {
+    detail: { key },
+  })
+
+  window.dispatchEvent(event)
+  console.log(
+    `Cache invalidé pour les projets ${category || '(toutes catégories)'}`
+  )
+}
 
 export default sanityAdapter

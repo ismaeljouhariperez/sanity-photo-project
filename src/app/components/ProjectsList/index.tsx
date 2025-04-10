@@ -15,21 +15,23 @@ interface ProjectsListProps {
  * Manages data loading and provides appropriate views based on loading state
  */
 export default function ProjectsList({ category }: ProjectsListProps) {
-  const {
-    isLoading,
-    loadProjects,
-    setActiveCategory,
-    hasFetched,
-    getProjectsByCategory,
-  } = useProjectsStore()
+  const { isLoading, loadProjects, setActiveCategory, getProjectsByCategory } =
+    useProjectsStore()
 
   useEffect(() => {
     setActiveCategory(category)
 
-    if (!hasFetched[category]) {
+    // Force reload projects on component mount to ensure fresh data
+    loadProjects(category, true)
+
+    // Optional: Set up polling for regular updates while component is mounted
+    const intervalId = setInterval(() => {
+      // Use regular load with cache for polling (will only fetch if cache is stale)
       loadProjects(category)
-    }
-  }, [category, loadProjects, setActiveCategory, hasFetched])
+    }, 60000) // Check for updates every minute
+
+    return () => clearInterval(intervalId)
+  }, [category, loadProjects, setActiveCategory])
 
   const filteredProjects = getProjectsByCategory(category)
 
