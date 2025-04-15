@@ -6,10 +6,16 @@ import {
 } from './constants'
 import { TransitionAnimation, AnimationOptions, Direction } from './types'
 
+type Position = 'top' | 'bottom'
+type TransformValue = { x?: number | string; y?: number | string }
+
 /**
  * Calcule les valeurs de transformation selon la direction et la distance
  */
-const getDirectionValue = (direction: Direction, distance: number | string) => {
+const getDirectionValue = (
+  direction: Direction,
+  distance: number | string
+): TransformValue => {
   switch (direction) {
     case 'up':
       return { y: -distance }
@@ -26,13 +32,43 @@ const getDirectionValue = (direction: Direction, distance: number | string) => {
  * Crée une configuration de transition commune
  */
 const createTransitionConfig = (
-  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS,
+  overrides: Partial<AnimationOptions> = {}
 ) => {
-  const { speed, ease, delay } = options
+  const { speed, ease, delay } = { ...options, ...overrides }
   return {
     duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
     ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
     delay,
+  }
+}
+
+/**
+ * Crée une animation de base avec des états initial, animate et exit
+ */
+const createBaseAnimation = <T extends Record<string, unknown>>(
+  states: {
+    initial: T
+    animate: T
+    exit?: T
+  },
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
+) => {
+  const transition = createTransitionConfig(options)
+  const exitTransition = createTransitionConfig(options, { delay: 0 })
+
+  return {
+    initial: states.initial,
+    animate: {
+      ...states.animate,
+      transition,
+    },
+    ...(states.exit && {
+      exit: {
+        ...states.exit,
+        transition: exitTransition,
+      },
+    }),
   }
 }
 
@@ -44,21 +80,15 @@ export const createSlideAnimation: TransitionAnimation = (
   options = DEFAULT_ANIMATION_OPTIONS
 ) => {
   const distance = DISTANCES.large
-  const transition = createTransitionConfig(options)
 
-  return {
-    initial: { ...getDirectionValue(direction, distance), opacity: 0 },
-    animate: {
-      ...getDirectionValue(direction, 0),
-      opacity: 1,
-      transition,
+  return createBaseAnimation(
+    {
+      initial: { ...getDirectionValue(direction, distance), opacity: 0 },
+      animate: { ...getDirectionValue(direction, 0), opacity: 1 },
+      exit: { ...getDirectionValue(direction, -distance), opacity: 0 },
     },
-    exit: {
-      ...getDirectionValue(direction, -distance),
-      opacity: 0,
-      transition: { ...transition, delay: 0 },
-    },
-  }
+    options
+  )
 }
 
 /**
@@ -89,21 +119,21 @@ const createBaseRevealAnimation = (
   options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS,
   initialHeight: string | number = DISTANCES.full,
   targetHeight: string | number = 0,
-  position: 'top' | 'bottom' = 'bottom'
+  position: Position = 'bottom'
 ) => {
-  const transition = createTransitionConfig(options)
-
-  return {
-    initial: {
-      height: initialHeight,
-      [position]: 0,
+  return createBaseAnimation(
+    {
+      initial: {
+        height: initialHeight,
+        [position]: 0,
+      },
+      animate: {
+        height: targetHeight,
+        [position]: 0,
+      },
     },
-    animate: {
-      height: targetHeight,
-      [position]: 0,
-      transition,
-    },
-  }
+    options
+  )
 }
 
 /**
@@ -118,7 +148,7 @@ export const createRevealAnimation = (
     exit: {
       height: DISTANCES.full,
       bottom: 0,
-      transition: { ...base.animate.transition, delay: 0 },
+      transition: createTransitionConfig(options, { delay: 0 }),
     },
   }
 }
