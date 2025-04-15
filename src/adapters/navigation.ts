@@ -2,16 +2,18 @@ import { useRouter } from 'next/navigation'
 
 // Interface de navigation
 export interface INavigationService {
-  navigateTo(path: string): Promise<void>
+  navigateTo(path: string): void
 }
 
-// Adapter pour Next.js Router
+/**
+ * Adapter for Next.js Router
+ * Provides a consistent navigation interface across the application
+ */
 export class NextNavigationAdapter implements INavigationService {
   constructor(private router: ReturnType<typeof useRouter>) {}
 
-  async navigateTo(path: string): Promise<void> {
-    // Utilisation directe sans await pour éviter l'erreur
-    // "A listener indicated an asynchronous response by returning true, but the message channel closed"
+  navigateTo(path: string): void {
+    // Direct usage of router.push as it's already handling navigation internally
     this.router.push(path)
   }
 }
