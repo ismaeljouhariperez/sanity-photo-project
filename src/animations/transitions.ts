@@ -23,33 +23,40 @@ const getDirectionValue = (direction: Direction, distance: number | string) => {
 }
 
 /**
+ * Crée une configuration de transition commune
+ */
+const createTransitionConfig = (
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
+) => {
+  const { speed, ease, delay } = options
+  return {
+    duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
+    ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+    delay,
+  }
+}
+
+/**
  * Crée une animation de glissement (slide) avec entrée et sortie
  */
 export const createSlideAnimation: TransitionAnimation = (
   direction,
   options = DEFAULT_ANIMATION_OPTIONS
 ) => {
-  const { speed, ease, delay } = options
   const distance = DISTANCES.large
+  const transition = createTransitionConfig(options)
 
   return {
     initial: { ...getDirectionValue(direction, distance), opacity: 0 },
     animate: {
       ...getDirectionValue(direction, 0),
       opacity: 1,
-      transition: {
-        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
-        delay,
-      },
+      transition,
     },
     exit: {
       ...getDirectionValue(direction, -distance),
       opacity: 0,
-      transition: {
-        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
-      },
+      transition: { ...transition, delay: 0 },
     },
   }
 }
@@ -76,33 +83,42 @@ export const createStaggerContainer = (
 }
 
 /**
+ * Crée une animation de base pour les révélations
+ */
+const createBaseRevealAnimation = (
+  options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS,
+  initialHeight: string | number = DISTANCES.full,
+  targetHeight: string | number = 0,
+  position: 'top' | 'bottom' = 'bottom'
+) => {
+  const transition = createTransitionConfig(options)
+
+  return {
+    initial: {
+      height: initialHeight,
+      [position]: 0,
+    },
+    animate: {
+      height: targetHeight,
+      [position]: 0,
+      transition,
+    },
+  }
+}
+
+/**
  * Crée une animation de révélation complète (entrée et sortie)
  */
 export const createRevealAnimation = (
   options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
 ) => {
-  const { speed, ease, delay } = options
-
+  const base = createBaseRevealAnimation(options)
   return {
-    initial: {
-      bottom: 0,
-      height: DISTANCES.full,
-    },
-    animate: {
-      height: 0,
-      transition: {
-        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
-        delay,
-      },
-    },
+    ...base,
     exit: {
       height: DISTANCES.full,
       bottom: 0,
-      transition: {
-        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
-      },
+      transition: { ...base.animate.transition, delay: 0 },
     },
   }
 }
@@ -112,47 +128,11 @@ export const createRevealAnimation = (
  */
 export const createEntranceRevealAnimation = (
   options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
-) => {
-  const { speed, ease, delay } = options
-
-  return {
-    initial: {
-      height: '100%',
-      bottom: 0,
-    },
-    animate: {
-      height: '0%',
-      bottom: 0,
-      transition: {
-        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
-        delay,
-      },
-    },
-  }
-}
+) => createBaseRevealAnimation(options, '100%', '0%', 'bottom')
 
 /**
  * Crée une animation de recouvrement (de haut en bas)
  */
 export const createExitCoverAnimation = (
   options: AnimationOptions = DEFAULT_ANIMATION_OPTIONS
-) => {
-  const { speed, ease, delay } = options
-
-  return {
-    initial: {
-      height: 0,
-      top: 0,
-    },
-    animate: {
-      height: '100%',
-      top: 0,
-      transition: {
-        duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-        ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
-        delay,
-      },
-    },
-  }
-}
+) => createBaseRevealAnimation(options, 0, '100%', 'top')
