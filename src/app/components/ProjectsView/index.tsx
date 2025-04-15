@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useEffect } from 'react'
+import { memo, useEffect, MouseEvent } from 'react'
 import { motion, Variants, usePresence } from 'framer-motion'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
@@ -39,7 +39,7 @@ const ProjectsView = memo(function ProjectsView({
   }, [isPresent, safeToRemove])
 
   // Gestionnaire d'événements pour la navigation
-  const handleProjectClick = (e: React.MouseEvent, projectSlug: string) => {
+  const handleProjectClick = (e: MouseEvent, projectSlug: string) => {
     // Ne pas déclencher la navigation si on est déjà sur ce projet
     if (activeSlugs.includes(projectSlug)) return
 
