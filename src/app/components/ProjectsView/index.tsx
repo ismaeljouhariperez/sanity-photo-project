@@ -1,6 +1,6 @@
 'use client'
 
-import React, { memo, useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { motion, Variants, usePresence } from 'framer-motion'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
