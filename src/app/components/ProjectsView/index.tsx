@@ -23,7 +23,7 @@ const ProjectsView = memo(function ProjectsView({
   category,
   activeSlugs = [],
 }: ProjectsViewProps) {
-  const { navigateTo } = useTransitionNavigation()
+  const { navigateWithTransition } = useTransitionNavigation()
   const isDetailPage = activeSlugs.length > 0
   const pathname = usePathname()
   const [isPresent, safeToRemove] = usePresence()
@@ -44,7 +44,7 @@ const ProjectsView = memo(function ProjectsView({
     if (activeSlugs.includes(projectSlug)) return
 
     e.preventDefault()
-    navigateTo(`/projects/${category}/${projectSlug}`, { delay: 0 }) // Transition immédiate
+    navigateWithTransition(`/projects/${category}/${projectSlug}`, 0) // Transition immédiate
   }
 
   /**
