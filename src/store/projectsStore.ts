@@ -29,12 +29,17 @@ export interface ProjectsState {
     category: Category,
     forceReload?: boolean
   ) => Promise<Project[]>
+  loadProjectDetails: (
+    category: Category,
+    slug: string
+  ) => Promise<Project | undefined>
   setProjects: (projects: Project[], category: Category) => void
   setLoading: (isLoading: boolean) => void
   resetState: () => void
 
   // Selectors
   getProjectsByCategory: (category: Category) => Project[]
+  getProjectBySlug: (category: Category, slug: string) => Project | undefined
 }
 
 // Singleton Sanity adapter to avoid repeated instantiation
@@ -141,6 +146,69 @@ export const useProjectsStore = create<ProjectsState>()(
           }
         },
 
+        loadProjectDetails: async (category, slug) => {
+          if (!category || !slug) return undefined
+
+          try {
+            set({ isLoading: true })
+
+            // Récupérer le projet complet avec photos
+            const projectDetail = await sanityAdapter.fetchProjectBySlug(
+              slug,
+              category
+            )
+
+            if (!projectDetail) {
+              set({ isLoading: false })
+              return undefined
+            }
+
+            // Normaliser le slug
+            const normalizedProject = {
+              ...projectDetail,
+              normalizedSlug:
+                projectDetail.slug.current || String(projectDetail.slug),
+            }
+
+            // Mettre à jour ce projet dans l'état
+            set((state) => {
+              // Trouver l'index du projet si déjà présent
+              const projectsList = [...state.projectsList]
+              const existingIndex = projectsList.findIndex(
+                (p) =>
+                  p.category === category &&
+                  (p.normalizedSlug === slug ||
+                    p.slug.current === slug ||
+                    String(p.slug) === slug)
+              )
+
+              // Remplacer ou ajouter le projet
+              if (existingIndex >= 0) {
+                projectsList[existingIndex] = normalizedProject
+              } else {
+                projectsList.push(normalizedProject)
+              }
+
+              // Reset cache for this category
+              if (category) delete categoryProjectsCache[category]
+
+              return {
+                projectsList,
+                isLoading: false,
+              }
+            })
+
+            return normalizedProject
+          } catch (error) {
+            console.error(
+              `Error loading project details (${category}/${slug}):`,
+              error
+            )
+            set({ isLoading: false })
+            return undefined
+          }
+        },
+
         setProjects: (projects, category) => {
           if (!category) return
 
@@ -205,6 +273,19 @@ export const useProjectsStore = create<ProjectsState>()(
           )
           categoryProjectsCache[category] = filtered
           return filtered
+        },
+
+        // Get a specific project by slug and category
+        getProjectBySlug: (category, slug) => {
+          if (!category || !slug) return undefined
+
+          const projects = get().getProjectsByCategory(category)
+          return projects.find(
+            (project) =>
+              project.normalizedSlug === slug ||
+              project.slug.current === slug ||
+              String(project.slug) === slug
+          )
         },
       }
     },

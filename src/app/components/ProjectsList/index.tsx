@@ -49,13 +49,13 @@ export default function ProjectsList({ category }: ProjectsListProps) {
 // UI Components
 
 const LoadingView = () => (
-  <div className="flex flex-col justify-center items-center min-h-[70vh]">
+  <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
     <DelayedLoader isLoading={true} message="Chargement des projets..." />
   </div>
 )
 
 const EmptyView = () => (
-  <div className="flex flex-col justify-center items-center min-h-[70vh]">
+  <div className="min-h-[calc(100vh-5.5rem)] flex flex-col justify-center items-center px-16">
     <p className="mb-4">Aucun projet trouvé dans cette catégorie.</p>
     <Link href="/projects" className="text-blue-500 hover:underline">
       Retour aux projets

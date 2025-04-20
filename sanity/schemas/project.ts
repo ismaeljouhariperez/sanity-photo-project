@@ -7,7 +7,7 @@ export const project = {
       name: 'title',
       title: 'Titre',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'slug',
@@ -17,7 +17,7 @@ export const project = {
         source: 'title',
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'description',
@@ -31,7 +31,7 @@ export const project = {
       options: {
         hotspot: true,
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'category',
@@ -43,16 +43,56 @@ export const project = {
           {title: 'Couleur', value: 'early-color'},
         ],
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
     },
     {
-      name: 'photos',
-      title: 'Photos',
+      name: 'images',
+      title: 'Images du projet',
+      description: 'Ajoutez des images à ce projet',
       type: 'array',
       of: [
         {
-          type: 'reference',
-          to: [{type: 'photo'}],
+          type: 'object',
+          fields: [
+            {
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+              options: {
+                hotspot: true,
+              },
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              name: 'title',
+              title: 'Titre',
+              type: 'string',
+            },
+            {
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+              rows: 2,
+            },
+            {
+              name: 'order',
+              title: "Ordre d'affichage",
+              type: 'number',
+              initialValue: 0,
+            },
+          ],
+          preview: {
+            select: {
+              title: 'title',
+              media: 'image',
+            },
+            prepare({title, media}) {
+              return {
+                title: title || 'Image sans titre',
+                media,
+              }
+            },
+          },
         },
       ],
     },

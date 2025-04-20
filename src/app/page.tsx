@@ -21,13 +21,13 @@ interface ProjectImageProps {
   exitDelay?: number
 }
 
-const ProjectImage: React.FC<ProjectImageProps> = ({
+const ProjectImage = ({
   path,
   title,
   src,
   entranceDelay = 0,
   exitDelay = 0,
-}) => {
+}: ProjectImageProps) => {
   const { isLeavingPage } = useAnimationStore()
   const [showEntrance, setShowEntrance] = useState(true)
   const handleNavigate = useNavigateToProject()
@@ -98,7 +98,7 @@ const ProjectImage: React.FC<ProjectImageProps> = ({
  * Hook personnalisé pour gérer la navigation avec animation de sortie
  */
 function useNavigateToProject() {
-  const { navigateTo } = useTransitionNavigation()
+  const { navigateWithTransition } = useTransitionNavigation()
   const { setLeavingPage } = useAnimationStore()
   const [targetUrl, setTargetUrl] = useState<string | null>(null)
 
@@ -106,12 +106,12 @@ function useNavigateToProject() {
   useEffect(() => {
     if (targetUrl) {
       const timer = setTimeout(() => {
-        navigateTo(targetUrl)
+        navigateWithTransition(targetUrl)
       }, 1000) // Délai réduit pour permettre aux animations de sortie de se terminer
 
       return () => clearTimeout(timer)
     }
-  }, [targetUrl, navigateTo])
+  }, [targetUrl, navigateWithTransition])
 
   // Fonction pour déclencher la navigation
   const handleNavigate = (path: string) => {

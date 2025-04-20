@@ -1,98 +1,87 @@
 'use client'
 import { useState, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { useProjectsStore } from '@/store'
+import { useRouter, usePathname } from 'next/navigation'
+
+// États pour la navigation
+type NavigationState = 'idle' | 'navigating' | 'completed'
 
 /**
  * Hook for managing page transitions and navigation
  * Optimizes transitions between project pages for a smoother UX
  */
-export function useTransitionNavigation() {
+export const useTransitionNavigation = () => {
   const router = useRouter()
-  const [isNavigating, setIsNavigating] = useState(false)
-  const navigatingRef = useRef(false) // Prevents closure issues
+  const pathname = usePathname()
 
-  const { activeCategory, hasFetched } = useProjectsStore()
+  // États pour suivre la progression de la navigation
+  const [navigationState, setNavigationState] =
+    useState<NavigationState>('idle')
+  const [transitionDelay, setTransitionDelay] = useState(0)
+  const isNavigating = useRef(false)
+  const transitionTimeout = useRef<NodeJS.Timeout | null>(null)
+  const lastPath = useRef<string | null>(null)
 
-  const navigateTo = useCallback(
-    (url: string, options = { delay: 600 }) => {
-      // Skip if already on the target URL
-      if (typeof window !== 'undefined' && window.location.pathname === url) {
-        return
+  // Navigation avec transition
+  const navigateWithTransition = useCallback(
+    (url: string, delay = 800) => {
+      // Éviter les navigations multiples pendant les transitions
+      if (isNavigating.current) return
+
+      // Éviter la navigation si on est déjà sur l'URL cible
+      if (pathname === url || lastPath.current === url) return
+
+      lastPath.current = url
+      isNavigating.current = true
+
+      // Déterminer si c'est une transition rapide ou lente
+      const isFastTransition = shouldUseFastTransition(pathname || '', url)
+      const actualDelay = isFastTransition ? 300 : delay
+
+      setTransitionDelay(actualDelay)
+      setNavigationState('navigating')
+
+      // Nettoyer tout timeout existant
+      if (transitionTimeout.current) {
+        clearTimeout(transitionTimeout.current)
       }
 
-      // Prevent multiple navigations
-      if (isNavigating || navigatingRef.current) return
+      // Planifier la navigation après le délai
+      transitionTimeout.current = setTimeout(() => {
+        router.push(url)
+        setNavigationState('completed')
 
-      navigatingRef.current = true
-      setIsNavigating(true)
-
-      // Parse current and target URLs
-      const currentPath =
-        typeof window !== 'undefined' ? window.location.pathname : ''
-      const projectUrlPattern = /\/projects\/([^/]+)\/([^/]+)/
-      const categoryUrlPattern = /\/projects\/([^/]+)$/
-
-      const isCurrentlyOnDetailPage = projectUrlPattern.test(currentPath)
-
-      const projectMatch = url.match(projectUrlPattern)
-      const categoryMatch = url.match(categoryUrlPattern)
-
-      const isProjectUrl = projectMatch !== null
-      const isCategoryUrl = categoryMatch !== null
-      const targetCategory = isProjectUrl
-        ? projectMatch[1]
-        : isCategoryUrl
-        ? categoryMatch[1]
-        : null
-
-      // Determine if this should be a fast transition
-      const isFastTransition =
-        // Detail to category list (same category)
-        (isCurrentlyOnDetailPage &&
-          isCategoryUrl &&
-          targetCategory === activeCategory) ||
-        // Between projects in the same category
-        (isProjectUrl &&
-          (targetCategory === activeCategory ||
-            (targetCategory &&
-              hasFetched[targetCategory as 'black-and-white' | 'early-color'])))
-
-      // For immediate navigations
-      if (isFastTransition || options.delay === 0) {
-        try {
-          router.push(url)
-        } catch (error) {
-          console.error('Navigation error:', error)
-        }
-
+        // Réinitialiser l'état après la navigation
         setTimeout(() => {
-          setIsNavigating(false)
-          navigatingRef.current = false
+          isNavigating.current = false
+          setNavigationState('idle')
         }, 100)
-
-        return
-      }
-
-      // For delayed navigations
-      setTimeout(() => {
-        try {
-          router.push(url)
-        } catch (error) {
-          console.error('Navigation error:', error)
-        }
-
-        setTimeout(() => {
-          setIsNavigating(false)
-          navigatingRef.current = false
-        }, 100)
-      }, options.delay)
+      }, actualDelay)
     },
-    [router, isNavigating, activeCategory, hasFetched]
+    [pathname, router]
   )
 
+  // Déterminer si la transition doit être rapide
+  const shouldUseFastTransition = (
+    currentUrl: string,
+    targetUrl: string
+  ): boolean => {
+    // Si les deux URL sont des pages de projets ou de catégories, utiliser une transition rapide
+    const currentIsProjectUrl = currentUrl.includes('/projects/')
+    const targetIsProjectUrl = targetUrl.includes('/projects/')
+    const currentIsCategoryUrl = currentUrl.includes('/categories/')
+    const targetIsCategoryUrl = targetUrl.includes('/categories/')
+
+    return (
+      (currentIsProjectUrl && targetIsProjectUrl) ||
+      (currentIsCategoryUrl && targetIsCategoryUrl) ||
+      (currentIsCategoryUrl && targetIsProjectUrl) ||
+      (currentIsProjectUrl && targetIsCategoryUrl)
+    )
+  }
+
   return {
-    navigateTo,
-    isNavigating,
+    navigateWithTransition,
+    navigationState,
+    transitionDelay,
   }
 }

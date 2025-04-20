@@ -272,21 +272,82 @@ export class SanityAdapter implements ISanityService {
     category: string
   ): Promise<ProjectFull> {
     const cacheKey = `${CACHE_KEYS.PROJECT_DETAIL}_${category}_${slug}`
+    console.log(
+      `Récupération du projet par slug: ${slug}, catégorie: ${category}`
+    )
+
+    // Désactiver le cache pour le débogage
+    clientCache.invalidateKey(cacheKey)
 
     return clientCache.getOrCreateRequest(
       cacheKey,
       async () => {
+        // Requête simplifiée pour récupérer le projet avec ses images intégrées
         const query = `*[_type == "project" && slug.current == $slug && category == $category][0]{
           ...,
-          "photos": *[_type == "photo" && references(^._id)] | order(order) {
-            ...,
+          "coverImage": coverImage.asset->url,
+          "images": images[] {
             "url": image.asset->url,
-            "metadata": image.asset->metadata
+            "width": image.asset->metadata.dimensions.width,
+            "height": image.asset->metadata.dimensions.height,
+            "alt": title,
+            title,
+            description,
+            order
           }
         }`
-        const params = { slug, category }
-        const data = await this.client.fetch(query, params)
-        return data
+
+        console.log(
+          `Exécution de la requête GROQ pour images intégrées: ${query}`
+        )
+        console.log(`Avec les paramètres:`, { slug, category })
+
+        try {
+          const project = await this.client.fetch(query, { slug, category })
+          console.log(`Projet récupéré:`, project)
+
+          if (!project) {
+            console.error('Projet non trouvé')
+            return null
+          }
+
+          // Convertir les images intégrées en format Photo pour maintenir la compatibilité
+          const photos =
+            project.images?.map((img: any, index: number) => ({
+              _id: `embedded-image-${index}`,
+              _type: 'photo',
+              title: img.title || `Image ${index + 1}`,
+              description: img.description,
+              url: img.url,
+              alt: img.alt || img.title || `Image ${index + 1}`,
+              order: img.order || index,
+              dimensions: {
+                width: img.width,
+                height: img.height,
+                aspectRatio: img.width / img.height,
+              },
+            })) || []
+
+          console.log(`Images converties en photos:`, photos)
+
+          // Créer un objet ProjectFull compatible
+          const result = {
+            ...project,
+            photos: photos,
+          }
+
+          console.log(`Résultat final:`, result)
+          if (result?.photos) {
+            console.log(`Photos trouvées: ${result.photos.length}`)
+          } else {
+            console.log(`Pas de photos trouvées dans le projet.`)
+          }
+
+          return result
+        } catch (error) {
+          console.error(`Erreur lors de la récupération du projet:`, error)
+          throw error
+        }
       },
       category
     )
@@ -339,7 +400,7 @@ export class SanityAdapter implements ISanityService {
   }
 
   // Méthode utilitaire pour générer des URLs d'images
-  urlFor(source: any) {
+  urlFor(source: unknown) {
     return this.builder.image(source)
   }
 }

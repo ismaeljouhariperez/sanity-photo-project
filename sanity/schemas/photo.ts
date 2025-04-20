@@ -7,7 +7,7 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'image',
@@ -18,7 +18,7 @@ export default {
         metadata: ['exif', 'location', 'palette'],
         storeOriginalFilename: true,
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'alt',
@@ -40,6 +40,13 @@ export default {
       title: 'Description',
       type: 'text',
       rows: 3,
+    },
+    {
+      name: 'project',
+      title: 'Projet associé',
+      type: 'reference',
+      to: [{type: 'project'}],
+      description: 'Projet auquel cette photo appartient',
     },
     {
       name: 'tags',
@@ -75,6 +82,24 @@ export default {
       title: 'title',
       media: 'image',
       subtitle: 'description',
+      project: 'project.title',
+    },
+    prepare({
+      title,
+      media,
+      subtitle,
+      project,
+    }: {
+      title: string
+      media: any
+      subtitle?: string
+      project?: string
+    }) {
+      return {
+        title,
+        subtitle: project ? `${project} - ${subtitle || ''}` : subtitle,
+        media,
+      }
     },
   },
 }
