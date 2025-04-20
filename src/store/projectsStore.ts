@@ -11,8 +11,11 @@ export interface ProjectsState {
   activeCategory: Category
   activeSlug: string | null
   previousSlug: string | null
+  previousPathname: string | null
   projectsList: Project[]
   isLoading: boolean
+  isPhotoLoading: boolean
+  projectViewMounted: boolean
   hasFetched: {
     'black-and-white': boolean
     'early-color': boolean
@@ -25,6 +28,9 @@ export interface ProjectsState {
   // Actions
   setActiveProject: (category: Category, slug: string | null) => void
   setActiveCategory: (category: Category) => void
+  setPreviousPathname: (pathname: string) => void
+  setProjectViewMounted: (isMounted: boolean) => void
+  setPhotoLoading: (isLoading: boolean) => void
   loadProjects: (
     category: Category,
     forceReload?: boolean
@@ -63,8 +69,11 @@ export const useProjectsStore = create<ProjectsState>()(
         activeCategory: null,
         activeSlug: null,
         previousSlug: null,
+        previousPathname: null,
         projectsList: [],
         isLoading: false,
+        isPhotoLoading: false,
+        projectViewMounted: false,
         hasFetched: {
           'black-and-white': false,
           'early-color': false,
@@ -83,6 +92,13 @@ export const useProjectsStore = create<ProjectsState>()(
           })),
 
         setActiveCategory: (category) => set({ activeCategory: category }),
+
+        setPreviousPathname: (pathname) => set({ previousPathname: pathname }),
+
+        setProjectViewMounted: (isMounted) =>
+          set({ projectViewMounted: isMounted }),
+
+        setPhotoLoading: (isLoading) => set({ isPhotoLoading: isLoading }),
 
         loadProjects: async (category, forceReload = false) => {
           if (!category) return []
@@ -150,7 +166,8 @@ export const useProjectsStore = create<ProjectsState>()(
           if (!category || !slug) return undefined
 
           try {
-            set({ isLoading: true })
+            // Utiliser un état de chargement spécifique pour les photos
+            set({ isPhotoLoading: true })
 
             // Récupérer le projet complet avec photos
             const projectDetail = await sanityAdapter.fetchProjectBySlug(
@@ -159,7 +176,7 @@ export const useProjectsStore = create<ProjectsState>()(
             )
 
             if (!projectDetail) {
-              set({ isLoading: false })
+              set({ isPhotoLoading: false })
               return undefined
             }
 
@@ -194,7 +211,7 @@ export const useProjectsStore = create<ProjectsState>()(
 
               return {
                 projectsList,
-                isLoading: false,
+                isPhotoLoading: false,
               }
             })
 
@@ -204,7 +221,7 @@ export const useProjectsStore = create<ProjectsState>()(
               `Error loading project details (${category}/${slug}):`,
               error
             )
-            set({ isLoading: false })
+            set({ isPhotoLoading: false })
             return undefined
           }
         },
@@ -245,8 +262,11 @@ export const useProjectsStore = create<ProjectsState>()(
             activeCategory: null,
             activeSlug: null,
             previousSlug: null,
+            previousPathname: null,
             projectsList: [],
             isLoading: false,
+            isPhotoLoading: false,
+            projectViewMounted: false,
             hasFetched: {
               'black-and-white': false,
               'early-color': false,
@@ -296,6 +316,7 @@ export const useProjectsStore = create<ProjectsState>()(
         activeCategory: state.activeCategory,
         activeSlug: state.activeSlug,
         previousSlug: state.previousSlug,
+        previousPathname: state.previousPathname,
         projectsList: state.projectsList,
         hasFetched: state.hasFetched,
         lastFetchTimestamp: state.lastFetchTimestamp,
