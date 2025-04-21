@@ -3,12 +3,14 @@ import { createClient } from 'next-sanity'
 import ProjectDetailClient from '@/app/components/ProjectDetailClient'
 
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }> | { slug: string }
 }
 
 // Fonction pour générer les métadonnées dynamiques
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = params.slug
+  // Attendre la résolution des paramètres s'ils sont une Promise
+  const resolvedParams = await Promise.resolve(params)
+  const slug = resolvedParams.slug
   const category = 'black-and-white'
 
   const client = createClient({
@@ -47,6 +49,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Page du projet (serveur)
-export default function ProjectPage({ params }: Props) {
-  return <ProjectDetailClient slug={params.slug} category="black-and-white" />
+export default async function ProjectPage({ params }: Props) {
+  // Attendre la résolution des paramètres s'ils sont une Promise
+  const resolvedParams = await Promise.resolve(params)
+  const slug = resolvedParams.slug
+
+  return <ProjectDetailClient slug={slug} category="black-and-white" />
 }

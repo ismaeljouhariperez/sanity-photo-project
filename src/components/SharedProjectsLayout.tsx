@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useProjectsStore } from '@/store'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 interface SharedProjectsLayoutProps {
   children: React.ReactNode
@@ -55,19 +55,16 @@ export default function SharedProjectsLayout({
 
   return (
     <div className="relative min-h-screen">
-      {/* Contenu avec animation de transition */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="relative"
-        >
-          {children}
-        </motion.div>
-      </AnimatePresence>
+      {/* Contenu sans animation qui causerait des problèmes */}
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="relative"
+      >
+        {children}
+      </motion.div>
     </div>
   )
 }

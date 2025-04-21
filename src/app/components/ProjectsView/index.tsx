@@ -47,7 +47,8 @@ function ProjectsView({
     if (activeSlugs.includes(projectSlug)) return
 
     e.preventDefault()
-    navigateWithTransition(`/${category}/${projectSlug}`, 0) // Transition immédiate
+    // Navigation immédiate sans délai
+    navigateWithTransition(`/${category}/${projectSlug}`)
   }
 
   /**

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useProjectsStore } from '@/store'
 import ProjectsView from '@/app/components/ProjectsView'
 import PhotoGrid from '@/app/components/ProjectDetail/PhotoGrid'
@@ -28,25 +28,61 @@ export default function ProjectDetailClient({
   const isLoading = useProjectsStore((state) => state.isLoading)
   const isPhotoLoading = useProjectsStore((state) => state.isPhotoLoading)
   const hasFetched = useProjectsStore((state) => state.hasFetched)
+  const setActiveProject = useProjectsStore((state) => state.setActiveProject)
 
   const [photos, setPhotos] = useState<Photo[]>([])
+  const [mounted, setMounted] = useState(false)
 
-  // Charger les projets et les détails du projet actuel
-  useEffect(() => {
-    if (!hasFetched[category]) {
-      loadProjects(category)
-    }
-
-    const loadPhotos = async () => {
+  // Fonction de chargement des photos mémorisée pour éviter les recréations
+  const fetchProjectDetails = useCallback(async () => {
+    try {
       const project = await loadProjectDetails(category, slug)
       if (project?.photos) {
         setPhotos(project.photos)
       }
+    } catch (error) {
+      console.error('Error loading project details:', error)
+    }
+  }, [category, slug, loadProjectDetails])
+
+  // Premier effet: charger les données de base au montage du composant
+  useEffect(() => {
+    setMounted(true)
+
+    // Marquer ce projet comme actif pour le state global
+    setActiveProject(category, slug)
+
+    // Charger les projets de la catégorie s'ils ne sont pas déjà chargés
+    if (!hasFetched[category]) {
+      loadProjects(category)
     }
 
-    loadPhotos()
-  }, [category, slug, loadProjects, loadProjectDetails, hasFetched])
+    // Charger les détails du projet spécifique
+    fetchProjectDetails()
 
+    // Nettoyage lors du démontage
+    return () => {
+      setMounted(false)
+    }
+  }, [
+    category,
+    slug,
+    loadProjects,
+    fetchProjectDetails,
+    hasFetched,
+    setActiveProject,
+  ])
+
+  // État de chargement initial avant le montage du composant
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p>Chargement...</p>
+      </div>
+    )
+  }
+
+  // Si les projets sont en cours de chargement
   if (isLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
