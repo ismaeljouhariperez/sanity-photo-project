@@ -19,7 +19,6 @@ export default function SharedProjectsLayout({
   children,
 }: SharedProjectsLayoutProps) {
   const pathname = usePathname()
-  const isPhotoLoading = useProjectsStore((state) => state.isPhotoLoading)
   const projectViewMounted = useProjectsStore(
     (state) => state.projectViewMounted
   )
@@ -115,13 +114,6 @@ export default function SharedProjectsLayout({
           {children}
         </motion.div>
       </AnimatePresence>
-
-      {/* Indicateur de chargement pour les photos uniquement */}
-      {isPhotoLoading && (
-        <div className="fixed bottom-4 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-md text-sm z-50">
-          Chargement des photos...
-        </div>
-      )}
     </div>
   )
 }

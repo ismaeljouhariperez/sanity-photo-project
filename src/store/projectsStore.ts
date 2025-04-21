@@ -24,8 +24,6 @@ export interface ProjectsState {
   setActiveProject: (category: Category, slug: string | null) => void
   setActiveCategory: (category: Category) => void
   setPreviousPathname: (pathname: string) => void
-  setProjectViewMounted: (isMounted: boolean) => void
-  setPhotoLoading: (isLoading: boolean) => void
   loadProjects: (
     category: Category,
     forceReload?: boolean
@@ -36,6 +34,8 @@ export interface ProjectsState {
   ) => Promise<Project | undefined>
   setProjects: (projects: Project[], category: Category) => void
   setLoading: (isLoading: boolean) => void
+  setProjectViewMounted: (isMounted: boolean) => void
+  setPhotoLoading: (isLoading: boolean) => void
   resetState: () => void
 
   // Selectors
@@ -276,14 +276,12 @@ export const useProjectsStore = create<ProjectsState>()(
     },
     {
       name: 'projects-storage',
-      // Only persist essential data to avoid storage bloat
+      // Only persist essential data for animations
       partialize: (state) => ({
         activeCategory: state.activeCategory,
         activeSlug: state.activeSlug,
         previousSlug: state.previousSlug,
         previousPathname: state.previousPathname,
-        projectsList: state.projectsList,
-        hasFetched: state.hasFetched,
       }),
     }
   )
