@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { useProjectsStore } from '@/store'
 import ProjectsView from '@/app/components/ProjectsView'
@@ -69,11 +69,28 @@ export default function SharedProjectsLayout({
     }
   }, [category, projectViewMounted, setProjectViewMounted])
 
-  // Rendre le layout uniquement si nous avons une catégorie
-  if (!category) return null
+  // Récupérer les projets de manière sécurisée
+  const projects = useMemo(() => {
+    if (!category) return []
+    return useProjectsStore.getState().getProjectsByCategory(category)
+  }, [category])
 
-  // Récupérer les projets pour la catégorie actuelle
-  const projects = useProjectsStore.getState().getProjectsByCategory(category)
+  // Mémoriser l'instance de ProjectsView pour éviter les remontages inutiles
+  const memoizedProjectsView = useMemo(() => {
+    if (!category) return null
+    if (!projectViewMounted || projects.length === 0) return null
+
+    return (
+      <ProjectsView
+        projects={projects}
+        category={category}
+        activeSlugs={currentSlug ? [currentSlug] : []}
+      />
+    )
+  }, [category, projectViewMounted, projects, currentSlug])
+
+  // Si pas de catégorie, ne rien afficher
+  if (!category) return null
 
   return (
     <div className="relative min-h-screen">
@@ -82,13 +99,7 @@ export default function SharedProjectsLayout({
         className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900"
         key="projects-view-permanent"
       >
-        {projectViewMounted && projects.length > 0 && (
-          <ProjectsView
-            projects={projects}
-            category={category}
-            activeSlugs={currentSlug ? [currentSlug] : []}
-          />
-        )}
+        {memoizedProjectsView}
       </div>
 
       {/* Contenu dynamique (photos et détails) qui change entre les pages */}

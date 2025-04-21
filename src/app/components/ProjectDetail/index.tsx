@@ -140,6 +140,18 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     projectPhotos,
   } = useProjectDetail(category, slug)
 
+  // Mémoriser le composant ProjectsView pour éviter les remontages inutiles
+  const memoizedProjectsView = useMemo(
+    () => (
+      <ProjectsView
+        projects={projects}
+        category={category}
+        activeSlugs={activeSlugs}
+      />
+    ),
+    [projects, category, activeSlugs]
+  )
+
   // Débogage du projet courant
   useEffect(() => {
     if (currentProject) {
@@ -185,11 +197,8 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
   if (isPhotoLoading) {
     return (
       <>
-        <ProjectsView
-          projects={projects}
-          category={category}
-          activeSlugs={activeSlugs}
-        />
+        {/* Utiliser l'instance mémorisée */}
+        {memoizedProjectsView}
         <div className="px-16 py-20 text-center">
           <DelayedLoader isLoading={true} message="Chargement des photos..." />
         </div>
@@ -200,11 +209,8 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
 
   return (
     <>
-      <ProjectsView
-        projects={projects}
-        category={category}
-        activeSlugs={activeSlugs}
-      />
+      {/* Utiliser l'instance mémorisée */}
+      {memoizedProjectsView}
 
       {/* Utiliser les photos depuis l'état local pour garantir une donnée à jour */}
       <PhotoGrid photos={photos} />
