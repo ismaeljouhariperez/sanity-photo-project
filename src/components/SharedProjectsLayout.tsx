@@ -19,7 +19,6 @@ export default function SharedProjectsLayout({
   children,
 }: SharedProjectsLayoutProps) {
   const pathname = usePathname()
-  const isLoading = useProjectsStore((state) => state.isLoading)
   const isPhotoLoading = useProjectsStore((state) => state.isPhotoLoading)
   const projectViewMounted = useProjectsStore(
     (state) => state.projectViewMounted
@@ -78,16 +77,19 @@ export default function SharedProjectsLayout({
 
   return (
     <div className="relative min-h-screen">
-      {/* Titres des projets (reste stable pendant les navigations) */}
-      {projectViewMounted && projects.length > 0 && (
-        <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900">
+      {/* Titres des projets - rendu de manière PERMANENTE avec une clé STABLE */}
+      <div
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900"
+        key="projects-view-permanent"
+      >
+        {projectViewMounted && projects.length > 0 && (
           <ProjectsView
             projects={projects}
             category={category}
             activeSlugs={currentSlug ? [currentSlug] : []}
           />
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Contenu dynamique (photos et détails) qui change entre les pages */}
       <AnimatePresence mode="wait">

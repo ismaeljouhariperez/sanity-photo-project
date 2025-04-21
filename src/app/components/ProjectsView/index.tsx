@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useEffect, MouseEvent } from 'react'
+import { useEffect, MouseEvent, memo } from 'react'
 import { motion, Variants, usePresence } from 'framer-motion'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
@@ -18,7 +18,7 @@ interface ProjectsViewProps {
  * Interactive list of photography projects with transition animations
  * Handles smooth transitions between list and detail views
  */
-const ProjectsView = memo(function ProjectsView({
+function ProjectsView({
   projects,
   category,
   activeSlugs = [],
@@ -53,6 +53,12 @@ const ProjectsView = memo(function ProjectsView({
   const animations = useProjectAnimations({
     isDetailPage,
     comingFromDetailPage,
+  })
+
+  console.log('Rendering ProjectsView', {
+    category,
+    activeSlugs,
+    projectsCount: projects.length,
   })
 
   return (
@@ -95,7 +101,7 @@ const ProjectsView = memo(function ProjectsView({
       </motion.nav>
     </div>
   )
-})
+}
 
 /**
  * Extrait le slug normalisé d'un projet
@@ -204,4 +210,12 @@ function useProjectAnimations({
   }
 }
 
-export default ProjectsView
+// Utilisez React.memo pour éviter les remontages inutiles
+export default memo(ProjectsView, (prevProps, nextProps) => {
+  // Comparer uniquement la catégorie - les projets devraient rester stables
+  const categoryEqual = prevProps.category === nextProps.category
+
+  // Ne pas remonter si la catégorie est la même, même si les slugs actifs changent
+  // C'est important pour éviter le scintillement lors de la navigation
+  return categoryEqual
+})
