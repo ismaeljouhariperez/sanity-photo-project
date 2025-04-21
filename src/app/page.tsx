@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ImageKitImage from './components/ImageKitImage'
+import Image from 'next/image'
 import PageTransition from '@/components/transitions/PageTransition'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import { useAnimationStore } from '@/store/animationStore'
@@ -56,8 +56,8 @@ const ProjectImage = ({
       onClick={() => handleNavigate(path)}
     >
       <div className="w-full h-full">
-        <ImageKitImage
-          src={src || 'default-image.jpg'}
+        <Image
+          src={`/images/${src}`}
           alt={title}
           width={900}
           height={675}
@@ -104,13 +104,13 @@ function useNavigateToProject() {
 
   // Effectue la navigation une fois l'animation terminée
   useEffect(() => {
-    if (targetUrl) {
-      const timer = setTimeout(() => {
-        navigateWithTransition(targetUrl)
-      }, 1000) // Délai réduit pour permettre aux animations de sortie de se terminer
+    if (!targetUrl) return
 
-      return () => clearTimeout(timer)
-    }
+    const timer = setTimeout(() => {
+      navigateWithTransition(targetUrl)
+    }, 1000) // Délai réduit pour permettre aux animations de sortie de se terminer
+
+    return () => clearTimeout(timer)
   }, [targetUrl, navigateWithTransition])
 
   // Fonction pour déclencher la navigation
@@ -137,17 +137,17 @@ export default function Home() {
     <PageTransition>
       <div className="h-[calc(100vh-5.5rem)] grid grid-cols-2 gap-16 px-24 py-16 items-center">
         <ProjectImage
-          path="/projects/black-and-white"
-          title="Black and White Photography"
-          src="default-image.jpg"
+          path="/black-and-white"
+          title="Photographie Noir et Blanc"
+          src="bw-cover.jpg"
           entranceDelay={0}
           exitDelay={0}
         />
 
         <ProjectImage
-          path="/projects/early-color"
-          title="Early Color Photography"
-          src="default-image.jpg"
+          path="/early-color"
+          title="Photographie Couleur"
+          src="color-cover.jpg"
           entranceDelay={1}
           exitDelay={0.6}
         />

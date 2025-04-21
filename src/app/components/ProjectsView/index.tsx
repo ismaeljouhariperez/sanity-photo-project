@@ -28,7 +28,10 @@ function ProjectsView({
   const pathname = usePathname()
   const [isPresent, safeToRemove] = usePresence()
   const comingFromDetailPage =
-    isPresent && !isDetailPage && pathname.includes(`/projects/${category}`)
+    isPresent &&
+    !isDetailPage &&
+    (pathname.includes(`/${category}`) ||
+      pathname.includes(`/projects/${category}`))
   const previousSlug = useProjectsStore((state) => state.previousSlug)
 
   // Nettoyage après l'animation
@@ -44,7 +47,7 @@ function ProjectsView({
     if (activeSlugs.includes(projectSlug)) return
 
     e.preventDefault()
-    navigateWithTransition(`/projects/${category}/${projectSlug}`, 0) // Transition immédiate
+    navigateWithTransition(`/${category}/${projectSlug}`, 0) // Transition immédiate
   }
 
   /**

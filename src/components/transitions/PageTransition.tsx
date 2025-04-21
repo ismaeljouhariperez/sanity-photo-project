@@ -27,7 +27,8 @@ export default function PageTransition({
   // Check if returning from a project detail to a project list
   const isReturningFromDetail =
     previousSlug &&
-    pathname?.includes('/projects/') &&
+    (pathname?.includes('/black-and-white') ||
+      pathname?.includes('/early-color')) &&
     !pathname?.includes(`/${previousSlug}`)
 
   // Reset isLeavingPage flag on unmount

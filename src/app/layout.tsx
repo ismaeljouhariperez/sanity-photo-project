@@ -20,37 +20,43 @@ export default function RootLayout({
 
   // Effet pour nettoyer le cache Sanity quand la route change
   useEffect(() => {
-    // Clé pour stocker le chemin précédent
-    const PREV_PATH_KEY = 'prev_sanity_path'
+    if (typeof window === 'undefined') return // Sortir si on est côté serveur
 
-    // Récupérer le chemin précédent
-    const prevPath = sessionStorage.getItem(PREV_PATH_KEY) || ''
+    try {
+      // Clé pour stocker le chemin précédent
+      const PREV_PATH_KEY = 'prev_sanity_path'
 
-    // Vérifier si la navigation est entre pages de projets
-    const isCurrentProjectPath = pathname?.includes('/projects/')
-    const isPrevProjectPath = prevPath?.includes('/projects/')
+      // Récupérer le chemin précédent
+      const prevPath = sessionStorage.getItem(PREV_PATH_KEY) || ''
 
-    // Stocker le chemin actuel pour la prochaine navigation
-    sessionStorage.setItem(PREV_PATH_KEY, pathname || '')
+      // Vérifier si la navigation est entre pages de projets
+      const isCurrentProjectPath = pathname?.includes('/projects/')
+      const isPrevProjectPath = prevPath?.includes('/projects/')
 
-    // Déterminer s'il faut nettoyer le cache
-    const shouldClearCache = !(isCurrentProjectPath && isPrevProjectPath)
+      // Stocker le chemin actuel pour la prochaine navigation
+      sessionStorage.setItem(PREV_PATH_KEY, pathname || '')
 
-    console.log(
-      `🔄 Route changée de ${prevPath} → ${pathname}${
-        shouldClearCache ? ' (nettoyage cache)' : ' (préservation cache)'
-      }`
-    )
+      // Déterminer s'il faut nettoyer le cache
+      const shouldClearCache = !(isCurrentProjectPath && isPrevProjectPath)
 
-    // Émettre l'événement seulement si nécessaire
-    if (shouldClearCache) {
-      // Créer un événement personnalisé pour nettoyer le cache avec des informations sur le chemin
-      const event = new CustomEvent(SANITY_CACHE_CLEAR_EVENT, {
-        detail: { path: pathname },
-      })
+      console.log(
+        `🔄 Route changée de ${prevPath} → ${pathname}${
+          shouldClearCache ? ' (nettoyage cache)' : ' (préservation cache)'
+        }`
+      )
 
-      // Déclencher l'événement
-      window.dispatchEvent(event)
+      // Émettre l'événement seulement si nécessaire
+      if (shouldClearCache) {
+        // Créer un événement personnalisé pour nettoyer le cache avec des informations sur le chemin
+        const event = new CustomEvent(SANITY_CACHE_CLEAR_EVENT, {
+          detail: { path: pathname },
+        })
+
+        // Déclencher l'événement
+        window.dispatchEvent(event)
+      }
+    } catch (error) {
+      console.error('Erreur lors du nettoyage du cache:', error)
     }
   }, [pathname])
 

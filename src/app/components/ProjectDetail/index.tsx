@@ -21,7 +21,6 @@ function useProjectDetail(
   category: ProjectDetailProps['category'],
   slug: string
 ) {
-  const isLoading = useProjectsStore((state) => state.isLoading)
   const isPhotoLoading = useProjectsStore((state) => state.isPhotoLoading)
   const hasFetched = useProjectsStore((state) => state.hasFetched)
   const loadProjects = useProjectsStore((state) => state.loadProjects)
@@ -77,7 +76,7 @@ function useProjectDetail(
   const handleBackToProjects = (e: React.MouseEvent) => {
     e.preventDefault()
     setActiveProject(category, slug)
-    navigateWithTransition(`/projects/${category}`)
+    navigateWithTransition(`/${category}`)
   }
 
   return {
@@ -170,7 +169,6 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
 
   return (
     <>
-      {memoizedProjectsView}
       <PhotoGrid photos={photos} />
     </>
   )

@@ -11,7 +11,7 @@ export default function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
-  const { navigateTo } = useTransitionNavigation()
+  const { navigateWithTransition } = useTransitionNavigation()
 
   const handleAboutClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -22,13 +22,16 @@ export default function Header() {
     e.preventDefault()
 
     // Logique pour naviguer vers l'index du projet avec notre hook personnalisé
-    if (pathname.includes('/projects/')) {
-      const projectType = pathname.split('/projects/')[1]?.split('/')[0]
+    if (
+      pathname.includes('/black-and-white') ||
+      pathname.includes('/early-color')
+    ) {
+      const projectType = pathname.split('/')[1]?.split('/')[0]
       if (projectType) {
         // Utiliser le hook avec délai 0 pour transition immédiate
-        navigateTo(`/projects/${projectType}`, { delay: 0 })
+        navigateWithTransition(`/${projectType}`, 0)
       } else {
-        navigateTo('/projects')
+        navigateWithTransition('/')
       }
     }
   }
@@ -36,7 +39,7 @@ export default function Header() {
   // Réinitialise l'animation quand on quitte la page projects
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    navigateTo('/')
+    navigateWithTransition('/')
   }
 
   // Surveille les changements de pathname pour mettre à jour l'état

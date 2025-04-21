@@ -66,8 +66,14 @@ export const useTransitionNavigation = () => {
     targetUrl: string
   ): boolean => {
     // Si les deux URL sont des pages de projets ou de catégories, utiliser une transition rapide
-    const currentIsProjectUrl = currentUrl.includes('/projects/')
-    const targetIsProjectUrl = targetUrl.includes('/projects/')
+    const currentIsProjectUrl =
+      currentUrl.includes('/projects/') ||
+      currentUrl.includes('/black-and-white') ||
+      currentUrl.includes('/early-color')
+    const targetIsProjectUrl =
+      targetUrl.includes('/projects/') ||
+      targetUrl.includes('/black-and-white') ||
+      targetUrl.includes('/early-color')
     const currentIsCategoryUrl = currentUrl.includes('/categories/')
     const targetIsCategoryUrl = targetUrl.includes('/categories/')
 
