@@ -215,7 +215,16 @@ export default memo(ProjectsView, (prevProps, nextProps) => {
   // Comparer uniquement la catégorie - les projets devraient rester stables
   const categoryEqual = prevProps.category === nextProps.category
 
-  // Ne pas remonter si la catégorie est la même, même si les slugs actifs changent
+  // Comparer les slugs actifs
+  const slugsEqual =
+    prevProps.activeSlugs && nextProps.activeSlugs
+      ? prevProps.activeSlugs.length === nextProps.activeSlugs?.length &&
+        prevProps.activeSlugs.every(
+          (slug, i) => slug === nextProps.activeSlugs?.[i]
+        )
+      : prevProps.activeSlugs === nextProps.activeSlugs
+
+  // Ne pas remonter si la catégorie est la même et si les slugs actifs n'ont pas changé
   // C'est important pour éviter le scintillement lors de la navigation
-  return categoryEqual
+  return categoryEqual && slugsEqual
 })

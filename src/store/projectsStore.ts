@@ -3,7 +3,6 @@ import { persist } from 'zustand/middleware'
 import { SanityAdapter } from '@/adapters'
 import { Project } from '@/lib/sanity.types'
 
-// Type Category pour typer correctement la catégorie
 type Category = 'black-and-white' | 'early-color' | null
 
 export interface ProjectsState {
@@ -19,10 +18,6 @@ export interface ProjectsState {
   hasFetched: {
     'black-and-white': boolean
     'early-color': boolean
-  }
-  lastFetchTimestamp: {
-    'black-and-white': number
-    'early-color': number
   }
 
   // Actions
@@ -51,9 +46,6 @@ export interface ProjectsState {
 // Singleton Sanity adapter to avoid repeated instantiation
 const sanityAdapter = new SanityAdapter()
 
-// Définir un seuil de fraîcheur pour les données (en ms)
-const CACHE_FRESHNESS_THRESHOLD = 5 * 60 * 1000 // 5 minutes
-
 /**
  * Zustand store for projects management
  * Handles loading, caching, and accessing projects by category
@@ -78,10 +70,6 @@ export const useProjectsStore = create<ProjectsState>()(
           'black-and-white': false,
           'early-color': false,
         },
-        lastFetchTimestamp: {
-          'black-and-white': 0,
-          'early-color': 0,
-        },
 
         // Actions
         setActiveProject: (category, slug) =>
@@ -104,16 +92,10 @@ export const useProjectsStore = create<ProjectsState>()(
           if (!category) return []
 
           // Check if projects for this category are already loaded
-          const { hasFetched, lastFetchTimestamp } = get()
-          const now = Date.now()
-          const dataAge = now - (lastFetchTimestamp[category] || 0)
-          const isCacheFresh = dataAge < CACHE_FRESHNESS_THRESHOLD
+          const { hasFetched } = get()
 
-          // Skip loading if data is already loaded and fresh, unless forceReload is true
-          if (hasFetched[category] && isCacheFresh && !forceReload) {
-            console.log(
-              `Using cached projects for ${category}, age: ${dataAge}ms`
-            )
+          // Skip loading if data is already loaded, unless forceReload is true
+          if (hasFetched[category] && !forceReload) {
             // Return filtered projects from internal cache
             return get().getProjectsByCategory(category)
           }
@@ -146,17 +128,12 @@ export const useProjectsStore = create<ProjectsState>()(
                   ...state.hasFetched,
                   [category]: true,
                 },
-                lastFetchTimestamp: {
-                  ...state.lastFetchTimestamp,
-                  [category]: Date.now(),
-                },
                 isLoading: false,
               }
             })
 
             return processedProjects
-          } catch (error) {
-            console.error(`Error loading projects (${category}):`, error)
+          } catch {
             set({ isLoading: false })
             return []
           }
@@ -216,11 +193,7 @@ export const useProjectsStore = create<ProjectsState>()(
             })
 
             return normalizedProject
-          } catch (error) {
-            console.error(
-              `Error loading project details (${category}/${slug}):`,
-              error
-            )
+          } catch {
             set({ isPhotoLoading: false })
             return undefined
           }
@@ -241,10 +214,6 @@ export const useProjectsStore = create<ProjectsState>()(
               hasFetched: {
                 ...state.hasFetched,
                 [category]: true,
-              },
-              lastFetchTimestamp: {
-                ...state.lastFetchTimestamp,
-                [category]: Date.now(),
               },
             }
           })
@@ -270,10 +239,6 @@ export const useProjectsStore = create<ProjectsState>()(
             hasFetched: {
               'black-and-white': false,
               'early-color': false,
-            },
-            lastFetchTimestamp: {
-              'black-and-white': 0,
-              'early-color': 0,
             },
           })
         },
@@ -319,7 +284,6 @@ export const useProjectsStore = create<ProjectsState>()(
         previousPathname: state.previousPathname,
         projectsList: state.projectsList,
         hasFetched: state.hasFetched,
-        lastFetchTimestamp: state.lastFetchTimestamp,
       }),
     }
   )
