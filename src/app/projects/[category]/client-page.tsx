@@ -33,7 +33,7 @@ export default function ClientCategoryPage({
   // éviter de rendre ProjectsList pour éviter les cycles de montage/démontage
   return (
     <PageTransition>
-      <main className="flex min-h-screen flex-col items-center justify-between">
+      <main className="flex flex-col items-center justify-between">
         {loaded && <ProjectsList category={category} />}
       </main>
     </PageTransition>

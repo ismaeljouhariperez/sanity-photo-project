@@ -12,6 +12,15 @@ interface PhotoGridProps {
 const PhotoGrid = ({ photos }: PhotoGridProps) => {
   const controls = useAnimation()
 
+  // Log pour déboguer les photos reçues
+  useEffect(() => {
+    console.log('PhotoGrid a reçu photos:', {
+      count: photos?.length || 0,
+      firstPhoto: photos?.length > 0 ? photos[0] : null,
+      hasUrls: photos?.every((photo) => Boolean(photo.url)),
+    })
+  }, [photos])
+
   // Démarrer l'animation une fois que les items du ProjectsView ont terminé leur animation
   useEffect(() => {
     // Attendre que les animations de ProjectsView soient complètes
@@ -59,7 +68,23 @@ const PhotoGrid = ({ photos }: PhotoGridProps) => {
     )
   }
 
-  console.log('Rendu PhotoGrid avec photos:', photos)
+  // Vérification supplémentaire pour les URLs manquantes
+  const validPhotos = photos.filter((photo) => Boolean(photo.url))
+
+  if (validPhotos.length === 0) {
+    console.error('Photos reçues mais aucune URL valide trouvée:', photos)
+    return (
+      <div className="px-16 py-20 text-center">
+        <h3 className="text-xl font-semibold mb-4">
+          Problème d&apos;affichage des photos
+        </h3>
+        <p className="text-gray-500">
+          Les photos existent mais ne peuvent pas être affichées (URLs
+          manquantes).
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="px-16 py-20">
@@ -69,7 +94,7 @@ const PhotoGrid = ({ photos }: PhotoGridProps) => {
         initial="hidden"
         animate={controls}
       >
-        {photos.map((photo, index) => (
+        {validPhotos.map((photo, index) => (
           <motion.div
             key={photo._id || `photo-${index}`}
             className={`relative ${index % 2 === 1 ? 'md:mt-16' : ''}`}
@@ -90,16 +115,6 @@ const PhotoGrid = ({ photos }: PhotoGridProps) => {
                 </div>
               )}
             </div>
-            {photo.title && (
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold">{photo.title}</h3>
-                {photo.description && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {photo.description}
-                  </p>
-                )}
-              </div>
-            )}
           </motion.div>
         ))}
       </motion.div>

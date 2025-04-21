@@ -313,32 +313,49 @@ export class SanityAdapter implements ISanityService {
 
           // Convertir les images intégrées en format Photo pour maintenir la compatibilité
           const photos =
-            project.images?.map((img: any, index: number) => ({
-              _id: `embedded-image-${index}`,
-              _type: 'photo',
-              title: img.title || `Image ${index + 1}`,
-              description: img.description,
-              url: img.url,
-              alt: img.alt || img.title || `Image ${index + 1}`,
-              order: img.order || index,
-              dimensions: {
-                width: img.width,
-                height: img.height,
-                aspectRatio: img.width / img.height,
-              },
-            })) || []
+            project.images?.map((img: any, index: number) => {
+              // Vérification et debugging des propriétés d'image
+              if (!img.url) {
+                console.error(`Image ${index} sans URL:`, img)
+              }
+
+              return {
+                _id: `embedded-image-${index}`,
+                _type: 'photo',
+                title: img.title || `Image ${index + 1}`,
+                description: img.description,
+                url: img.url,
+                alt: img.alt || img.title || `Image ${index + 1}`,
+                order: img.order || index,
+                dimensions: {
+                  width: img.width || 0,
+                  height: img.height || 0,
+                  aspectRatio:
+                    img.width && img.height ? img.width / img.height : 1.5,
+                },
+              }
+            }) || []
+
+          // Filtrer les photos sans URL
+          const validPhotos = photos.filter((photo: any) => Boolean(photo.url))
 
           console.log(`Images converties en photos:`, photos)
+          console.log(
+            `Photos valides avec URL: ${validPhotos.length}/${photos.length}`
+          )
 
           // Créer un objet ProjectFull compatible
           const result = {
             ...project,
-            photos: photos,
+            photos: validPhotos, // Utiliser uniquement les photos avec URL valide
           }
 
           console.log(`Résultat final:`, result)
           if (result?.photos) {
             console.log(`Photos trouvées: ${result.photos.length}`)
+            if (result.photos.length > 0) {
+              console.log(`Première photo:`, result.photos[0])
+            }
           } else {
             console.log(`Pas de photos trouvées dans le projet.`)
           }
