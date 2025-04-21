@@ -6,7 +6,6 @@ import DelayedLoader from '@/components/ui/DelayedLoader'
 import ProjectsView from '../ProjectsView'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import PhotoGrid from './PhotoGrid'
-import Debug from './Debug'
 import { Photo } from '@/lib/sanity.types'
 
 interface ProjectDetailProps {
@@ -48,30 +47,21 @@ function useProjectDetail(
   const { navigateWithTransition } = useTransitionNavigation()
   const activeSlugs = useMemo(() => [slug], [slug])
 
-  // État client uniquement pour éviter les problèmes d'hydratation
   const [isClientReady, setIsClientReady] = useState(false)
   const [projectPhotos, setProjectPhotos] = useState<Photo[]>([])
 
   useEffect(() => {
-    // Marquer comme prêt côté client après hydratation
     setIsClientReady(true)
-
     setActiveProject(category, slug)
 
     if (!hasFetched[category]) {
-      // Charger tous les projets de la catégorie pour l'affichage de la liste
       loadProjects(category)
     }
 
-    // Charger les détails du projet spécifique (avec les photos)
     loadProjectDetails(category, slug).then((project) => {
-      console.log('Projet chargé avec détails :', project)
       if (project?.photos && project.photos.length > 0) {
-        console.log(`Photos récupérées : ${project.photos.length}`)
-        console.log('Première photo :', project.photos[0])
         setProjectPhotos(project.photos)
       } else {
-        console.log('Aucune photo trouvée dans le projet')
         setProjectPhotos([])
       }
     })
@@ -86,10 +76,7 @@ function useProjectDetail(
 
   const handleBackToProjects = (e: React.MouseEvent) => {
     e.preventDefault()
-
-    // Mark this project as previously active for better transition experience
     setActiveProject(category, slug)
-
     navigateWithTransition(`/projects/${category}`)
   }
 
@@ -140,7 +127,6 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     projectPhotos,
   } = useProjectDetail(category, slug)
 
-  // Mémoriser le composant ProjectsView pour éviter les remontages inutiles
   const memoizedProjectsView = useMemo(
     () => (
       <ProjectsView
@@ -152,20 +138,6 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     [projects, category, activeSlugs]
   )
 
-  // Débogage du projet courant
-  useEffect(() => {
-    if (currentProject) {
-      console.log('État actuel du projet :', {
-        slug,
-        category,
-        hasPhotos: Boolean(currentProject?.photos?.length),
-        photosCount: currentProject?.photos?.length || 0,
-        currentProject,
-      })
-    }
-  }, [slug, category, currentProject])
-
-  // État de chargement initial pour éviter l'erreur d'hydratation
   if (!isClientReady) {
     return (
       <div className="min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
@@ -182,41 +154,24 @@ export default function ProjectDetail({ slug, category }: ProjectDetailProps) {
     return <ProjectNotFound onBackClick={handleBackToProjects} />
   }
 
-  // Utiliser directement projectPhotos qui est plus fiable que currentProject?.photos
   const photos =
     projectPhotos.length > 0 ? projectPhotos : currentProject?.photos || []
-
-  console.log('Rendu du composant ProjectDetail', {
-    hasPhotos: photos.length > 0,
-    photosCount: photos.length,
-    photosSources:
-      projectPhotos.length > 0 ? 'From useState' : 'From currentProject',
-    firstPhoto: photos.length > 0 ? photos[0] : null,
-  })
 
   if (isPhotoLoading) {
     return (
       <>
-        {/* Utiliser l'instance mémorisée */}
         {memoizedProjectsView}
         <div className="px-16 py-20 text-center">
           <DelayedLoader isLoading={true} message="Chargement des photos..." />
         </div>
-        <Debug slug={slug} category={category} />
       </>
     )
   }
 
   return (
     <>
-      {/* Utiliser l'instance mémorisée */}
       {memoizedProjectsView}
-
-      {/* Utiliser les photos depuis l'état local pour garantir une donnée à jour */}
       <PhotoGrid photos={photos} />
-
-      {/* Composant de débogage */}
-      {/* <Debug slug={slug} category={category} /> */}
     </>
   )
 }
