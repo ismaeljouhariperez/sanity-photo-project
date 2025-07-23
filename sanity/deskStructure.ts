@@ -9,7 +9,6 @@ import {
 } from 'react-icons/md'
 
 // Liste des types de documents que nous voulons cacher dans la liste par défaut
-const hiddenDocTypes = (listItem: any) => !['siteSettings'].includes(listItem.getId())
 
 export const structure = (S: StructureBuilder) =>
   S.list()
@@ -17,28 +16,28 @@ export const structure = (S: StructureBuilder) =>
     .items([
       S.listItem()
         .title('Paramètres du site')
-        .icon(MdSettings)
+        .icon(MdSettings as React.ComponentType)
         .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
 
       S.divider(),
 
       S.listItem()
         .title('Collections')
-        .icon(MdCollections)
+        .icon(MdCollections as React.ComponentType)
         .child(S.documentTypeList('collection').title('Collections')),
 
       S.divider(),
 
       S.listItem()
         .title('Projets Photo')
-        .icon(MdPhotoLibrary)
+        .icon(MdPhotoLibrary as React.ComponentType)
         .child(
           S.list()
             .title('Projets par catégorie')
             .items([
               S.listItem()
                 .title('Noir et Blanc')
-                .icon(MdInvertColors)
+                .icon(MdInvertColors as React.ComponentType)
                 .child(
                   S.documentList()
                     .title('Projets Noir et Blanc')
@@ -47,7 +46,7 @@ export const structure = (S: StructureBuilder) =>
                 ),
               S.listItem()
                 .title('Couleur')
-                .icon(MdColorLens)
+                .icon(MdColorLens as React.ComponentType)
                 .child(
                   S.documentList()
                     .title('Projets Couleur')
@@ -57,14 +56,14 @@ export const structure = (S: StructureBuilder) =>
               S.divider(),
               S.listItem()
                 .title('Tous les projets')
-                .icon(MdPhotoLibrary)
+                .icon(MdPhotoLibrary as React.ComponentType)
                 .child(S.documentTypeList('project').title('Tous les projets')),
             ]),
         ),
 
       S.listItem()
         .title('Photos')
-        .icon(MdPhoto)
+        .icon(MdPhoto as React.ComponentType)
         .child(S.documentTypeList('photo').title('Toutes les photos')),
 
       // Ajouter d'autres types de documents ici si nécessaire

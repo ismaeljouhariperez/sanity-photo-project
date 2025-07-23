@@ -1,0 +1,14 @@
+import React from 'react'
+import SharedProjectsLayout from '@/components/ui/SharedProjectsLayout'
+
+/**
+ * Layout pour les pages Noir et Blanc
+ * Utilise le layout partagé pour maintenir l'état des projets
+ */
+export default function BlackAndWhiteLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <SharedProjectsLayout>{children}</SharedProjectsLayout>
+}
