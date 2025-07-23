@@ -10,8 +10,7 @@ import { useProjectStore } from '@/store/projectStore'
 import { isValidCategory } from '@/lib/constants'
 
 /**
- * Shared layout for category pages
- * Provides persistent project list across navigation
+ * Category layout with animated project titles
  */
 export default function CategoryLayout({
   children,
@@ -23,25 +22,21 @@ export default function CategoryLayout({
   const { setSelectedSlug, setSelectedCategory } = useProjectStore()
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasEntered, setHasEntered] = useState(false)
 
-  // Extract category from pathname
   const category = pathname?.split('/')[1]
-
-  // Validate category
+  const activeSlug = pathname?.split('/')[2]
+  const isCategoryPage = !activeSlug
+  
   if (!category || !isValidCategory(category)) {
     return <div>Invalid category</div>
   }
 
-  const activeSlug = pathname?.split('/')[2]
-  const isDetailView = !!activeSlug
-
-  // Update store when route changes
   useEffect(() => {
     setSelectedCategory(category)
-    setSelectedSlug(isDetailView ? activeSlug : null)
-  }, [category, activeSlug, isDetailView, setSelectedCategory, setSelectedSlug])
+    setSelectedSlug(activeSlug || null)
+  }, [category, activeSlug, setSelectedCategory, setSelectedSlug])
 
-  // Load projects for current category
   useEffect(() => {
     const loadProjects = async () => {
       setIsLoading(true)
@@ -52,6 +47,8 @@ export default function CategoryLayout({
         console.error('Error loading projects:', error)
       } finally {
         setIsLoading(false)
+        // Trigger entrance animation after data loads
+        setTimeout(() => setHasEntered(true), 100)
       }
     }
 
@@ -71,27 +68,22 @@ export default function CategoryLayout({
       <nav className="flex flex-wrap justify-end gap-8">
         {projects.map((project, index) => {
           const projectSlug = project.slug?.current || project.slug
-          const isActive = isDetailView && activeSlug === projectSlug
+          const isActive = !isCategoryPage && activeSlug === projectSlug
 
           return (
             <div
               key={project._id}
               className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
               onClick={() => {
-                if (isActive) {
-                  // Navigate back to category list
-                  router.push(`/${category}`)
-                } else {
-                  // Navigate to project detail
-                  router.push(`/${category}/${projectSlug}`)
-                }
+                const targetUrl = isActive ? `/${category}` : `/${category}/${projectSlug}`
+                router.push(targetUrl)
               }}
             >
               <motion.h2
                 className="overflow-hidden"
                 initial={{ y: '-100%' }}
                 animate={{
-                  y: isDetailView && !isActive ? '-100%' : '0%',
+                  y: hasEntered && (isCategoryPage || isActive) ? '0%' : '-100%',
                 }}
                 transition={{
                   duration: 0.8,
@@ -106,8 +98,7 @@ export default function CategoryLayout({
         })}
       </nav>
 
-      {/* Detail Content Area */}
-      {isDetailView && <div className="flex-1">{children}</div>}
+      {!isCategoryPage && <div className="flex-1">{children}</div>}
     </main>
   )
 }
