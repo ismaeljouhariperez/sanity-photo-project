@@ -1,11 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence, Variants } from 'framer-motion'
-import { AnimationOptions } from '@/animations/types'
-import {
-  createEntranceRevealAnimation,
-  createExitCoverAnimation,
-} from '@/animations/transitions'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface AnimatedOverlayProps {
   /** Unique identifier for the overlay */
@@ -18,10 +13,10 @@ interface AnimatedOverlayProps {
   entranceDelay?: number
   /** Delay for exit animation in seconds */
   exitDelay?: number
-  /** Animation options for entrance */
-  entranceOptions?: AnimationOptions
-  /** Animation options for exit */
-  exitOptions?: AnimationOptions
+  /** Animation speed for entrance (in seconds) */
+  entranceSpeed?: number
+  /** Animation speed for exit (in seconds) */
+  exitSpeed?: number
   /** CSS classes for styling */
   className?: string
 }
@@ -36,20 +31,36 @@ export default function AnimatedOverlay({
   showExit,
   entranceDelay = 0,
   exitDelay = 0,
-  entranceOptions = { speed: 'slower', ease: 'default' },
-  exitOptions = { speed: 'normal', ease: 'default' },
+  entranceSpeed = 1.2,
+  exitSpeed = 0.5,
   className = 'absolute bottom-0 left-0 w-full bg-gray-50 z-10',
 }: AnimatedOverlayProps) {
-  // Create animation variants
-  const entranceVariants = createEntranceRevealAnimation({
-    ...entranceOptions,
-    delay: entranceDelay,
-  })
+  // Simple animation variants
+  const entranceVariants = {
+    initial: { height: '100%', bottom: 0 },
+    animate: { 
+      height: '0%', 
+      bottom: 0,
+      transition: { 
+        duration: entranceSpeed, 
+        ease: [0.16, 1, 0.3, 1] as const,
+        delay: entranceDelay 
+      }
+    },
+  }
 
-  const exitVariants = createExitCoverAnimation({
-    ...exitOptions,
-    delay: exitDelay,
-  })
+  const exitVariants = {
+    initial: { height: 0, top: 0 },
+    animate: { 
+      height: '100%', 
+      top: 0,
+      transition: { 
+        duration: exitSpeed, 
+        ease: [0.16, 1, 0.3, 1] as const,
+        delay: exitDelay 
+      }
+    },
+  }
 
   return (
     <>

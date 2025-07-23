@@ -1,6 +1,5 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { DURATIONS, EASE } from '@/animations'
 
 interface InfoOverlayProps {
   isOpen: boolean
@@ -8,7 +7,7 @@ interface InfoOverlayProps {
 }
 
 export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
-  // Utilisation des constantes d'animation standardisées
+  // Simple animation configurations
   const overlayAnimations = {
     initial: {
       width: 0,
@@ -16,21 +15,21 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
     animate: {
       width: '40%',
       transition: {
-        duration: DURATIONS.normal,
-        ease: EASE.default,
+        duration: 0.5,
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
     exit: {
       width: 0,
       transition: {
-        duration: DURATIONS.normal,
-        ease: EASE.default,
-        delay: DURATIONS.fast,
+        duration: 0.5,
+        ease: [0.16, 1, 0.3, 1] as const,
+        delay: 0.2,
       },
     },
   }
 
-  // Animation pour les éléments de contenu avec délai
+  // Content animation with delay
   const contentAnimations = {
     initial: {
       opacity: 0,
@@ -38,15 +37,15 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
     animate: {
       opacity: 1,
       transition: {
-        duration: DURATIONS.normal,
+        duration: 0.5,
         delay: 0.6,
-        ease: EASE.default,
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
     exit: {
       opacity: 0,
       transition: {
-        duration: DURATIONS.fast,
+        duration: 0.2,
       },
     },
   }

@@ -1,2 +1,2 @@
 export * from './animationStore'
-export * from './projectsStore'
+export * from './projectStore'

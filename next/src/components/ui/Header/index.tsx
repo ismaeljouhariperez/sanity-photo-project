@@ -4,14 +4,14 @@ import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import InfoOverlay from '../InfoOverlay'
 import { useAnimationStore } from '@/store/animationStore'
-import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
+import { useRouter } from 'next/navigation'
 import s from './styles.module.scss'
 
 export default function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
-  const { navigateWithTransition } = useTransitionNavigation()
+  const router = useRouter()
 
   const handleAboutClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -21,17 +21,17 @@ export default function Header() {
   const handleIndexClick = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    // Logique pour naviguer vers l'index du projet avec notre hook personnalisé
+    // Navigate to category list or home
     if (
       pathname.includes('/black-and-white') ||
       pathname.includes('/early-color')
     ) {
-      const projectType = pathname.split('/')[1]?.split('/')[0]
-      if (projectType) {
-        // Utiliser le hook avec délai 0 pour transition immédiate
-        navigateWithTransition(`/${projectType}`, 0)
+      const category = pathname.split('/')[1]
+      if (category && (category === 'black-and-white' || category === 'early-color')) {
+        // Navigate to category list
+        router.push(`/${category}`)
       } else {
-        navigateWithTransition('/')
+        router.push('/')
       }
     }
   }
@@ -39,12 +39,12 @@ export default function Header() {
   // Réinitialise l'animation quand on quitte la page projects
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    navigateWithTransition('/')
+    router.push('/')
   }
 
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
-    const isInProjects = pathname.includes('/projects')
+    const isInProjects = pathname.includes('/black-and-white') || pathname.includes('/early-color')
     setInProjectsSection(isInProjects)
 
     // Réinitialiser l'animation si on quitte complètement la section projects
@@ -53,7 +53,7 @@ export default function Header() {
     }
   }, [pathname, resetHeaderAnimation, setInProjectsSection])
 
-  const isProjectPage = pathname.includes('/projects')
+  const isProjectPage = pathname.includes('/black-and-white') || pathname.includes('/early-color')
 
   // Variants pour l'animation de l'Index
   const indexVariants = {

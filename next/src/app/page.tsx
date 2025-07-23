@@ -1,31 +1,48 @@
 'use client'
 
-import { useEffect } from 'react'
-import PageTransition from '@/components/transitions/PageTransition'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import CloudinaryImage from '@/components/ui/CloudinaryImage'
 import AnimatedOverlay from '@/components/ui/AnimatedOverlay'
 import { useAnimationStore } from '@/store/animationStore'
-import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
+import { useRouter } from 'next/navigation'
 
 /**
  * Home page with project showcase and animations
  */
 export default function Home() {
   const { setLeavingPage, isLeavingPage } = useAnimationStore()
-  const { navigateWithTransition } = useTransitionNavigation()
+  const router = useRouter()
+  const [showEntrance, setShowEntrance] = useState(false)
 
-  // Reset leaving state on mount
+  // Reset leaving state and trigger entrance animation on mount
   useEffect(() => {
     setLeavingPage(false)
+    setShowEntrance(true)
   }, [setLeavingPage])
 
+  // Handle navigation with exit animation
+  const handleNavigate = (path: string) => {
+    setLeavingPage(true)
+    
+    // Navigate after exit animation completes
+    setTimeout(() => {
+      router.push(path)
+    }, 1000) // Adjust timing to match your exit animation duration
+  }
+
   return (
-    <PageTransition>
-      <div className="h-[calc(100vh-5.5rem)] grid grid-cols-2 gap-16 px-24 py-16 items-center">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="h-[calc(100vh-5.5rem)] grid grid-cols-2 gap-16 px-24 py-16 items-center"
+    >
         {/* Black & White Project */}
         <div 
           className="relative flex items-center w-full max-w-[450px] mx-auto aspect-[4/3] cursor-pointer overflow-hidden"
-          onClick={() => navigateWithTransition('/black-and-white')}
+          onClick={() => handleNavigate('/black-and-white')}
         >
           <CloudinaryImage
             src="cover-bw.jpg"
@@ -38,7 +55,7 @@ export default function Home() {
           />
           <AnimatedOverlay
             id="/black-and-white"
-            showEntrance={true}
+            showEntrance={showEntrance && !isLeavingPage}
             showExit={isLeavingPage}
             entranceDelay={0}
             exitDelay={0}
@@ -48,7 +65,7 @@ export default function Home() {
         {/* Early Color Project */}
         <div 
           className="relative flex items-center w-full max-w-[450px] mx-auto aspect-[4/3] cursor-pointer overflow-hidden"
-          onClick={() => navigateWithTransition('/early-color')}
+          onClick={() => handleNavigate('/early-color')}
         >
           <CloudinaryImage
             src="cover-color.jpg"
@@ -61,13 +78,12 @@ export default function Home() {
           />
           <AnimatedOverlay
             id="/early-color"
-            showEntrance={true}
+            showEntrance={showEntrance && !isLeavingPage}
             showExit={isLeavingPage}
             entranceDelay={1}
             exitDelay={0.6}
           />
         </div>
-      </div>
-    </PageTransition>
+    </motion.div>
   )
 }
