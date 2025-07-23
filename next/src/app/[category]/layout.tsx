@@ -58,38 +58,25 @@ export default function CategoryLayout({
     loadProjects()
   }, [category])
 
-  if (isLoading) {
-    return (
-      <div className="min-h-[calc(100vh-5.5rem)] flex items-center justify-center">
-        <div>Loading...</div>
-      </div>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex min-h-[calc(100vh-5.5rem)] items-center justify-center">
+  //       <div>Loading...</div>
+  //     </div>
+  //   )
+  // }
 
   return (
-    <main className="flex-1 min-h-[calc(100vh-5.5rem)] flex justify-center items-center px-16">
-      <motion.nav
-        className="flex flex-wrap gap-8 justify-end"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: {},
-          visible: {
-            transition: {
-              staggerChildren: 0.2,
-              delayChildren: 0.3,
-            },
-          },
-        }}
-      >
-        {projects.map((project) => {
+    <main className="flex min-h-[calc(100vh-5.5rem)] flex-1 items-center justify-center px-16">
+      <nav className="flex flex-wrap justify-end gap-8">
+        {projects.map((project, index) => {
           const projectSlug = project.slug?.current || project.slug
           const isActive = isDetailView && activeSlug === projectSlug
 
           return (
             <div
               key={project._id}
-              className="text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 cursor-pointer transition-colors duration-300"
+              className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
               onClick={() => {
                 if (isActive) {
                   // Navigate back to category list
@@ -102,22 +89,14 @@ export default function CategoryLayout({
             >
               <motion.h2
                 className="overflow-hidden"
-                variants={{
-                  hidden: { y: -50 },
-                  visible: { 
-                    y: 0,
-                    transition: { 
-                      duration: 1,
-                      ease: [0.16, 1, 0.3, 1] as const
-                    }
-                  }
-                }}
+                initial={{ y: '-100%' }}
                 animate={{
                   y: isDetailView && !isActive ? '-100%' : '0%',
                 }}
                 transition={{
-                  duration: 0.6,
+                  duration: 0.8,
                   ease: [0.16, 1, 0.3, 1] as const,
+                  delay: 0.15 * index,
                 }}
               >
                 {project.title}
@@ -125,14 +104,10 @@ export default function CategoryLayout({
             </div>
           )
         })}
-      </motion.nav>
+      </nav>
 
       {/* Detail Content Area */}
-      {isDetailView && (
-        <div className="flex-1">
-          {children}
-        </div>
-      )}
+      {isDetailView && <div className="flex-1">{children}</div>}
     </main>
   )
 }
