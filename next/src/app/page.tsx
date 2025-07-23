@@ -28,11 +28,13 @@ export default function Home() {
           onClick={() => navigateWithTransition('/black-and-white')}
         >
           <CloudinaryImage
-            src="bw-cover.jpg"
+            src="cover-bw.jpg"
             alt="Photographie Noir et Blanc"
             width={900}
             height={675}
             className="w-full h-full"
+            folder="home"
+            fallbackSrc="/images/bw-cover.jpg"
           />
           <AnimatedOverlay
             id="/black-and-white"
@@ -49,11 +51,13 @@ export default function Home() {
           onClick={() => navigateWithTransition('/early-color')}
         >
           <CloudinaryImage
-            src="color-cover.jpg"
+            src="cover-color.jpg"
             alt="Photographie Couleur"
             width={900}
             height={675}
             className="w-full h-full"
+            folder="home"
+            fallbackSrc="/images/color-cover.jpg"
           />
           <AnimatedOverlay
             id="/early-color"

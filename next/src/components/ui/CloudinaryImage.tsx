@@ -13,6 +13,8 @@ interface CloudinaryImageProps {
   format?: 'auto' | 'webp' | 'avif' | 'jpg' | 'png'
   crop?: 'fill' | 'fit' | 'scale' | 'crop' | 'pad'
   gravity?: 'auto' | 'center' | 'face' | 'faces' | 'body'
+  folder?: string
+  fallbackSrc?: string
 }
 
 /**
@@ -29,6 +31,8 @@ export default function CloudinaryImage({
   format = 'auto',
   crop = 'fill',
   gravity = 'auto',
+  folder,
+  fallbackSrc,
 }: CloudinaryImageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
@@ -39,7 +43,7 @@ export default function CloudinaryImage({
     
     if (!cloudName) {
       console.warn('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME not set, falling back to local images')
-      return `/images/${src}`
+      return fallbackSrc || `/images/${src}`
     }
 
     const transformations = [
@@ -51,7 +55,11 @@ export default function CloudinaryImage({
       `f_${format}`,
     ].join(',')
 
-    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${src}`
+    // Build path with optional folder
+    const basePath = 'sanity-photo-project' // Project folder is always this
+    const imagePath = folder ? `${basePath}/${folder}/${src}` : `${basePath}/${src}`
+
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${imagePath}`
   }
 
   const handleLoad = () => {
@@ -60,10 +68,25 @@ export default function CloudinaryImage({
 
   const handleError = () => {
     setIsLoading(false)
+    
+    // Try fallback image if available
+    if (fallbackSrc && !hasError) {
+      setHasError(true)
+      return
+    }
+    
     setHasError(true)
   }
 
-  if (hasError) {
+  // Get the image source to use
+  const getImageSrc = () => {
+    if (hasError && fallbackSrc) {
+      return fallbackSrc
+    }
+    return buildCloudinaryUrl()
+  }
+
+  if (hasError && !fallbackSrc) {
     return (
       <div 
         className={`flex items-center justify-center bg-gray-200 text-gray-500 ${className}`}
@@ -77,7 +100,7 @@ export default function CloudinaryImage({
   return (
     <div className={`relative ${className}`}>
       <Image
-        src={buildCloudinaryUrl()}
+        src={getImageSrc()}
         alt={alt}
         width={width}
         height={height}
