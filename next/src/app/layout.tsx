@@ -2,10 +2,8 @@
 
 import React, { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { ThemeProvider } from 'next-themes'
 import { AnimatePresence } from 'framer-motion'
 import Header from './components/Header'
-import ThemeToggle from './components/ThemeToggle'
 import './globals.css'
 import { aujournuit } from './fonts'
 import { AnimationProvider } from '@/providers/AnimationProvider'
@@ -25,18 +23,19 @@ export default function RootLayout({
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
       <body
-        className="transition-colors duration-200 bg-gray-50 dark:bg-gray-900 text-black dark:text-white"
+        className="bg-gray-50 text-black"
         suppressHydrationWarning
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AnimationProvider>
+        <AnimationProvider>
+          <div className="min-h-screen flex flex-col">
             <Header />
-            <ThemeToggle />
-            <main>
-              <AnimatePresence mode="wait">{children}</AnimatePresence>
+            <main className="flex-1">
+              <AnimatePresence mode="wait" initial={false}>
+                {children}
+              </AnimatePresence>
             </main>
-          </AnimationProvider>
-        </ThemeProvider>
+          </div>
+        </AnimationProvider>
       </body>
     </html>
   )

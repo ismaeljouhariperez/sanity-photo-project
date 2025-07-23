@@ -63,7 +63,7 @@ export default function DelayedLoader({
       className="flex flex-col items-center space-y-4"
     >
       <div
-        className="border-t-2 border-b-2 border-black dark:border-white rounded-full animate-spin"
+        className="border-t-2 border-b-2 border-black rounded-full animate-spin"
         style={{ width: `${size}px`, height: `${size}px` }}
       ></div>
       {message && <div className="text-sm opacity-70">{message}</div>}

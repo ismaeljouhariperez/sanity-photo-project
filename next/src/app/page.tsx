@@ -73,7 +73,7 @@ const ProjectImage = ({
             variants={entranceVariants}
             initial="initial"
             animate="animate"
-            className="absolute bottom-0 left-0 w-full bg-gray-50 dark:bg-gray-900 z-10"
+            className="absolute bottom-0 left-0 w-full bg-gray-50 z-10"
           />
         )}
       </AnimatePresence>
@@ -86,7 +86,7 @@ const ProjectImage = ({
             variants={exitVariants}
             initial="initial"
             animate="animate"
-            className="absolute top-0 left-0 w-full bg-gray-50 dark:bg-gray-900 z-10"
+            className="absolute top-0 left-0 w-full bg-gray-50 z-10"
           />
         )}
       </AnimatePresence>
