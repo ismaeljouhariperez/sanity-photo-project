@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, MouseEvent, memo } from 'react'
-import { motion, Variants, usePresence } from 'framer-motion'
+import { motion, Variants, usePresence, Easing } from 'framer-motion'
 import { Project } from '@/lib/sanity.types'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 import { createStaggerContainer, EASE, DURATIONS } from '@/animations'
@@ -87,7 +87,7 @@ function ProjectsView({
                 wasPreviouslyActive && comingFromDetailPage
               )}
               onClick={(e) => handleProjectClick(e, projectSlug)}
-              className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 font-wide cursor-pointer transition-colors duration-50 ${
+              className={`text-6xl overflow-hidden leading-[1.3] hover:text-gray-500 cursor-pointer transition-colors duration-50 ${
                 isActive ? 'text-gray-500' : ''
               }`}
             >
@@ -150,7 +150,7 @@ function useProjectAnimations({
           y: 0,
           transition: {
             duration: DURATIONS.normal,
-            ease: EASE.default,
+            ease: EASE.default as Easing,
           },
         },
         exit: { opacity: 0, y: -30 },

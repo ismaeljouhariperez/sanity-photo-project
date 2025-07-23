@@ -1,3 +1,4 @@
+import { Easing } from 'framer-motion'
 import {
   DURATIONS,
   EASE,
@@ -38,7 +39,7 @@ const createTransitionConfig = (
   const { speed, ease, delay } = { ...options, ...overrides }
   return {
     duration: DURATIONS[speed || DEFAULT_ANIMATION_OPTIONS.speed],
-    ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease],
+    ease: EASE[ease || DEFAULT_ANIMATION_OPTIONS.ease] as Easing,
     delay,
   }
 }

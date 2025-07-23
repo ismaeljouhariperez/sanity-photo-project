@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { SanityAdapter } from '@/adapters'
+import { getProjects, getProjectBySlug } from '@/lib/sanity'
 import { Project } from '@/lib/sanity.types'
 
 type Category = 'black-and-white' | 'early-color' | null
@@ -43,8 +43,7 @@ export interface ProjectsState {
   getProjectBySlug: (category: Category, slug: string) => Project | undefined
 }
 
-// Singleton Sanity adapter to avoid repeated instantiation
-const sanityAdapter = new SanityAdapter()
+// Direct Sanity function usage - no adapter needed
 
 /**
  * Zustand store for projects management
@@ -104,7 +103,7 @@ export const useProjectsStore = create<ProjectsState>()(
           try {
             set({ isLoading: true })
 
-            const projects = await sanityAdapter.fetchProjects(category)
+            const projects = await getProjects(category)
 
             // Process projects to normalize slugs
             const processedProjects = projects.map((project) => ({
@@ -147,7 +146,7 @@ export const useProjectsStore = create<ProjectsState>()(
             set({ isPhotoLoading: true })
 
             // Récupérer le projet complet avec photos
-            const projectDetail = await sanityAdapter.fetchProjectBySlug(
+            const projectDetail = await getProjectBySlug(
               slug,
               category
             )

@@ -16,7 +16,6 @@ export const client = createClient({
   dataset,
   apiVersion,
   useCdn: false, // Set to false for server-side rendering
-  perspective: 'published',
 })
 
 // Create client for preview mode (if needed)
@@ -26,7 +25,6 @@ export const previewClient = createClient({
   apiVersion,
   useCdn: false,
   token: process.env.SANITY_API_TOKEN,
-  perspective: 'previewDrafts',
 })
 
 // Image URL builder

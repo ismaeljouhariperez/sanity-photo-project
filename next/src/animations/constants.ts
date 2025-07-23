@@ -7,12 +7,12 @@ export const DURATIONS: Record<AnimationSpeed, number> = {
   slower: 1.2,
 }
 
-export const EASE: Record<EaseType, number[]> = {
-  default: [0.16, 1, 0.3, 1], // custom ease
-  linear: [0, 0, 1, 1],
-  bounce: [0.87, 0, 0.13, 1],
-  elastic: [0.68, -0.55, 0.265, 1.55],
-}
+export const EASE = {
+  default: [0.16, 1, 0.3, 1] as const,
+  linear: [0, 0, 1, 1] as const,
+  bounce: [0.87, 0, 0.13, 1] as const,
+  elastic: [0.68, -0.55, 0.265, 1.55] as const,
+} as const
 
 // Valeurs par défaut pour les animations
 export const DEFAULT_ANIMATION_OPTIONS = {

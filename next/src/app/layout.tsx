@@ -9,7 +9,6 @@ import ThemeToggle from './components/ThemeToggle'
 import './globals.css'
 import { aujournuit } from './fonts'
 import { AnimationProvider } from '@/providers/AnimationProvider'
-import { SANITY_CACHE_CLEAR_EVENT } from '@/adapters/sanity'
 
 export default function RootLayout({
   children,
@@ -18,46 +17,9 @@ export default function RootLayout({
 }) {
   const pathname = usePathname()
 
-  // Effet pour nettoyer le cache Sanity quand la route change
+  // Simple route change effect - Next.js handles caching natively
   useEffect(() => {
-    if (typeof window === 'undefined') return // Sortir si on est côté serveur
-
-    try {
-      // Clé pour stocker le chemin précédent
-      const PREV_PATH_KEY = 'prev_sanity_path'
-
-      // Récupérer le chemin précédent
-      const prevPath = sessionStorage.getItem(PREV_PATH_KEY) || ''
-
-      // Vérifier si la navigation est entre pages de projets
-      const isCurrentProjectPath = pathname?.includes('/projects/')
-      const isPrevProjectPath = prevPath?.includes('/projects/')
-
-      // Stocker le chemin actuel pour la prochaine navigation
-      sessionStorage.setItem(PREV_PATH_KEY, pathname || '')
-
-      // Déterminer s'il faut nettoyer le cache
-      const shouldClearCache = !(isCurrentProjectPath && isPrevProjectPath)
-
-      console.log(
-        `🔄 Route changée de ${prevPath} → ${pathname}${
-          shouldClearCache ? ' (nettoyage cache)' : ' (préservation cache)'
-        }`
-      )
-
-      // Émettre l'événement seulement si nécessaire
-      if (shouldClearCache) {
-        // Créer un événement personnalisé pour nettoyer le cache avec des informations sur le chemin
-        const event = new CustomEvent(SANITY_CACHE_CLEAR_EVENT, {
-          detail: { path: pathname },
-        })
-
-        // Déclencher l'événement
-        window.dispatchEvent(event)
-      }
-    } catch (error) {
-      console.error('Erreur lors du nettoyage du cache:', error)
-    }
+    console.log(`🔄 Route changed to ${pathname}`)
   }, [pathname])
 
   return (
