@@ -106,7 +106,7 @@ export const useProjectsStore = create<ProjectsState>()(
             const projects = await getProjects(category)
 
             // Process projects to normalize slugs
-            const processedProjects = projects.map((project) => ({
+            const processedProjects = projects.map((project: Project) => ({
               ...project,
               normalizedSlug: project.slug.current || String(project.slug),
             }))
@@ -146,10 +146,7 @@ export const useProjectsStore = create<ProjectsState>()(
             set({ isPhotoLoading: true })
 
             // Récupérer le projet complet avec photos
-            const projectDetail = await getProjectBySlug(
-              slug,
-              category
-            )
+            const projectDetail = await getProjectBySlug(slug, category)
 
             if (!projectDetail) {
               set({ isPhotoLoading: false })

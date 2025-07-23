@@ -1,5 +1,5 @@
 'use client'
-import { motion } from 'framer-motion'
+import { motion, cubicBezier } from 'framer-motion'
 import { ReactNode, useEffect } from 'react'
 import { useAnimationStore } from '@/store/animationStore'
 import { usePathname } from 'next/navigation'
@@ -52,7 +52,7 @@ export default function PageTransition({
   // Adjust transitions for smoother animations
   const transition = {
     duration: overrideTransition || isLeavingPage ? 0.2 : 0.5,
-    ease: [0.22, 1, 0.36, 1], // Equivalent to GSAP's ease-out-cubic
+    ease: cubicBezier(0.22, 1, 0.36, 1), // Equivalent to GSAP's ease-out-cubic
   }
 
   return (
