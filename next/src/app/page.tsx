@@ -1,134 +1,20 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Image from 'next/image'
+
+import { useEffect } from 'react'
 import PageTransition from '@/components/transitions/PageTransition'
-import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
+import CloudinaryImage from '@/components/ui/CloudinaryImage'
+import AnimatedOverlay from '@/components/ui/AnimatedOverlay'
 import { useAnimationStore } from '@/store/animationStore'
-import {
-  createEntranceRevealAnimation,
-  createExitCoverAnimation,
-} from '@/animations/transitions'
+import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 
 /**
- * Composant d'image de projet avec animations d'entrée et de sortie
- */
-interface ProjectImageProps {
-  path: string
-  title: string
-  src: string
-  entranceDelay?: number
-  exitDelay?: number
-}
-
-const ProjectImage = ({
-  path,
-  title,
-  src,
-  entranceDelay = 0,
-  exitDelay = 0,
-}: ProjectImageProps) => {
-  const { isLeavingPage } = useAnimationStore()
-  const [showEntrance, setShowEntrance] = useState(true)
-  const handleNavigate = useNavigateToProject()
-
-  // Définition des animations
-  const entranceVariants = createEntranceRevealAnimation({
-    speed: 'slower',
-    ease: 'default',
-    delay: entranceDelay,
-  })
-
-  const exitVariants = createExitCoverAnimation({
-    speed: 'normal',
-    ease: 'default',
-    delay: exitDelay,
-  })
-
-  // Montrer l'animation d'entrée au montage du composant
-  useEffect(() => {
-    setShowEntrance(true)
-  }, [])
-
-  return (
-    <motion.div
-      className="relative flex items-center w-full max-w-[450px] mx-auto aspect-[4/3] cursor-pointer overflow-hidden"
-      onClick={() => handleNavigate(path)}
-    >
-      <div className="w-full h-full">
-        <Image
-          src={`/images/${src}`}
-          alt={title}
-          width={900}
-          height={675}
-          className="object-cover w-full h-full"
-        />
-      </div>
-
-      {/* Animation d'entrée */}
-      <AnimatePresence>
-        {showEntrance && !isLeavingPage && (
-          <motion.div
-            key={`entrance-${path}`}
-            variants={entranceVariants}
-            initial="initial"
-            animate="animate"
-            className="absolute bottom-0 left-0 w-full bg-gray-50 z-10"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Animation de sortie */}
-      <AnimatePresence>
-        {isLeavingPage && (
-          <motion.div
-            key={`exit-${path}`}
-            variants={exitVariants}
-            initial="initial"
-            animate="animate"
-            className="absolute top-0 left-0 w-full bg-gray-50 z-10"
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-}
-
-/**
- * Hook personnalisé pour gérer la navigation avec animation de sortie
- */
-function useNavigateToProject() {
-  const { navigateWithTransition } = useTransitionNavigation()
-  const { setLeavingPage } = useAnimationStore()
-  const [targetUrl, setTargetUrl] = useState<string | null>(null)
-
-  // Effectue la navigation une fois l'animation terminée
-  useEffect(() => {
-    if (!targetUrl) return
-
-    const timer = setTimeout(() => {
-      navigateWithTransition(targetUrl)
-    }, 1000) // Délai réduit pour permettre aux animations de sortie de se terminer
-
-    return () => clearTimeout(timer)
-  }, [targetUrl, navigateWithTransition])
-
-  // Fonction pour déclencher la navigation
-  const handleNavigate = (path: string) => {
-    setLeavingPage(true)
-    setTargetUrl(path)
-  }
-
-  return handleNavigate
-}
-
-/**
- * Page d'accueil avec affichage des projets et animations
+ * Home page with project showcase and animations
  */
 export default function Home() {
-  const { setLeavingPage } = useAnimationStore()
+  const { setLeavingPage, isLeavingPage } = useAnimationStore()
+  const { navigateWithTransition } = useTransitionNavigation()
 
-  // Réinitialiser l'état de sortie au montage
+  // Reset leaving state on mount
   useEffect(() => {
     setLeavingPage(false)
   }, [setLeavingPage])
@@ -136,21 +22,47 @@ export default function Home() {
   return (
     <PageTransition>
       <div className="h-[calc(100vh-5.5rem)] grid grid-cols-2 gap-16 px-24 py-16 items-center">
-        <ProjectImage
-          path="/black-and-white"
-          title="Photographie Noir et Blanc"
-          src="bw-cover.jpg"
-          entranceDelay={0}
-          exitDelay={0}
-        />
+        {/* Black & White Project */}
+        <div 
+          className="relative flex items-center w-full max-w-[450px] mx-auto aspect-[4/3] cursor-pointer overflow-hidden"
+          onClick={() => navigateWithTransition('/black-and-white')}
+        >
+          <CloudinaryImage
+            src="bw-cover.jpg"
+            alt="Photographie Noir et Blanc"
+            width={900}
+            height={675}
+            className="w-full h-full"
+          />
+          <AnimatedOverlay
+            id="/black-and-white"
+            showEntrance={true}
+            showExit={isLeavingPage}
+            entranceDelay={0}
+            exitDelay={0}
+          />
+        </div>
 
-        <ProjectImage
-          path="/early-color"
-          title="Photographie Couleur"
-          src="color-cover.jpg"
-          entranceDelay={1}
-          exitDelay={0.6}
-        />
+        {/* Early Color Project */}
+        <div 
+          className="relative flex items-center w-full max-w-[450px] mx-auto aspect-[4/3] cursor-pointer overflow-hidden"
+          onClick={() => navigateWithTransition('/early-color')}
+        >
+          <CloudinaryImage
+            src="color-cover.jpg"
+            alt="Photographie Couleur"
+            width={900}
+            height={675}
+            className="w-full h-full"
+          />
+          <AnimatedOverlay
+            id="/early-color"
+            showEntrance={true}
+            showExit={isLeavingPage}
+            entranceDelay={1}
+            exitDelay={0.6}
+          />
+        </div>
       </div>
     </PageTransition>
   )
