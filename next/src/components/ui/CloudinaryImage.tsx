@@ -15,6 +15,7 @@ interface CloudinaryImageProps {
   gravity?: 'auto' | 'center' | 'face' | 'faces' | 'body'
   folder?: string
   fallbackSrc?: string
+  priority?: boolean
 }
 
 /**
@@ -33,6 +34,7 @@ export default function CloudinaryImage({
   gravity = 'auto',
   folder,
   fallbackSrc,
+  priority = false,
 }: CloudinaryImageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
@@ -109,7 +111,7 @@ export default function CloudinaryImage({
         }`}
         onLoad={handleLoad}
         onError={handleError}
-        priority={false}
+        priority={priority}
       />
       
       {isLoading && (

@@ -27,7 +27,7 @@ export default function CategoryLayout({
   const category = pathname?.split('/')[1]
   const activeSlug = pathname?.split('/')[2]
   const isCategoryPage = !activeSlug
-  
+
   if (!category || !isValidCategory(category)) {
     return <div>Invalid category</div>
   }
@@ -75,7 +75,9 @@ export default function CategoryLayout({
               key={project._id}
               className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
               onClick={() => {
-                const targetUrl = isActive ? `/${category}` : `/${category}/${projectSlug}`
+                const targetUrl = isActive
+                  ? `/${category}`
+                  : `/${category}/${projectSlug}`
                 router.push(targetUrl)
               }}
             >
@@ -83,7 +85,8 @@ export default function CategoryLayout({
                 className="overflow-hidden"
                 initial={{ y: '-100%' }}
                 animate={{
-                  y: hasEntered && (isCategoryPage || isActive) ? '0%' : '-100%',
+                  y:
+                    hasEntered && (isCategoryPage || isActive) ? '0%' : '-100%',
                 }}
                 transition={{
                   duration: 0.8,

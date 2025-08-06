@@ -52,6 +52,7 @@ export default function Home() {
             className="w-full h-full"
             folder="home"
             fallbackSrc="/images/bw-cover.jpg"
+            priority={true}
           />
           <AnimatedOverlay
             id="/black-and-white"
@@ -75,6 +76,7 @@ export default function Home() {
             className="w-full h-full"
             folder="home"
             fallbackSrc="/images/color-cover.jpg"
+            priority={true}
           />
           <AnimatedOverlay
             id="/early-color"
