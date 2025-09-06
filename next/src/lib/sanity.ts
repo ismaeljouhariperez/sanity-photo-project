@@ -44,6 +44,7 @@ export const queries = {
     category,
     order,
     coverImage,
+    "featuredImage": photos[featured == true][0].asset,
     _createdAt
   }`,
   

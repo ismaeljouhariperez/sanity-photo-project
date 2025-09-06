@@ -65,6 +65,7 @@ export interface Project extends SanityDocument {
   coverImage: SanityImage
   category: 'black-and-white' | 'early-color'
   photos?: Photo[]
+  featuredImage?: SanityImage
   order?: number
   normalizedSlug?: string // Version normalisée du slug pour les animations
 }
