@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import InfoOverlay from '../InfoOverlay'
 import { useAnimationStore } from '@/store/animationStore'
 import { useRouter } from 'next/navigation'
@@ -27,7 +28,10 @@ export default function Header() {
       pathname.includes('/early-color')
     ) {
       const category = pathname.split('/')[1]
-      if (category && (category === 'black-and-white' || category === 'early-color')) {
+      if (
+        category &&
+        (category === 'black-and-white' || category === 'early-color')
+      ) {
         // Navigate to category list
         router.push(`/${category}`)
       } else {
@@ -36,15 +40,10 @@ export default function Header() {
     }
   }
 
-  // Réinitialise l'animation quand on quitte la page projects
-  const handleHomeClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    router.push('/')
-  }
-
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
-    const isInProjects = pathname.includes('/black-and-white') || pathname.includes('/early-color')
+    const isInProjects =
+      pathname.includes('/black-and-white') || pathname.includes('/early-color')
     setInProjectsSection(isInProjects)
 
     // Réinitialiser l'animation si on quitte complètement la section projects
@@ -53,7 +52,8 @@ export default function Header() {
     }
   }, [pathname, resetHeaderAnimation, setInProjectsSection])
 
-  const isProjectPage = pathname.includes('/black-and-white') || pathname.includes('/early-color')
+  const isProjectPage =
+    pathname.includes('/black-and-white') || pathname.includes('/early-color')
 
   // Variants pour l'animation de l'Index
   const indexVariants = {
@@ -65,12 +65,12 @@ export default function Header() {
   return (
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
-      <header className="py-5 flex justify-center">
+      <header className="flex justify-center py-5">
         <nav className={s.nav}>
           <button onClick={handleAboutClick}>About</button>
           {isProjectPage && (
             <motion.div
-              className="overflow-hidden h-[24px] flex items-center"
+              className="flex h-[24px] items-center overflow-hidden"
               initial="hidden"
               animate="visible"
               exit="exit"
@@ -82,9 +82,12 @@ export default function Header() {
               </motion.div>
             </motion.div>
           )}
-          <button onClick={handleHomeClick} className="text-xl">
-            Ismael Ahab
-          </button>
+          <Link
+            href="/"
+            className="text-xl transition-opacity hover:opacity-80"
+          >
+            Ismael Leon
+          </Link>
         </nav>
       </header>
     </>

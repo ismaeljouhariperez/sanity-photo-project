@@ -64,8 +64,18 @@ export default function CategoryLayout({
   // }
 
   return (
-    <main className="flex min-h-[calc(100vh-5.5rem)] flex-1 items-center justify-center px-16">
-      <nav className="flex flex-wrap justify-end gap-8">
+    <main className="flex min-h-[calc(100vh-5.5rem)] flex-1 items-center justify-center">
+      <div className="h-full w-1/3">
+        <div className="flex h-full w-full items-center justify-center p-16">
+          <img
+            src="https://images.squarespace-cdn.com/content/v1/634723977fd6041c2f4c7c59/7af3cdd9-943d-446c-92d6-8dd8db10e183/DSCF0286.jpg?format=1000w"
+            alt="Photographie Noir et Blanc"
+            width={1000}
+            height={1000}
+          />
+        </div>
+      </div>
+      <nav className="flex w-2/3 flex-wrap justify-end gap-8 px-16">
         {projects.map((project, index) => {
           const projectSlug = project.slug?.current || project.slug
           const isActive = !isCategoryPage && activeSlug === projectSlug
