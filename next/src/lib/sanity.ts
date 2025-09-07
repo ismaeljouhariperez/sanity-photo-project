@@ -1,5 +1,6 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
+import type { SanityImage } from './sanity.types'
 
 // Sanity configuration
 export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
@@ -30,7 +31,7 @@ export const previewClient = createClient({
 // Image URL builder
 const builder = imageUrlBuilder({ projectId, dataset })
 
-export function urlFor(source: any) {
+export function urlFor(source: SanityImage) {
   return builder.image(source)
 }
 
@@ -44,7 +45,7 @@ export const queries = {
     category,
     order,
     coverImage,
-    "featuredImage": photos[featured == true][0].asset,
+    featuredImage,
     _createdAt
   }`,
   

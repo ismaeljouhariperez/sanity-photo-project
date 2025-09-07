@@ -23,7 +23,6 @@ export default function CategoryLayout({
   const router = useRouter()
   const { setSelectedSlug, setSelectedCategory } = useProjectStore()
   const [projects, setProjects] = useState<Project[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [hasEntered, setHasEntered] = useState(false)
   const [hoveredProject, setHoveredProject] = useState<string | null>(null)
 
@@ -31,25 +30,23 @@ export default function CategoryLayout({
   const activeSlug = pathname?.split('/')[2]
   const isCategoryPage = !activeSlug
 
-  if (!category || !isValidCategory(category)) {
-    return <div>Invalid category</div>
-  }
-
   useEffect(() => {
-    setSelectedCategory(category)
-    setSelectedSlug(activeSlug || null)
+    if (category) {
+      setSelectedCategory(category)
+      setSelectedSlug(activeSlug || null)
+    }
   }, [category, activeSlug, setSelectedCategory, setSelectedSlug])
 
   useEffect(() => {
+    if (!category) return
+    
     const loadProjects = async () => {
-      setIsLoading(true)
       try {
         const categoryProjects = await getProjects(category)
         setProjects(categoryProjects)
       } catch (error) {
         console.error('Error loading projects:', error)
       } finally {
-        setIsLoading(false)
         // Trigger entrance animation after data loads
         setTimeout(() => setHasEntered(true), 100)
       }
@@ -57,6 +54,10 @@ export default function CategoryLayout({
 
     loadProjects()
   }, [category])
+
+  if (!category || !isValidCategory(category)) {
+    return <div>Invalid category</div>
+  }
 
   // if (isLoading) {
   //   return (
