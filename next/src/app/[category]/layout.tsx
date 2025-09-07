@@ -8,6 +8,8 @@ import type { Project } from '@/lib/sanity.types'
 import { useRouter } from 'next/navigation'
 import { useProjectStore } from '@/store/projectStore'
 import { isValidCategory } from '@/lib/constants'
+import CloudinaryImage from '@/components/ui/CloudinaryImage'
+import ProjectPhotosGrid from '@/components/ui/ProjectPhotosGrid'
 
 /**
  * Category layout with animated project titles
@@ -64,80 +66,128 @@ export default function CategoryLayout({
   //   )
   // }
 
-  const defaultImage =
-    'https://images.squarespace-cdn.com/content/v1/634723977fd6041c2f4c7c59/7af3cdd9-943d-446c-92d6-8dd8db10e183/DSCF0286.jpg?format=1000w'
-  const hoveredProjectData = hoveredProject
-    ? projects.find((p) => p._id === hoveredProject)
-    : null
-  const currentImageSrc = hoveredProjectData
-    ? urlFor(hoveredProjectData.featuredImage || hoveredProjectData.coverImage).width(1000).height(1000).url()
-    : defaultImage
+  // Show active project (on detail page), then hovered project, then null
+  const activeProject =
+    !isCategoryPage && activeSlug
+      ? projects.find((p) => (p.slug?.current || p.slug) === activeSlug)
+      : null
 
-  console.log(hoveredProjectData)
+  const displayedProjectData =
+    activeProject ||
+    (hoveredProject ? projects.find((p) => p._id === hoveredProject) : null)
+
+  // Category-specific default images
+  const getDefaultImageProps = () => {
+    if (category === 'black-and-white') {
+      return {
+        src: 'projects-bw.jpg',
+        alt: 'Projets Noir et Blanc',
+        fallbackSrc: '/images/bw-cover.jpg',
+      }
+    } else {
+      return {
+        src: 'projects-color.jpg',
+        alt: 'Projets Couleur',
+        fallbackSrc: '/images/color-cover.jpg',
+      }
+    }
+  }
 
   return (
-    <main className="flex min-h-[calc(100vh-5.5rem)] flex-1 items-center justify-center">
-      <div className="h-full w-1/3">
-        <div className="relative flex h-full w-full items-center justify-center overflow-hidden p-16">
+    <>
+      <main className="container mx-auto flex h-[85vh] flex-1 items-center">
+        <div className="w-1/3 overflow-hidden">
           <AnimatePresence mode="wait">
-            <motion.img
-              key={currentImageSrc}
-              src={currentImageSrc}
-              alt={
-                hoveredProjectData
-                  ? `${hoveredProjectData.title} - Featured Image`
-                  : 'Default Photography'
-              }
-              width={1000}
-              height={1000}
-              className="object-cover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-            />
+            {displayedProjectData ? (
+              <motion.img
+                key={displayedProjectData._id}
+                src={urlFor(
+                  displayedProjectData.featuredImage ||
+                    displayedProjectData.coverImage
+                )
+                  .width(1000)
+                  .height(1000)
+                  .url()}
+                alt={`${displayedProjectData.title} - Featured Image`}
+                width={1000}
+                height={1200}
+                className="h-full w-full overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              />
+            ) : (
+              <motion.div
+                key="default"
+                className="h-full w-full overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <CloudinaryImage
+                  {...getDefaultImageProps()}
+                  width={1000}
+                  height={1200}
+                  className="h-full w-full object-cover"
+                  folder="projects"
+                  priority={true}
+                />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
-      </div>
-      <nav className="flex w-2/3 flex-wrap justify-end gap-8 px-16">
-        {projects.map((project, index) => {
-          const projectSlug = project.slug?.current || project.slug
-          const isActive = !isCategoryPage && activeSlug === projectSlug
+        <nav className="flex w-2/3 flex-wrap justify-end gap-8 px-8">
+          {projects.map((project, index) => {
+            const projectSlug = project.slug?.current || project.slug
+            const isActive = !isCategoryPage && activeSlug === projectSlug
 
-          return (
-            <div
-              key={project._id}
-              className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
-              onMouseEnter={() => setHoveredProject(project._id)}
-              onMouseLeave={() => setHoveredProject(null)}
-              onClick={() => {
-                const targetUrl = isActive
-                  ? `/${category}`
-                  : `/${category}/${projectSlug}`
-                router.push(targetUrl)
-              }}
-            >
-              <motion.h2
-                className="overflow-hidden"
-                initial={{ y: '-100%' }}
-                animate={{
-                  y:
-                    hasEntered && (isCategoryPage || isActive) ? '0%' : '-100%',
-                }}
-                transition={{
-                  duration: 0.8,
-                  ease: [0.16, 1, 0.3, 1] as const,
-                  delay: 0.15 * index,
+            return (
+              <div
+                key={project._id}
+                className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
+                onMouseEnter={() => setHoveredProject(project._id)}
+                onMouseLeave={() => setHoveredProject(null)}
+                onClick={() => {
+                  const targetUrl = isActive
+                    ? `/${category}`
+                    : `/${category}/${projectSlug}`
+                  router.push(targetUrl)
                 }}
               >
-                {project.title}
-              </motion.h2>
-            </div>
-          )
-        })}
-      </nav>
+                <motion.h2
+                  className="overflow-hidden"
+                  initial={{ y: '-100%' }}
+                  animate={{
+                    y:
+                      hasEntered && (isCategoryPage || isActive)
+                        ? '0%'
+                        : '-100%',
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.16, 1, 0.3, 1] as const,
+                    delay: 0.15 * index,
+                  }}
+                >
+                  {project.title}
+                </motion.h2>
+              </div>
+            )
+          })}
+        </nav>
 
-      {!isCategoryPage && <div className="flex-1">{children}</div>}
-    </main>
+        {!isCategoryPage && <div className="flex-1">{children}</div>}
+      </main>
+
+      {!isCategoryPage && activeSlug && (
+        <ProjectPhotosGrid
+          projectSlug={activeSlug}
+          category={category}
+          animationDelay={projects.length * 0.15 + 0.8} // Wait for all text animations + base duration
+        />
+      )}
+    </>
   )
 }

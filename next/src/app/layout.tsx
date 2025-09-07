@@ -22,12 +22,10 @@ export default function RootLayout({
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
       <body className="bg-gray-50 text-black" suppressHydrationWarning>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <AnimatePresence mode="wait" initial={false}>
-            {children}
-          </AnimatePresence>
-        </div>
+        <Header />
+        <AnimatePresence mode="wait" initial={false}>
+          {children}
+        </AnimatePresence>
       </body>
     </html>
   )

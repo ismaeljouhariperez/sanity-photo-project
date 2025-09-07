@@ -56,6 +56,15 @@ export interface Photo extends SanityDocument {
   }
 }
 
+// Project Image type (for images within a project)
+export interface ProjectImage {
+  _key: string
+  image: SanityImage
+  title?: string
+  description?: string
+  order?: number
+}
+
 // Project type
 export interface Project extends SanityDocument {
   _type: 'project'
@@ -64,7 +73,7 @@ export interface Project extends SanityDocument {
   description?: string
   coverImage: SanityImage
   category: 'black-and-white' | 'early-color'
-  photos?: Photo[]
+  images?: ProjectImage[]
   featuredImage?: SanityImage
   order?: number
   normalizedSlug?: string // Version normalisée du slug pour les animations

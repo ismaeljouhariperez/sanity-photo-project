@@ -56,10 +56,11 @@ export const queries = {
     category,
     order,
     coverImage,
-    photos[] {
+    images[] {
       _key,
-      asset->,
-      caption,
+      image,
+      title,
+      description,
       order
     },
     _createdAt,
