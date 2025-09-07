@@ -114,6 +114,45 @@ export default {
         },
       ],
     },
+    {
+      name: 'themeColors',
+      title: 'Couleurs du thème',
+      type: 'object',
+      fields: [
+        {
+          name: 'primaryColor',
+          title: 'Couleur principale',
+          type: 'color',
+          options: {
+            disableAlpha: true,
+          },
+        },
+        {
+          name: 'secondaryColor',
+          title: 'Couleur secondaire', 
+          type: 'color',
+          options: {
+            disableAlpha: true,
+          },
+        },
+        {
+          name: 'backgroundColor',
+          title: 'Couleur de fond',
+          type: 'color',
+          options: {
+            disableAlpha: true,
+          },
+        },
+        {
+          name: 'textColor',
+          title: 'Couleur du texte',
+          type: 'color',
+          options: {
+            disableAlpha: true,
+          },
+        },
+      ],
+    },
   ],
   preview: {
     select: {

@@ -5,6 +5,8 @@ import {structure} from './deskStructure'
 import {CustomPanel} from './components/CustomPanel'
 import './styles/styles.css'
 import {media} from 'sanity-plugin-media'
+import {colorInput} from '@sanity/color-input'
+import {seoMetaFields} from 'sanity-plugin-seo'
 
 export default defineConfig({
   name: 'default',
@@ -18,6 +20,8 @@ export default defineConfig({
       structure,
     }),
     media(),
+    colorInput(),
+    seoMetaFields(),
   ],
 
   schema: {
