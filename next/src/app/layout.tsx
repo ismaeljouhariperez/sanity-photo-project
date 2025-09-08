@@ -1,31 +1,36 @@
-'use client'
-
-import React, { useEffect } from 'react'
-import { usePathname } from 'next/navigation'
-import { AnimatePresence } from 'framer-motion'
-import Header from '@/components/ui/Header'
+import { Metadata } from 'next'
+import { getSiteSettings } from '@/lib/sanity'
+import { generateHomeMetadata } from '@/lib/seo'
+import ClientLayout from '@/components/layout/ClientLayout'
 import './globals.css'
 import { aujournuit } from './fonts'
+
+// Generate metadata for the site
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const siteSettings = await getSiteSettings()
+    return generateHomeMetadata(siteSettings)
+  } catch (error) {
+    console.error('Error generating metadata:', error)
+    return generateHomeMetadata() // Fallback to defaults
+  }
+}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const pathname = usePathname()
-
-  // Simple route change effect - Next.js handles caching natively
-  useEffect(() => {
-    console.log(`🔄 Route changed to ${pathname}`)
-  }, [pathname])
-
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+      </head>
       <body className="bg-gray-50 text-black" suppressHydrationWarning>
-        <Header />
-        <AnimatePresence mode="wait" initial={false}>
-          {children}
-        </AnimatePresence>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   )

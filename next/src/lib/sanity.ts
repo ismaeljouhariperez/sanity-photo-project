@@ -57,6 +57,7 @@ export const queries = {
     category,
     order,
     coverImage,
+    seo,
     images[] {
       _key,
       image,
@@ -71,7 +72,11 @@ export const queries = {
   siteSettings: `*[_type == "siteSettings"][0] {
     title,
     description,
-    ogImage
+    keywords,
+    author,
+    siteUrl,
+    seo,
+    logo
   }`,
   
   collections: `*[_type == "collection"] | order(order asc) {

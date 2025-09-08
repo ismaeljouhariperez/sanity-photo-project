@@ -115,6 +115,18 @@ export default {
       ],
     },
     {
+      name: 'seo',
+      title: 'SEO Global',
+      type: 'seoMetaFields',
+    },
+    {
+      name: 'siteUrl',
+      title: 'URL du site',
+      type: 'url',
+      description: 'URL principale du site (ex: https://monsite.com)',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'themeColors',
       title: 'Couleurs du thème',
       type: 'object',
