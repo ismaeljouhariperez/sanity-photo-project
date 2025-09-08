@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { getProjectBySlug, urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 
@@ -69,13 +70,15 @@ export default function ProjectPhotosGrid({
               delay: shouldAnimate ? animationDelay + index * 0.15 : 0,
             }}
           >
-            <img
+            <Image
               src={urlFor(projectImage.image)
                 .width(800)
                 .height(600)
                 .quality(85)
                 .url()}
               alt={projectImage.title || `Image ${index + 1}`}
+              width={800}
+              height={600}
               className="h-auto w-full object-cover"
               loading="lazy"
             />
