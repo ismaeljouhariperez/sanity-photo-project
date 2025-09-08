@@ -31,7 +31,7 @@ export default function CategoryLayout({
   const isCategoryPage = !activeSlug
 
   useEffect(() => {
-    if (category) {
+    if (category && isValidCategory(category)) {
       setSelectedCategory(category)
       setSelectedSlug(activeSlug || null)
     }
