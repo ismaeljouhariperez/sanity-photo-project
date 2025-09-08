@@ -8,7 +8,6 @@
 .yarn/install-state.gz
 
 # package managers
-pnpm-lock.yaml
 pnpm-workspace.yaml
 yarn-error.log
 package-lock.json
