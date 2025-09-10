@@ -57,7 +57,7 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          className="fixed left-0 top-0 z-50 h-full overflow-hidden bg-gray-900 text-gray-100"
+          className="fixed left-0 top-0 z-[60] h-full overflow-hidden bg-gray-900 text-gray-100"
           initial="initial"
           animate="animate"
           exit="exit"

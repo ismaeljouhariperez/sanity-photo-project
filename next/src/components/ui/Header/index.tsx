@@ -1,15 +1,16 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 import InfoOverlay from '../InfoOverlay'
+import MenuOverlay from '../MenuOverlay'
 import { useAnimationStore } from '@/store/animationStore'
 import { useRouter } from 'next/navigation'
 import s from './styles.module.scss'
 
 export default function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
   const router = useRouter()
@@ -19,24 +20,29 @@ export default function Header() {
     setIsInfoOpen(true)
   }
 
-  const handleIndexClick = (e: React.MouseEvent) => {
+  const handleMenuClick = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    // Navigate to category list or home
-    if (
-      pathname.includes('/black-and-white') ||
-      pathname.includes('/early-color')
-    ) {
-      const category = pathname.split('/')[1]
+    // If on project page, navigate to category list or home
+    if (isProjectPage) {
       if (
-        category &&
-        (category === 'black-and-white' || category === 'early-color')
+        pathname.includes('/black-and-white') ||
+        pathname.includes('/early-color')
       ) {
-        // Navigate to category list
-        router.push(`/${category}`)
-      } else {
-        router.push('/')
+        const category = pathname.split('/')[1]
+        if (
+          category &&
+          (category === 'black-and-white' || category === 'early-color')
+        ) {
+          // Navigate to category list
+          router.push(`/${category}`)
+        } else {
+          router.push('/')
+        }
       }
+    } else {
+      // Toggle menu overlay
+      setIsMenuOpen(!isMenuOpen)
     }
   }
 
@@ -55,33 +61,24 @@ export default function Header() {
   const isProjectPage =
     pathname.includes('/black-and-white') || pathname.includes('/early-color')
 
-  // Variants pour l'animation de l'Index
-  const indexVariants = {
-    hidden: { y: -20 },
-    visible: { y: 0, transition: { duration: 0.5 } },
-    exit: { y: -20, transition: { duration: 0.3 } },
+  // Dynamic header text - easily extensible for future content
+  const getHeaderText = () => {
+    if (isProjectPage) return 'Index'
+    if (isMenuOpen) return 'Close'
+    // Add more conditions here for future dynamic content
+    return 'Menu'
   }
 
   return (
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
-      <header className="flex justify-center py-5">
+      <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <header className="fixed left-0 right-0 top-0 z-50 bg-cream flex justify-center py-5">
         <nav className={s.nav}>
           <button onClick={handleAboutClick}>About</button>
-          {isProjectPage && (
-            <motion.div
-              className="flex h-[24px] items-center overflow-hidden"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <motion.div variants={indexVariants}>
-                <button onClick={handleIndexClick} className={s.title}>
-                  Index
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
+          <button onClick={handleMenuClick} className={s.title}>
+            {getHeaderText()}
+          </button>
           <Link
             href="/"
             className="text-xl transition-opacity hover:opacity-80"

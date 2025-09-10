@@ -120,7 +120,7 @@ export default function CloudinaryImage({
 
       {isLoading && (
         <div
-          className="absolute inset-0 animate-pulse bg-gray-100"
+          className="-0 absolute animate-pulse bg-gray-100"
           style={{ width, height }}
         />
       )}

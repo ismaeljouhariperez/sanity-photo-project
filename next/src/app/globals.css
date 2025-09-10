@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: #fefefe;
+    --header-height: 80px;
+  }
+}
+
+@layer utilities {
+  .bg-cream {
+    background-color: #faf9f6;
+  }
+
+  .pt-header {
+    padding-top: var(--header-height);
+  }
+}
+
 /* View Transitions */
 @view-transition {
   navigation: auto;
