@@ -81,11 +81,11 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
               <p>
                 Ismael León est né à Marseille et vit actuellement à Bordeaux.
                 Autodidacte, il a voyagé en Amérique du Nord et du Sud, de
-                Montréal au Pérou jusqu'en Argentine.
+                Montréal au Pérou jusqu&apos;en Argentine.
               </p>
 
               <p>
-                Son travail explore l'errance, la lumière et la géométrie dans
+                Son travail explore l&apos;errance, la lumière et la géométrie dans
                 une approche du réalisme magique. Inspiré par Larry Sultan, Alec
                 Soth ou Alessandra Sanguinetti, il navigue entre documentaire et
                 photographie de rue.
