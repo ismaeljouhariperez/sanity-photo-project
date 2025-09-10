@@ -29,7 +29,6 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 /**
  * Project detail page
- * The category layout handles all the UI and transitions
  */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { category, slug } = await params
@@ -38,6 +37,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
-  // Layout handles all the rendering logic
-  return null
+  // Import dynamically to avoid SSR issues
+  const ProjectPhotosGrid = (await import('@/components/ui/ProjectPhotosGrid')).default
+
+  return (
+    <ProjectPhotosGrid 
+      projectSlug={slug}
+      category={category}
+      animationDelay={0}
+    />
+  )
 }

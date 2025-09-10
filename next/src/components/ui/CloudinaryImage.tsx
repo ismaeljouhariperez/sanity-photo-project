@@ -42,9 +42,11 @@ export default function CloudinaryImage({
   // Build Cloudinary URL with transformations
   const buildCloudinaryUrl = () => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-    
+
     if (!cloudName) {
-      console.warn('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME not set, falling back to local images')
+      console.warn(
+        'NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME not set, falling back to local images'
+      )
       return fallbackSrc || `/images/${src}`
     }
 
@@ -59,7 +61,9 @@ export default function CloudinaryImage({
 
     // Build path with optional folder
     const basePath = 'sanity-photo-project' // Project folder is always this
-    const imagePath = folder ? `${basePath}/${folder}/${src}` : `${basePath}/${src}`
+    const imagePath = folder
+      ? `${basePath}/${folder}/${src}`
+      : `${basePath}/${src}`
 
     return `https://res.cloudinary.com/${cloudName}/image/upload/${transformations}/${imagePath}`
   }
@@ -70,13 +74,13 @@ export default function CloudinaryImage({
 
   const handleError = () => {
     setIsLoading(false)
-    
+
     // Try fallback image if available
     if (fallbackSrc && !hasError) {
       setHasError(true)
       return
     }
-    
+
     setHasError(true)
   }
 
@@ -90,7 +94,7 @@ export default function CloudinaryImage({
 
   if (hasError && !fallbackSrc) {
     return (
-      <div 
+      <div
         className={`flex items-center justify-center bg-gray-200 text-gray-500 ${className}`}
         style={{ width, height }}
       >
@@ -106,17 +110,17 @@ export default function CloudinaryImage({
         alt={alt}
         width={width}
         height={height}
-        className={`object-cover transition-opacity duration-300 ${
-          isLoading ? 'opacity-0' : 'opacity-100'
+        className={`object-cover transition-opacity delay-200 duration-1000 ${
+          isLoading ? 'opacity-50' : 'opacity-100'
         }`}
         onLoad={handleLoad}
         onError={handleError}
         priority={priority}
       />
-      
+
       {isLoading && (
-        <div 
-          className="absolute inset-0 bg-gray-100 animate-pulse"
+        <div
+          className="absolute inset-0 animate-pulse bg-gray-100"
           style={{ width, height }}
         />
       )}

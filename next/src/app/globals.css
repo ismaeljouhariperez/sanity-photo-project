@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* View Transitions */
+@view-transition {
+  navigation: auto;
+}
+
+/* Simple fade transitions only - no transform */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  transform: none !important;
+}
+
+::view-transition-old(root) {
+  animation-name: simple-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: simple-fade-in;
+}
+
+@keyframes simple-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes simple-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 body * {
   transition: color 200ms, background-color 200ms;
 }
