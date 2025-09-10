@@ -69,6 +69,15 @@ export default function CategoryLayout({
     loadProjects()
   }, [category, setHasEntered])
 
+  // Update displayed project when hovering, clear when not hovering
+  useEffect(() => {
+    if (hoveredProject) {
+      setDisplayedProjectId(hoveredProject)
+    } else {
+      setDisplayedProjectId(null)
+    }
+  }, [hoveredProject])
+
   if (!category || !isValidCategory(category)) {
     return <div>Invalid category</div>
   }
@@ -78,15 +87,6 @@ export default function CategoryLayout({
     isDetailPage && currentSlug
       ? projects.find((p) => (p.slug?.current || p.slug) === currentSlug)
       : null
-
-  // Update displayed project when hovering, clear when not hovering
-  useEffect(() => {
-    if (hoveredProject) {
-      setDisplayedProjectId(hoveredProject)
-    } else {
-      setDisplayedProjectId(null)
-    }
-  }, [hoveredProject])
 
   // Show current project on detail pages, otherwise show hovered project
   const displayedProjectData =
@@ -118,6 +118,7 @@ export default function CategoryLayout({
 
     // Check if View Transitions API is supported
     if ('startViewTransition' in document) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(document as any).startViewTransition(() => {
         startTransition(() => {
           router.push(`/${category}/${projectSlug}`)
