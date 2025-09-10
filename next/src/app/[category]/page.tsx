@@ -22,15 +22,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     const siteSettings = await getSiteSettings()
     return generateCategoryMetadata(category, siteSettings)
   } catch (error) {
-    console.error('Error generating category metadata:', error)
-    return generateCategoryMetadata('black-and-white') // Fallback
+    console.error('Error generating metadata:', error)
+    return generateCategoryMetadata('black-and-white')
   }
 }
 
 /**
- * Category list page
- * The actual project list is rendered by the layout component
- * This page intentionally returns null since layout handles the display
+ * Category page that handles both list and detail views
+ * The layout component manages all the UI and transitions
  */
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params
@@ -39,5 +38,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound()
   }
 
+  // Layout handles all the rendering logic
   return null
 }

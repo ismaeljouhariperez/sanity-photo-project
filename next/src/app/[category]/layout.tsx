@@ -5,47 +5,72 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProjects, urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
-import { useRouter } from 'next/navigation'
 import { useProjectStore } from '@/store/projectStore'
+import { useProjectViewStore } from '@/store/projectViewStore'
 import { isValidCategory } from '@/lib/constants'
 import CloudinaryImage from '@/components/ui/CloudinaryImage'
 import ProjectPhotosGrid from '@/components/ui/ProjectPhotosGrid'
 
 /**
- * Category layout with animated project titles
+ * Single layout component that handles both list and detail views
+ * This ensures true component persistence by never unmounting
  */
 export default function CategoryLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  console.log('🏗️ [CategoryLayout] Component mounting')
+
   const pathname = usePathname()
-  const router = useRouter()
   const { setSelectedSlug, setSelectedCategory } = useProjectStore()
+  const { 
+    mode, 
+    activeSlug, 
+    hasEntered, 
+    hoveredProject,
+    setHasEntered, 
+    setHoveredProject,
+    syncWithURL 
+  } = useProjectViewStore()
+
   const [projects, setProjects] = useState<Project[]>([])
-  const [hasEntered, setHasEntered] = useState(false)
-  const [hoveredProject, setHoveredProject] = useState<string | null>(null)
 
-  const category = pathname?.split('/')[1]
-  const activeSlug = pathname?.split('/')[2]
-  const isCategoryPage = !activeSlug
+  // Extract category and slug from pathname
+  const segments = pathname.split('/').filter(Boolean)
+  const category = segments[0]
+  
+  useEffect(() => {
+    return () => {
+      console.log('💀 [CategoryLayout] Component unmounting')
+    }
+  }, [])
 
+  // Sync URL changes with Zustand state
+  useEffect(() => {
+    console.log('🔄 [URL] Pathname:', pathname, '| Mode:', mode)
+    syncWithURL(pathname)
+  }, [pathname, syncWithURL])
+
+  // Update project store when URL changes  
   useEffect(() => {
     if (category && isValidCategory(category)) {
       setSelectedCategory(category)
-      setSelectedSlug(activeSlug || null)
+      setSelectedSlug(activeSlug)
     }
   }, [category, activeSlug, setSelectedCategory, setSelectedSlug])
 
+  // Load projects for current category
   useEffect(() => {
-    if (!category) return
+    if (!category || !isValidCategory(category)) return
     
     const loadProjects = async () => {
       try {
         const categoryProjects = await getProjects(category)
         setProjects(categoryProjects)
+        console.log('✅ [Projects] Loaded:', categoryProjects.length, 'for', category)
       } catch (error) {
-        console.error('Error loading projects:', error)
+        console.error('❌ [Projects] Error:', error)
       } finally {
         // Trigger entrance animation after data loads
         setTimeout(() => setHasEntered(true), 100)
@@ -53,23 +78,15 @@ export default function CategoryLayout({
     }
 
     loadProjects()
-  }, [category])
+  }, [category, setHasEntered])
 
   if (!category || !isValidCategory(category)) {
     return <div>Invalid category</div>
   }
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex min-h-[calc(100vh-5.5rem)] items-center justify-center">
-  //       <div>Loading...</div>
-  //     </div>
-  //   )
-  // }
-
   // Show active project (on detail page), then hovered project, then null
   const activeProject =
-    !isCategoryPage && activeSlug
+    mode === 'detail' && activeSlug
       ? projects.find((p) => (p.slug?.current || p.slug) === activeSlug)
       : null
 
@@ -91,6 +108,23 @@ export default function CategoryLayout({
         alt: 'Projets Couleur',
         fallbackSrc: '/images/color-cover.jpg',
       }
+    }
+  }
+
+  // Pure client-side navigation without changing actual URL
+  const handleProjectClick = (project: Project) => {
+    const projectSlug = project.slug?.current || project.slug
+    const isActive = mode === 'detail' && activeSlug === projectSlug
+    
+    console.log('🎯 [Click]', project.title, isActive ? '→ List' : '→ Detail')
+    
+    // Pure client-side state change - NO URL manipulation
+    if (isActive) {
+      // Switch to list mode
+      syncWithURL(`/${category}`)
+    } else {
+      // Switch to detail mode
+      syncWithURL(`/${category}/${projectSlug}`)
     }
   }
 
@@ -139,10 +173,12 @@ export default function CategoryLayout({
             )}
           </AnimatePresence>
         </div>
+        
         <nav className="flex w-2/3 flex-wrap justify-end gap-8 px-8">
           {projects.map((project, index) => {
             const projectSlug = project.slug?.current || project.slug
-            const isActive = !isCategoryPage && activeSlug === projectSlug
+            const isActive = mode === 'detail' && activeSlug === projectSlug
+            const isCategoryPage = mode === 'list'
 
             return (
               <div
@@ -150,12 +186,7 @@ export default function CategoryLayout({
                 className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
                 onMouseEnter={() => setHoveredProject(project._id)}
                 onMouseLeave={() => setHoveredProject(null)}
-                onClick={() => {
-                  const targetUrl = isActive
-                    ? `/${category}`
-                    : `/${category}/${projectSlug}`
-                  router.push(targetUrl)
-                }}
+                onClick={() => handleProjectClick(project)}
               >
                 <motion.h2
                   className="overflow-hidden"
@@ -179,10 +210,10 @@ export default function CategoryLayout({
           })}
         </nav>
 
-        {!isCategoryPage && <div className="flex-1">{children}</div>}
+        {mode === 'detail' && <div className="flex-1">{children}</div>}
       </main>
 
-      {!isCategoryPage && activeSlug && (
+      {mode === 'detail' && activeSlug && (
         <ProjectPhotosGrid
           projectSlug={activeSlug}
           category={category}

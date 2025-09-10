@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { getProjectBySlug, getSiteSettings } from '@/lib/sanity'
-import { generateProjectMetadata } from '@/lib/seo'
+import { getSiteSettings } from '@/lib/sanity'
+import { generateCategoryMetadata } from '@/lib/seo'
 import { isValidCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 
@@ -10,7 +10,7 @@ interface ProjectPageProps {
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   try {
-    const { category, slug } = await params
+    const { category } = await params
     
     if (!isValidCategory(category)) {
       return {
@@ -19,48 +19,25 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
       }
     }
 
-    const [project, siteSettings] = await Promise.all([
-      getProjectBySlug(slug, category),
-      getSiteSettings()
-    ])
-
-    if (!project) {
-      return {
-        title: 'Projet non trouvé',
-        description: 'Le projet demandé n\'existe pas.',
-      }
-    }
-
-    return generateProjectMetadata({
-      ...project,
-      category,
-      slug,
-    }, siteSettings)
+    const siteSettings = await getSiteSettings()
+    return generateCategoryMetadata(category, siteSettings)
   } catch (error) {
-    console.error('Error generating project metadata:', error)
-    return {
-      title: 'Erreur',
-      description: 'Une erreur s\'est produite lors du chargement du projet.',
-    }
+    console.error('Error generating metadata:', error)
+    return generateCategoryMetadata('black-and-white')
   }
 }
 
 /**
- * Project detail page - displays same content as category list for now
- * Will evolve later with different content/animations
+ * Project detail page
+ * The category layout handles all the UI and transitions
  */
-export default async function ProjectDetailPage({ params }: ProjectPageProps) {
+export default async function ProjectPage({ params }: ProjectPageProps) {
   const { category, slug } = await params
   
   if (!isValidCategory(category)) {
     notFound()
   }
 
-  // Verify project exists
-  const project = await getProjectBySlug(slug, category)
-  if (!project) {
-    notFound()
-  }
-
+  // Layout handles all the rendering logic
   return null
 }
