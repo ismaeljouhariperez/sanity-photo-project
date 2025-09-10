@@ -86,7 +86,7 @@ export default function Header() {
             href="/"
             className="text-xl transition-opacity hover:opacity-80"
           >
-            Ismael Leon
+            Ismael Perez Léon
           </Link>
         </nav>
       </header>

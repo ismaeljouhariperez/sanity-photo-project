@@ -79,9 +79,9 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
 
             <div className="space-y-5 leading-relaxed text-gray-300">
               <p>
-                Ismael León est né à Marseille et vit actuellement à Bordeaux.
-                Autodidacte, il a voyagé en Amérique du Nord et du Sud, de
-                Montréal au Pérou jusqu&apos;en Argentine.
+                Ismael Perez León est né à Marseille et vit actuellement à
+                Bordeaux. Autodidacte, il a voyagé en Amérique du Nord et du
+                Sud, de Montréal au Pérou jusqu&apos;en Argentine.
               </p>
 
               <p>
