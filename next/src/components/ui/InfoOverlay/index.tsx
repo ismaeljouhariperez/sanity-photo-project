@@ -85,10 +85,10 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
               </p>
 
               <p>
-                Son travail explore l&apos;errance, la lumière et la géométrie dans
-                une approche du réalisme magique. Inspiré par Larry Sultan, Alec
-                Soth ou Alessandra Sanguinetti, il navigue entre documentaire et
-                photographie de rue.
+                Son travail explore l&apos;errance, la lumière et la géométrie
+                dans une approche du réalisme magique. Inspiré par Larry Sultan,
+                Alec Soth ou Alessandra Sanguinetti, il navigue entre
+                documentaire et photographie de rue.
               </p>
 
               <p>
@@ -125,7 +125,6 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
                     </svg>
                   </a>
                 </p>
-
                 <p className="mt-6 text-sm text-gray-400">
                   Disponible pour des commissions commerciales et éditoriales à
                   Bordeaux et Paris.

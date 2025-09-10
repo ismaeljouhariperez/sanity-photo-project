@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence } from 'framer-motion'
 import Header from '@/components/ui/Header'
+import SmoothScrollProvider from './SmoothScrollProvider'
 
 export default function ClientLayout({
   children,
@@ -18,11 +19,11 @@ export default function ClientLayout({
   }, [pathname])
 
   return (
-    <>
+    <SmoothScrollProvider>
       <Header />
       <AnimatePresence mode="wait" initial={false}>
         {children}
       </AnimatePresence>
-    </>
+    </SmoothScrollProvider>
   )
 }
