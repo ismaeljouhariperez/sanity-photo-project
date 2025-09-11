@@ -4,20 +4,21 @@ import type { SanityImage } from './sanity.types'
 
 // Site defaults - these can be fetched from Sanity siteSettings
 const SITE_DEFAULTS = {
-  title: 'Portfolio Photographique | Photographie Analogique',
-  description: 'Portfolio de photographie analogique présentant des collections en noir et blanc et en couleur early. Découvrez l\'art de la photographie argentique.',
-  author: 'Photographe',
-  siteUrl: 'https://sanity-photo-project.vercel.app',
+  title: 'Ismael Perez León | Portfolio Photographique',
+  description:
+    "Portfolio de photographie analogique d'Ismael Perez León présentant des collections en noir et blanc et en couleur. Découvrez l'art de la photographie argentique.",
+  author: 'Ismael Perez León',
+  siteUrl: 'https://ismaelperezleon.com',
   keywords: [
     'photographie analogique',
-    'photographie argentique', 
+    'photographie argentique',
     'noir et blanc',
     'early color',
     'portfolio photographique',
     'photographie artistique',
-    'film photography'
+    'film photography',
   ],
-  ogImage: '/images/og-default.jpg'
+  ogImage: '/images/og-default.jpg',
 }
 
 // Remove the local interface since we're importing it
@@ -52,30 +53,33 @@ export function generateProjectMetadata(
 ): Metadata {
   const siteUrl = siteSettings?.siteUrl || SITE_DEFAULTS.siteUrl
   const author = siteSettings?.author || SITE_DEFAULTS.author
-  
-  // Use project SEO fields first, then fallback to project data, then site defaults
-  const title = project.seo?.metaTitle || 
-               `${project.title} | ${getCategoryLabel(project.category)}` ||
-               siteSettings?.title || 
-               SITE_DEFAULTS.title
 
-  const description = project.seo?.metaDescription || 
-                     project.description || 
-                     `Découvrez le projet photographique "${project.title}" dans la collection ${getCategoryLabel(project.category)}` ||
-                     siteSettings?.description || 
-                     SITE_DEFAULTS.description
+  // Use project SEO fields first, then fallback to project data, then site defaults
+  const title =
+    project.seo?.metaTitle ||
+    `${project.title} | ${getCategoryLabel(project.category)}` ||
+    siteSettings?.title ||
+    SITE_DEFAULTS.title
+
+  const description =
+    project.seo?.metaDescription ||
+    project.description ||
+    `Découvrez le projet photographique "${project.title}" dans la collection ${getCategoryLabel(project.category)}` ||
+    siteSettings?.description ||
+    SITE_DEFAULTS.description
 
   // Combine keywords: project SEO > project tags > site keywords > defaults
   const keywords = [
     ...(project.seo?.keywords || []),
     ...(siteSettings?.keywords || []),
     ...SITE_DEFAULTS.keywords,
-    getCategoryLabel(project.category).toLowerCase()
+    getCategoryLabel(project.category).toLowerCase(),
   ].filter(Boolean)
 
   // Choose best image: project SEO OG > project cover > site OG > default
-  const ogImage = project.seo?.ogImage || project.coverImage || siteSettings?.ogImage
-  const ogImageUrl = ogImage 
+  const ogImage =
+    project.seo?.ogImage || project.coverImage || siteSettings?.ogImage
+  const ogImageUrl = ogImage
     ? urlFor(ogImage).width(1200).height(630).quality(90).url()
     : `${siteUrl}${SITE_DEFAULTS.ogImage}`
 
@@ -88,7 +92,7 @@ export function generateProjectMetadata(
     authors: [{ name: author }],
     creator: author,
     publisher: author,
-    
+
     openGraph: {
       type: 'article',
       title,
@@ -104,7 +108,7 @@ export function generateProjectMetadata(
         },
       ],
     },
-    
+
     twitter: {
       card: 'summary_large_image',
       title,
@@ -134,15 +138,17 @@ export function generateCategoryMetadata(
   const siteUrl = siteSettings?.siteUrl || SITE_DEFAULTS.siteUrl
   const author = siteSettings?.author || SITE_DEFAULTS.author
   const categoryLabel = getCategoryLabel(category)
-  
+
   const title = `${categoryLabel} | ${siteSettings?.title || SITE_DEFAULTS.title}`
   const description = `Découvrez la collection ${categoryLabel.toLowerCase()} de notre portfolio de photographie analogique. ${getCategoryDescription(category)}`
-  
+
   const keywords = [
     ...(siteSettings?.keywords || []),
     ...SITE_DEFAULTS.keywords,
     categoryLabel.toLowerCase(),
-    category === 'black-and-white' ? 'photographie noir et blanc' : 'photographie couleur vintage'
+    category === 'black-and-white'
+      ? 'photographie noir et blanc'
+      : 'photographie couleur vintage',
   ]
 
   const url = `${siteUrl}/${category}`
@@ -153,7 +159,7 @@ export function generateCategoryMetadata(
     description,
     keywords: keywords.join(', '),
     authors: [{ name: author }],
-    
+
     openGraph: {
       type: 'website',
       title,
@@ -169,7 +175,7 @@ export function generateCategoryMetadata(
         },
       ],
     },
-    
+
     twitter: {
       card: 'summary_large_image',
       title,
@@ -189,11 +195,14 @@ export function generateCategoryMetadata(
 export function generateHomeMetadata(siteSettings?: SEOData): Metadata {
   const siteUrl = siteSettings?.siteUrl || SITE_DEFAULTS.siteUrl
   const author = siteSettings?.author || SITE_DEFAULTS.author
-  
+
   const title = siteSettings?.title || SITE_DEFAULTS.title
   const description = siteSettings?.description || SITE_DEFAULTS.description
-  const keywords = [...(siteSettings?.keywords || []), ...SITE_DEFAULTS.keywords]
-  
+  const keywords = [
+    ...(siteSettings?.keywords || []),
+    ...SITE_DEFAULTS.keywords,
+  ]
+
   const ogImageUrl = siteSettings?.ogImage
     ? urlFor(siteSettings.ogImage).width(1200).height(630).quality(90).url()
     : `${siteUrl}${SITE_DEFAULTS.ogImage}`
@@ -205,7 +214,7 @@ export function generateHomeMetadata(siteSettings?: SEOData): Metadata {
     authors: [{ name: author }],
     creator: author,
     publisher: author,
-    
+
     openGraph: {
       type: 'website',
       title,
@@ -221,7 +230,7 @@ export function generateHomeMetadata(siteSettings?: SEOData): Metadata {
         },
       ],
     },
-    
+
     twitter: {
       card: 'summary_large_image',
       title,
@@ -264,10 +273,12 @@ function getCategoryLabel(category?: string): string {
   }
 }
 
-function getCategoryDescription(category: 'black-and-white' | 'early-color'): string {
+function getCategoryDescription(
+  category: 'black-and-white' | 'early-color'
+): string {
   switch (category) {
     case 'black-and-white':
-      return 'Une exploration intemporelle de la lumière, du contraste et de l\'émotion à travers la photographie argentique noir et blanc.'
+      return "Une exploration intemporelle de la lumière, du contraste et de l'émotion à travers la photographie argentique noir et blanc."
     case 'early-color':
       return 'Découvrez la beauté nostalgique des premières techniques de photographie couleur et leur esthétique vintage unique.'
     default:

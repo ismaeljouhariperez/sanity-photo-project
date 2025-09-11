@@ -1,0 +1,19 @@
+{
+  "name": "Ismael Perez León - Portfolio Photographique",
+  "short_name": "IPL Photo",
+  "description": "Portfolio de photographie analogique d'Ismael Perez León présentant des collections en noir et blanc et en couleur",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf9f6",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "lang": "fr",
+  "scope": "/",
+  "orientation": "portrait-primary"
+}
