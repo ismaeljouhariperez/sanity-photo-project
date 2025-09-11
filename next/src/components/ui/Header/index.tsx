@@ -114,7 +114,7 @@ export default function Header() {
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      <header className="bg-cream fixed left-0 right-0 top-0 z-50 flex justify-center py-5">
+      <header className="fixed left-0 right-0 top-0 z-50 flex justify-center py-5">
         <AnimatePresence mode="wait">
           <motion.nav
             key={pathname}

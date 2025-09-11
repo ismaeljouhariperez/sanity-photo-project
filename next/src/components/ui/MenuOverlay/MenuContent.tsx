@@ -14,25 +14,20 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
   const overlayVariants = {
     hidden: {
       y: '-100%',
-      opacity: 0,
     },
     visible: {
       y: 0,
-      opacity: 1,
       transition: {
-        type: 'spring' as const,
-        damping: 30,
-        stiffness: 300,
-        duration: 0.6,
+        duration: 1.5,
+        ease: [0.16, 1, 0.3, 1] as const, // Smooth custom bezier
       },
     },
     exit: {
-      y: '-100%',
       opacity: 0,
       transition: {
-        duration: 0.6,
-        delay: 0.2,
-        ease: 'easeInOut' as const,
+        duration: 0.8,
+        delay: 0.15,
+        ease: [0.7, 0, 0.84, 0] as const,
       },
     },
   }
@@ -42,36 +37,35 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
+        staggerChildren: 0.08,
+        delayChildren: 0.4,
       },
     },
     exit: {
       opacity: 0,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.03,
         staggerDirection: -1,
-        duration: 0.3,
+        duration: 0.2,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.6,
+        duration: 0.8,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
     exit: {
-      y: -10,
       opacity: 0,
       transition: {
-        duration: 0.2,
-        ease: 'easeOut' as const,
+        duration: 0.25,
+        ease: [0.7, 0, 0.84, 0] as const,
       },
     },
   }
