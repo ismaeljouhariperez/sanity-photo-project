@@ -18,7 +18,7 @@ export default function LenisProvider({ children }: LenisProviderProps) {
     // Small delay to ensure DOM is ready and navigation is complete
     const timer = setTimeout(() => {
       setIsReady(true)
-    }, 100)
+    }, 200)
 
     return () => clearTimeout(timer)
   }, [])
@@ -28,8 +28,8 @@ export default function LenisProvider({ children }: LenisProviderProps) {
   }
 
   return (
-    <ReactLenis 
-      root 
+    <ReactLenis
+      root
       options={{
         duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

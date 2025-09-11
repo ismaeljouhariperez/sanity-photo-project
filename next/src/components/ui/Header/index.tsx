@@ -1,10 +1,12 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
 import { useAnimationStore } from '@/store/animationStore'
+import { useTransitionStore } from '@/store/transitionStore'
 import { useRouter } from 'next/navigation'
 import s from './styles.module.scss'
 
@@ -13,6 +15,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
+  const { isTransitioning, direction } = useTransitionStore()
   const router = useRouter()
 
   const handleAboutClick = (e: React.MouseEvent) => {
@@ -69,23 +72,83 @@ export default function Header() {
     return 'Menu'
   }
 
+  // Header elements animation variants
+  const headerElementVariants = {
+    initial: { y: 50, opacity: 0 },
+    enter: { 
+      y: 0, 
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: [0.16, 1, 0.3, 1] as const,
+        delay: 0.2
+      }
+    },
+    exit: { 
+      y: -50, 
+      opacity: 0,
+      transition: {
+        duration: 0.4,
+        ease: [0.16, 1, 0.3, 1] as const
+      }
+    }
+  }
+
+  const containerVariants = {
+    initial: { opacity: 0 },
+    enter: { 
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1
+      }
+    },
+    exit: { 
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    }
+  }
+
   return (
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <header className="fixed left-0 right-0 top-0 z-50 bg-cream flex justify-center py-5">
-        <nav className={s.nav}>
-          <button onClick={handleAboutClick}>About</button>
-          <button onClick={handleMenuClick} className={s.title}>
-            {getHeaderText()}
-          </button>
-          <Link
-            href="/"
-            className="text-xl transition-opacity hover:opacity-80"
+        <AnimatePresence mode="wait">
+          <motion.nav
+            key={pathname}
+            className={s.nav}
+            variants={containerVariants}
+            initial="initial"
+            animate="enter"
+            exit="exit"
           >
-            Ismael Perez Léon
-          </Link>
-        </nav>
+            <motion.button 
+              variants={headerElementVariants}
+              onClick={handleAboutClick}
+            >
+              About
+            </motion.button>
+            <motion.button 
+              variants={headerElementVariants}
+              onClick={handleMenuClick} 
+              className={s.title}
+            >
+              {getHeaderText()}
+            </motion.button>
+            <motion.div variants={headerElementVariants}>
+              <Link
+                href="/"
+                className="text-xl transition-opacity hover:opacity-80"
+              >
+                Ismael Perez Léon
+              </Link>
+            </motion.div>
+          </motion.nav>
+        </AnimatePresence>
       </header>
     </>
   )
