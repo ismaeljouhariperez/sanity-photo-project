@@ -40,6 +40,22 @@ body * {
 
 body {
   font-family: var(--font-aujournuit);
+  /* Optimize scrolling performance */
+  overflow-x: hidden;
+  scroll-behavior: auto; /* Let Lenis handle smooth scrolling */
+}
+
+/* Performance optimizations for smooth scrolling */
+* {
+  /* Enable hardware acceleration for transforms */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize images and media for scroll performance */
+img, video {
+  will-change: transform;
 }
 
 html,
