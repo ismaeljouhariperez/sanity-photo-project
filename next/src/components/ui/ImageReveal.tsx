@@ -37,6 +37,7 @@ export default function ImageReveal({
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
+    console.log(`🖼️ ImageReveal ${alt}: useEffect running`)
     // Fix hydration by ensuring client-side mount
     setIsMounted(true)
     
@@ -46,7 +47,7 @@ export default function ImageReveal({
     }, 100 + delay * 1000) // Base delay + stagger
 
     return () => clearTimeout(timer)
-  }, [delay])
+  }, []) // Remove delay dependency to prevent re-runs
 
   // Prevent hydration mismatch - render static version on server
   if (!isMounted) {

@@ -1,22 +1,26 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTransitionStore } from '@/store/transitionStore'
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { setTransition } = useTransitionStore()
+  const prevPathnameRef = useRef(pathname)
 
   useEffect(() => {
-    // Only coordinate header transitions, no page content animations
-    setTransition(true, 'entering', null, pathname)
-    
-    const timer = setTimeout(() => {
-      setTransition(false)
-    }, 800) // Match header animation duration
+    // Only trigger transitions when pathname actually changes
+    if (prevPathnameRef.current !== pathname) {
+      setTransition(true, 'entering', prevPathnameRef.current, pathname)
+      
+      const timer = setTimeout(() => {
+        setTransition(false)
+      }, 800) // Match header animation duration
 
-    return () => clearTimeout(timer)
+      prevPathnameRef.current = pathname
+      return () => clearTimeout(timer)
+    }
   }, [pathname, setTransition])
 
   // Page content renders immediately with no animations

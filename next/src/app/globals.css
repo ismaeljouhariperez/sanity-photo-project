@@ -19,17 +19,9 @@
   }
 }
 
-/* View Transitions - Disabled for page content */
+/* View Transitions - Completely disabled */
 @view-transition {
-  navigation: auto;
-}
-
-/* No page-level animations - content stays static */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none !important;
-  transform: none !important;
-  opacity: 1 !important;
+  navigation: none;
 }
 
 body * {

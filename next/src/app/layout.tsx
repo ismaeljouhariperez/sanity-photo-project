@@ -33,7 +33,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
       </head>
-      <body className="bg-cream pt-header text-black" suppressHydrationWarning>
+      <body className="bg-cream pt-header" suppressHydrationWarning>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

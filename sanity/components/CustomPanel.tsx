@@ -1,4 +1,3 @@
-import React from 'react'
 import {Card, Stack, Text, Box} from '@sanity/ui'
 import s from './CustomPanel.module.css'
 

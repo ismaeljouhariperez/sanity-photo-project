@@ -14,12 +14,15 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
   const overlayVariants = {
     hidden: {
       y: '-100%',
+      opacity: 0,
     },
     visible: {
       y: 0,
+      opacity: 1,
       transition: {
-        duration: 1.5,
-        ease: [0.16, 1, 0.3, 1] as const, // Smooth custom bezier
+        duration: 1.2,
+        delay: 0.2,
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     },
     exit: {
@@ -38,7 +41,7 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
       opacity: 1,
       transition: {
         staggerChildren: 0.08,
-        delayChildren: 0.4,
+        delayChildren: 0.4, // Better timing with overlay delay
       },
     },
     exit: {
