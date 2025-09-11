@@ -1,91 +1,89 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import CloudinaryImage from '@/components/ui/CloudinaryImage'
-import AnimatedOverlay from '@/components/ui/AnimatedOverlay'
-import { useAnimationStore } from '@/store/animationStore'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { useTransitionStore } from '@/store/transitionStore'
+import ImageReveal from '@/components/ui/ImageReveal'
 
 /**
- * Home page with project showcase and animations
+ * Home page with clean image reveal animations
+ * Following Next.js 15+ and Framer Motion best practices
  */
 export default function Home() {
-  const { setLeavingPage, isLeavingPage } = useAnimationStore()
   const router = useRouter()
-  const [showEntrance, setShowEntrance] = useState(false)
+  const { setTransition } = useTransitionStore()
+  const [isExiting, setIsExiting] = useState(false)
 
-  // Reset leaving state and trigger entrance animation on mount
-  useEffect(() => {
-    setLeavingPage(false)
-    setShowEntrance(true)
-  }, [setLeavingPage])
-
-  // Handle navigation with exit animation
   const handleNavigate = (path: string) => {
-    setLeavingPage(true)
+    setIsExiting(true)
+    setTransition(true, 'exiting')
 
-    // Navigate after exit animation completes
+    // Wait for exit animation before navigating
     setTimeout(() => {
       router.push(path)
-    }, 1000) // Adjust timing to match your exit animation duration
+    }, 800)
+  }
+
+  const containerVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+      },
+    },
+    exit: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+      },
+    },
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="grid h-[calc(100vh-5.5rem)] grid-cols-2 items-center gap-16 py-16"
-    >
-      {/* Black & White Project */}
-      <div
-        className="relative mx-auto flex aspect-[4/3] w-full max-w-[450px] cursor-pointer items-center overflow-hidden"
-        onClick={() => handleNavigate('/black-and-white')}
+    <AnimatePresence mode="wait">
+      <motion.div
+        variants={containerVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        className="mx-auto flex h-full items-center justify-center"
       >
-        <CloudinaryImage
-          src="cover-bw.jpg"
-          alt="Photographie Noir et Blanc"
-          width={900}
-          height={675}
-          className="h-full w-full"
-          folder="home"
-          fallbackSrc="/images/bw-cover.jpg"
-          priority={true}
-        />
-        <AnimatedOverlay
-          id="/black-and-white"
-          showEntrance={showEntrance && !isLeavingPage}
-          showExit={isLeavingPage}
-          entranceDelay={0}
-          exitDelay={0}
-        />
-      </div>
+        <div className="grid w-full grid-cols-2 gap-8">
+          {/* Black & White Project */}
+          <ImageReveal
+            src="cover-bw.jpg"
+            alt="Photographie Noir et Blanc"
+            width={900}
+            height={675}
+            className="mx-auto"
+            folder="home"
+            fallbackSrc="/images/bw-cover.jpg"
+            priority={true}
+            onClick={() => handleNavigate('/black-and-white')}
+            delay={0}
+            exitDelay={0}
+            isExiting={isExiting}
+          />
 
-      {/* Early Color Project */}
-      <div
-        className="relative mx-auto flex aspect-[4/3] w-full max-w-[450px] cursor-pointer items-center overflow-hidden"
-        onClick={() => handleNavigate('/early-color')}
-      >
-        <CloudinaryImage
-          src="cover-color.jpg"
-          alt="Photographie Couleur"
-          width={900}
-          height={675}
-          className="h-full w-full"
-          folder="home"
-          fallbackSrc="/images/color-cover.jpg"
-          priority={true}
-        />
-        <AnimatedOverlay
-          id="/early-color"
-          showEntrance={showEntrance && !isLeavingPage}
-          showExit={isLeavingPage}
-          entranceDelay={1}
-          exitDelay={0.6}
-        />
-      </div>
-    </motion.div>
+          {/* Early Color Project */}
+          <ImageReveal
+            src="cover-color.jpg"
+            alt="Photographie Couleur"
+            width={900}
+            height={675}
+            className="mx-auto"
+            folder="home"
+            fallbackSrc="/images/color-cover.jpg"
+            priority={true}
+            onClick={() => handleNavigate('/early-color')}
+            delay={0.4}
+            exitDelay={0.2}
+            isExiting={isExiting}
+          />
+        </div>
+      </motion.div>
+    </AnimatePresence>
   )
 }

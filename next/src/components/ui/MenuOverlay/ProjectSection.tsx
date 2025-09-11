@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useTransitionStore } from '@/store/transitionStore'
 
@@ -16,9 +16,9 @@ interface ProjectSectionProps {
   title: string
   projects: Project[]
   category: string
-  itemVariants: any
-  listVariants: any
-  countVariants: any
+  itemVariants: Variants
+  listVariants: Variants
+  countVariants: Variants
   onClose: () => void
 }
 

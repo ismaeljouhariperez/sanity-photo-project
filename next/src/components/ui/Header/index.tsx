@@ -6,7 +6,6 @@ import Link from 'next/link'
 import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
 import { useAnimationStore } from '@/store/animationStore'
-import { useTransitionStore } from '@/store/transitionStore'
 import { useRouter } from 'next/navigation'
 import s from './styles.module.scss'
 
@@ -15,7 +14,6 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
-  const { isTransitioning, direction } = useTransitionStore()
   const router = useRouter()
 
   const handleAboutClick = (e: React.MouseEvent) => {
@@ -75,48 +73,48 @@ export default function Header() {
   // Header elements animation variants
   const headerElementVariants = {
     initial: { y: 50, opacity: 0 },
-    enter: { 
-      y: 0, 
+    enter: {
+      y: 0,
       opacity: 1,
       transition: {
-        duration: 0.6,
+        duration: 1,
         ease: [0.16, 1, 0.3, 1] as const,
-        delay: 0.2
-      }
+        delay: 0.2,
+      },
     },
-    exit: { 
-      y: -50, 
+    exit: {
+      y: -50,
       opacity: 0,
       transition: {
-        duration: 0.4,
-        ease: [0.16, 1, 0.3, 1] as const
-      }
-    }
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
+    },
   }
 
   const containerVariants = {
     initial: { opacity: 0 },
-    enter: { 
+    enter: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.1
-      }
+        delayChildren: 0.1,
+      },
     },
-    exit: { 
+    exit: {
       opacity: 1,
       transition: {
         staggerChildren: 0.05,
-        staggerDirection: -1
-      }
-    }
+        staggerDirection: -1,
+      },
+    },
   }
 
   return (
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      <header className="fixed left-0 right-0 top-0 z-50 bg-cream flex justify-center py-5">
+      <header className="bg-cream fixed left-0 right-0 top-0 z-50 flex justify-center py-5">
         <AnimatePresence mode="wait">
           <motion.nav
             key={pathname}
@@ -126,15 +124,15 @@ export default function Header() {
             animate="enter"
             exit="exit"
           >
-            <motion.button 
+            <motion.button
               variants={headerElementVariants}
               onClick={handleAboutClick}
             >
               About
             </motion.button>
-            <motion.button 
+            <motion.button
               variants={headerElementVariants}
-              onClick={handleMenuClick} 
+              onClick={handleMenuClick}
               className={s.title}
             >
               {getHeaderText()}
