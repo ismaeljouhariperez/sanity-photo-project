@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState, startTransition } from 'react'
+import { useEffect, useState, startTransition, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { getProjects, urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import { isValidCategory } from '@/lib/constants'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import CloudinaryImage from '@/components/ui/CloudinaryImage'
 
 /**
@@ -37,6 +38,24 @@ export default function CategoryLayout({
   )
 
   const [projects, setProjects] = useState<Project[]>([])
+
+  // Veiling effect setup
+  const { shouldDisableParallax } = useReducedMotion()
+  const containerRef = useRef<HTMLElement>(null)
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  })
+
+  // Veil mask that slides down to cover the image when scrolling
+  const veilY = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.6, 1], // Start veiling at 20% scroll, complete by 60%
+    shouldDisableParallax
+      ? ['-100%', '-100%', '-100%', '-100%']
+      : ['-100%', '-100%', '0%', '100%'] // Slide from above to below
+  )
 
   useEffect(() => {
     return () => {
@@ -132,8 +151,11 @@ export default function CategoryLayout({
 
   return (
     <>
-      <main className="container mx-auto flex h-[85vh] flex-1 items-center">
-        <div className="w-1/3 overflow-hidden">
+      <main
+        ref={containerRef}
+        className="container mx-auto flex h-[85vh] flex-1 items-center"
+      >
+        <div className="relative w-1/3 overflow-hidden">
           <AnimatePresence mode="wait">
             {displayedProjectData ? (
               <motion.img
@@ -174,6 +196,12 @@ export default function CategoryLayout({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Veil that slides down to cover image when scrolling */}
+          <motion.div
+            style={{ y: veilY }}
+            className="bg-cream absolute inset-0 z-10"
+          />
         </div>
 
         <nav className="flex w-2/3 flex-wrap justify-end gap-8 px-8">

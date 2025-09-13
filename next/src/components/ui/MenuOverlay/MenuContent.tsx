@@ -102,7 +102,7 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
       >
         <div className="grid h-full grid-cols-2 gap-16">
           <ProjectSection
-            title="Black and White Projects"
+            title="Black and White"
             projects={data.blackAndWhiteProjects}
             category="black-and-white"
             itemVariants={itemVariants}
@@ -112,7 +112,7 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
           />
 
           <ProjectSection
-            title="Early Color Projects"
+            title="Early Color"
             projects={data.earlyColorProjects}
             category="early-color"
             itemVariants={itemVariants}

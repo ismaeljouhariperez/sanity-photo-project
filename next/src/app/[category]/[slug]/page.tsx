@@ -44,7 +44,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <ProjectPhotosGrid 
       projectSlug={slug}
       category={category}
-      animationDelay={0}
     />
   )
 }

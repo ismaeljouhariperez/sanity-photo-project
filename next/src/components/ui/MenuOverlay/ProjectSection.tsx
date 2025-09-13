@@ -38,10 +38,10 @@ export default function ProjectSection({
   const handleProjectClick = (slug: string) => {
     // Set exiting transition state
     setTransition(true, 'exiting')
-    
+
     // Start menu close animation first
     onClose()
-    
+
     // Small delay to let menu and header animations start before navigation
     setTimeout(() => {
       router.push(`/${category}/${slug}`)
@@ -69,7 +69,7 @@ export default function ProjectSection({
             >
               <button
                 onClick={() => handleProjectClick(slug)}
-                className="text-left text-lg transition-colors duration-200 hover:text-gray-600"
+                className="text-left text-xl transition-colors duration-200 hover:text-gray-600"
               >
                 {project.title}
               </button>
