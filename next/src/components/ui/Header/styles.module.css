@@ -1,5 +1,8 @@
 .nav {
-  @apply flex justify-between items-center w-11/12;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .titleWrapper {

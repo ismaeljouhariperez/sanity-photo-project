@@ -7,7 +7,7 @@ import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
 import { useAnimationStore } from '@/store/animationStore'
 import { useRouter } from 'next/navigation'
-import s from './styles.module.scss'
+import s from './styles.module.css'
 
 export default function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
@@ -114,7 +114,7 @@ export default function Header() {
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      <header className="fixed left-0 right-0 top-0 z-50 flex justify-center py-5">
+      <header className="container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-5">
         <AnimatePresence mode="wait">
           <motion.nav
             key={pathname}

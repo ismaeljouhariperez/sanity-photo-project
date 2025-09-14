@@ -31,7 +31,7 @@ export default function ImageReveal({
   onClick,
   delay = 0,
   exitDelay = 0,
-  isExiting = false
+  isExiting = false,
 }: ImageRevealProps) {
   const [isMounted, setIsMounted] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
@@ -40,11 +40,14 @@ export default function ImageReveal({
     console.log(`🖼️ ImageReveal ${alt}: useEffect running`)
     // Fix hydration by ensuring client-side mount
     setIsMounted(true)
-    
+
     // Trigger entrance animation after mount
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, 100 + delay * 1000) // Base delay + stagger
+    const timer = setTimeout(
+      () => {
+        setIsVisible(true)
+      },
+      100 + delay * 1000
+    ) // Base delay + stagger
 
     return () => clearTimeout(timer)
   }, []) // Remove delay dependency to prevent re-runs
@@ -53,7 +56,7 @@ export default function ImageReveal({
   if (!isMounted) {
     return (
       <div
-        className={`relative aspect-[4/3] w-full max-w-[450px] cursor-pointer overflow-hidden ${className}`}
+        className={`relative aspect-[4/3] cursor-pointer overflow-hidden ${className}`}
         onClick={onClick}
       >
         <CloudinaryImage
@@ -73,7 +76,7 @@ export default function ImageReveal({
   const revealVariants = {
     hidden: {
       clipPath: 'inset(100% 0 0 0)', // Hidden from top
-      opacity: 0
+      opacity: 0,
     },
     visible: {
       clipPath: 'inset(0% 0 0 0)', // Reveal from top to bottom
@@ -83,13 +86,13 @@ export default function ImageReveal({
         ease: [0.16, 1, 0.3, 1] as const,
         clipPath: {
           duration: 1.0,
-          ease: [0.16, 1, 0.3, 1] as const
+          ease: [0.16, 1, 0.3, 1] as const,
         },
         opacity: {
           duration: 0.3,
-          delay: 0.3
-        }
-      }
+          delay: 0.3,
+        },
+      },
     },
     exit: {
       clipPath: 'inset(0 0 100% 0)', // Hide to bottom (reverse)
@@ -97,21 +100,21 @@ export default function ImageReveal({
       transition: {
         duration: 0.8,
         ease: [0.16, 1, 0.3, 1] as const,
-        delay: exitDelay
-      }
-    }
+        delay: exitDelay,
+      },
+    },
   }
 
   // Determine current state based on props and local state
   const getCurrentVariant = () => {
-    if (isExiting) return "exit"
-    if (isVisible) return "visible"
-    return "hidden"
+    if (isExiting) return 'exit'
+    if (isVisible) return 'visible'
+    return 'hidden'
   }
 
   return (
     <motion.div
-      className={`relative aspect-[4/3] w-full max-w-[450px] cursor-pointer overflow-hidden ${className}`}
+      className={`aspect-[4/3] w-full max-w-[450px] cursor-pointer overflow-hidden ${className}`}
       onClick={onClick}
       initial="hidden"
       animate={getCurrentVariant()}

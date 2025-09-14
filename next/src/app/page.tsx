@@ -48,16 +48,15 @@ export default function Home() {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="mx-auto flex h-full items-center justify-center"
+        className="container mx-auto flex h-full items-center"
       >
-        <div className="grid w-full grid-cols-2 gap-8">
+        <div className="grid w-full grid-cols-2 place-items-center gap-8">
           {/* Black & White Project */}
           <ImageReveal
             src="cover-bw.jpg"
             alt="Photographie Noir et Blanc"
             width={900}
             height={675}
-            className="mx-auto"
             folder="home"
             fallbackSrc="/images/bw-cover.jpg"
             priority={true}
@@ -73,7 +72,6 @@ export default function Home() {
             alt="Photographie Couleur"
             width={900}
             height={675}
-            className="mx-auto"
             folder="home"
             fallbackSrc="/images/color-cover.jpg"
             priority={true}
