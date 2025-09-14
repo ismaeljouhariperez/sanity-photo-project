@@ -8,12 +8,10 @@ export function useCustomCursor() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
   const [showCursor, setShowCursor] = useState(false)
 
-  // Throttle mouse move for better performance
+  // Immediate cursor position updates for better responsiveness
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    // Use requestAnimationFrame for smooth updates
-    requestAnimationFrame(() => {
-      setCursorPosition({ x: e.clientX, y: e.clientY })
-    })
+    // Direct update for immediate responsiveness
+    setCursorPosition({ x: e.clientX, y: e.clientY })
   }, [])
 
   const handleMouseEnter = useCallback(() => {

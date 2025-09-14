@@ -79,21 +79,28 @@ body {
   box-sizing: border-box;
 }
 
-/* Embla Carousel - Disable translate animations, use fade instead */
+/* Modern Embla Carousel - Fade Mode */
 .embla {
   overflow: hidden;
-  /* height: calc(100% - var(--header-height)) !important; */
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 .embla__container {
-  display: flex;
+  /* Disable Embla transforms for fade mode */
   transform: none !important;
   transition: none !important;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 .embla__slide {
-  flex: 0 0 100%;
-  min-width: 0;
+  /* All slides stacked on top of each other for fade effect */
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Custom cursor for project slider */
@@ -113,4 +120,10 @@ body {
   font-family: monospace;
   transform: translate(-50%, -100%);
   margin-top: -8px;
+}
+
+.project-detail-layout {
+  height: calc(100% - var(--header-height));
+  display: flex;
+  align-items: center;
 }
