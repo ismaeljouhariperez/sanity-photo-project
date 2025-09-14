@@ -16,7 +16,9 @@ export default function GalleryContent({
   onClose,
 }: GalleryContentProps) {
   const images = project?.images || []
-  const setTargetImage = useImageNavigationStore((state) => state.setTargetImage)
+  const setTargetImage = useImageNavigationStore(
+    (state) => state.setTargetImage
+  )
 
   const handleImageClick = (index: number) => {
     setTargetImage(index)

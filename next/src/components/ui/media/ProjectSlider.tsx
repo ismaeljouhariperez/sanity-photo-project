@@ -6,7 +6,7 @@ import type { Project } from '@/lib/sanity.types'
 import useEmblaCarousel from 'embla-carousel-react'
 import { easeInOut, motion } from 'framer-motion'
 import Image from 'next/image'
-import { useCustomCursor } from '@/hooks/useCustomCursor'
+import { useSimpleCursor } from '@/hooks/useSimpleCursor'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
 import { useImageNavigationStore } from '@/store/imageNavigationStore'
 import TextSlide from './TextSlide'
@@ -49,19 +49,9 @@ const ProjectSlider = memo(function ProjectSlider({
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const {
-    cursorPosition,
-    showCursor,
-    isHovering,
-    isReady,
-    registerContainer,
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useCustomCursor()
+  const { cursorPosition, showCursor } = useSimpleCursor()
   const images = project.images || []
   const totalSlides = images.length + 1 // Images + text slide
-  const cursorAreaRef = useRef<HTMLDivElement>(null)
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
@@ -99,12 +89,7 @@ const ProjectSlider = memo(function ProjectSlider({
     }
   }, [emblaApi, targetImageIndex, clearTarget])
 
-  // Register container with modern boundary detection system
-  useEffect(() => {
-    if (cursorAreaRef.current) {
-      registerContainer(cursorAreaRef.current)
-    }
-  }, [registerContainer])
+  // Simplified - no container registration needed
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) {
@@ -154,13 +139,7 @@ const ProjectSlider = memo(function ProjectSlider({
       className="flex h-[80%] w-full flex-col"
     >
       {/* Embla Carousel - responsive touch handling */}
-      <div
-        ref={cursorAreaRef}
-        className={`custom-cursor h-full ${isTouchDevice ? 'touch-pan-x' : ''}`}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div className={`custom-cursor h-full ${isTouchDevice ? 'touch-pan-x' : ''}`}>
         <div className="embla h-full" ref={emblaRef}>
           <div className="embla__container h-full">
             {/* Image slides */}
@@ -265,25 +244,17 @@ const ProjectSlider = memo(function ProjectSlider({
         </div>
       </footer>
 
-      {/* Custom Cursor Counter with fallback */}
-      {showCursor && isReady && (
+      {/* Simple Custom Cursor Counter */}
+      {showCursor && (
         <div
           className="cursor-counter"
           style={{
             left: cursorPosition.x,
             top: cursorPosition.y,
-            opacity: isHovering ? 1 : 0,
           }}
         >
           {String(selectedIndex + 1).padStart(2, '0')}/
           {String(totalSlides).padStart(2, '0')}
-        </div>
-      )}
-
-      {/* Debug/fallback indicator (only in dev) */}
-      {process.env.NODE_ENV === 'development' && !isReady && (
-        <div className="fixed left-4 top-4 z-50 rounded bg-yellow-200 px-2 py-1 text-xs">
-          Cursor loading...
         </div>
       )}
     </motion.div>
