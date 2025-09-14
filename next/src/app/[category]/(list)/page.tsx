@@ -4,6 +4,7 @@ import { generateCategoryMetadata } from '@/lib/seo'
 import { isValidCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import CategoryClient from './CategoryClient'
+import { cache } from 'react'
 
 interface CategoryListPageProps {
   params: Promise<{ category: string }>
@@ -26,6 +27,11 @@ function getDefaultImageProps(category: string) {
   }
 }
 
+// Cached site settings to avoid duplicate requests
+const getCachedSettings = cache(async () => {
+  return await getSiteSettings()
+})
+
 export async function generateMetadata({ params }: CategoryListPageProps): Promise<Metadata> {
   try {
     const { category } = await params
@@ -37,7 +43,7 @@ export async function generateMetadata({ params }: CategoryListPageProps): Promi
       }
     }
 
-    const siteSettings = await getSiteSettings()
+    const siteSettings = await getCachedSettings()
     return generateCategoryMetadata(category, siteSettings)
   } catch (error) {
     console.error('Error generating metadata:', error)
@@ -56,7 +62,7 @@ export default async function CategoryListPage({ params }: CategoryListPageProps
     notFound()
   }
 
-  // Fetch projects on server side for better performance
+  // Fetch projects on server side for better performance with caching
   try {
     const projects = await getProjects(category)
     const defaultImages = getDefaultImageProps(category)

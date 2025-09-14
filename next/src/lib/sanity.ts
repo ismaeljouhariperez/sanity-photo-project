@@ -11,12 +11,15 @@ if (!projectId || !dataset) {
   throw new Error('Missing Sanity configuration. Please check your environment variables.')
 }
 
-// Create client for data fetching
+// Modern Sanity client with optimal performance configuration
 export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Set to false for server-side rendering
+  useCdn: process.env.NODE_ENV === 'production', // CDN for production, direct for dev
+  perspective: 'published', // Only published content
+  // Disable stega for maximum performance
+  stega: { enabled: false },
 })
 
 // Create client for preview mode (if needed)
@@ -26,6 +29,7 @@ export const previewClient = createClient({
   apiVersion,
   useCdn: false,
   token: process.env.SANITY_API_TOKEN,
+  perspective: 'previewDrafts',
 })
 
 // Image URL builder
@@ -89,19 +93,66 @@ export const queries = {
   }`
 }
 
-// Type-safe fetch functions
+// High-performance fetch functions with Next.js 15.5 caching
 export async function getProjects(category?: string) {
-  return client.fetch(queries.projects, { category })
+  return client.fetch(
+    queries.projects, 
+    { category },
+    { 
+      next: { 
+        revalidate: 300, // 5 minutes cache
+        tags: ['projects', `category:${category || 'all'}`] 
+      }
+    }
+  )
 }
 
 export async function getProjectBySlug(slug: string, category: string) {
-  return client.fetch(queries.projectBySlug, { slug, category })
+  return client.fetch(
+    queries.projectBySlug, 
+    { slug, category },
+    { 
+      next: { 
+        revalidate: 600, // 10 minutes cache
+        tags: [`project:${slug}`, `category:${category}`] 
+      }
+    }
+  )
 }
 
 export async function getSiteSettings() {
-  return client.fetch(queries.siteSettings)
+  return client.fetch(
+    queries.siteSettings,
+    {},
+    { 
+      next: { 
+        revalidate: 3600, // 1 hour cache
+        tags: ['site-settings'] 
+      }
+    }
+  )
 }
 
 export async function getCollections() {
-  return client.fetch(queries.collections)
+  return client.fetch(
+    queries.collections,
+    {},
+    { 
+      next: { 
+        revalidate: 1800, // 30 minutes cache
+        tags: ['collections'] 
+      }
+    }
+  )
+}
+
+// Cache invalidation helpers for webhooks (future implementation)
+export function revalidateProject(slug: string, category: string) {
+  // Use with revalidateTag in webhook handlers
+  console.log(`Would revalidate project:${slug} and category:${category}`)
+}
+
+export function revalidateProjects(category?: string) {
+  // Use with revalidateTag in webhook handlers  
+  console.log(`Would revalidate projects${category ? ` for ${category}` : ''}`)
 }

@@ -5,11 +5,17 @@ import { getMenuData } from '@/components/ui/MenuOverlay/MenuData'
 import ClientLayout from '@/components/layout/ClientLayout'
 import './globals.css'
 import { aujournuit } from './fonts'
+import { cache } from 'react'
+
+// Global cached site settings to prevent duplicate requests across the app
+const getGlobalSiteSettings = cache(async () => {
+  return await getSiteSettings()
+})
 
 // Generate metadata for the site
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const siteSettings = await getSiteSettings()
+    const siteSettings = await getGlobalSiteSettings()
     return generateHomeMetadata(siteSettings)
   } catch (error) {
     console.error('Error generating metadata:', error)
