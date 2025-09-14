@@ -49,10 +49,11 @@ const ImageReveal = memo(function ImageReveal({
         clipPath: {
           duration: 1.0,
           ease: [0.16, 1, 0.3, 1] as const,
+          delay,
         },
         opacity: {
           duration: 0.3,
-          delay: delay + 0.3,
+          delay: 0.3, //
         },
       },
     },

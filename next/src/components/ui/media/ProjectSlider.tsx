@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, memo } from 'react'
+import { useEffect, useState, useCallback, memo, useRef } from 'react'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import useEmblaCarousel from 'embla-carousel-react'
@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { useCustomCursor } from '@/hooks/useCustomCursor'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
 import { useImageNavigationStore } from '@/store/imageNavigationStore'
+import TextSlide from './TextSlide'
 
 interface ProjectSliderProps {
   project: Project
@@ -19,7 +20,7 @@ const ProjectSlider = memo(function ProjectSlider({
 }: ProjectSliderProps) {
   // Set current project in store for other components
   const setProject = useCurrentProjectStore((state) => state.setProject)
-  
+
   // Image navigation from gallery
   const { targetImageIndex, clearTarget } = useImageNavigationStore()
 
@@ -52,11 +53,15 @@ const ProjectSlider = memo(function ProjectSlider({
     cursorPosition,
     showCursor,
     isHovering,
+    isReady,
+    registerContainer,
     handleMouseMove,
     handleMouseEnter,
     handleMouseLeave,
   } = useCustomCursor()
   const images = project.images || []
+  const totalSlides = images.length + 1 // Images + text slide
+  const cursorAreaRef = useRef<HTMLDivElement>(null)
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
@@ -93,6 +98,13 @@ const ProjectSlider = memo(function ProjectSlider({
       clearTarget() // Clear the target after navigation
     }
   }, [emblaApi, targetImageIndex, clearTarget])
+
+  // Register container with modern boundary detection system
+  useEffect(() => {
+    if (cursorAreaRef.current) {
+      registerContainer(cursorAreaRef.current)
+    }
+  }, [registerContainer])
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) {
@@ -143,6 +155,7 @@ const ProjectSlider = memo(function ProjectSlider({
     >
       {/* Embla Carousel - responsive touch handling */}
       <div
+        ref={cursorAreaRef}
         className={`custom-cursor h-full ${isTouchDevice ? 'touch-pan-x' : ''}`}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
@@ -150,6 +163,7 @@ const ProjectSlider = memo(function ProjectSlider({
       >
         <div className="embla h-full" ref={emblaRef}>
           <div className="embla__container h-full">
+            {/* Image slides */}
             {images.map((image, index) => (
               <div
                 key={image._key || index}
@@ -175,6 +189,18 @@ const ProjectSlider = memo(function ProjectSlider({
                 />
               </div>
             ))}
+
+            {/* Text slide - final slide */}
+            <div
+              className="embla__slide absolute inset-0"
+              style={{
+                opacity: selectedIndex === images.length ? 1 : 0,
+                transition: 'opacity 0.4s ease-in-out',
+                zIndex: selectedIndex === images.length ? 1 : 0,
+              }}
+            >
+              <TextSlide project={project} />
+            </div>
           </div>
         </div>
 
@@ -199,13 +225,14 @@ const ProjectSlider = memo(function ProjectSlider({
             </span>
             <span className="text-gray-400">/</span>
             <span className="text-gray-400">
-              {String(images.length).padStart(2, '0')}
+              {String(totalSlides).padStart(2, '0')}
             </span>
           </div>
 
           {/* Dots Navigation - larger touch targets */}
           <div className="flex items-center gap-3 md:gap-2">
-            {images.slice(0, 6).map((_, index) => (
+            {/* Image dots (show first 5 images if we have text slide) */}
+            {images.slice(0, Math.min(5, images.length)).map((_, index) => (
               <button
                 key={index}
                 onClick={() => scrollTo(index)}
@@ -216,17 +243,30 @@ const ProjectSlider = memo(function ProjectSlider({
                 }`}
               />
             ))}
-            {images.length > 6 && (
+
+            {/* Text slide dot (always show as last dot) */}
+            <button
+              key="text-slide"
+              onClick={() => scrollTo(images.length)}
+              className={`h-3 w-3 touch-manipulation rounded-full transition-colors md:h-2 md:w-2 ${
+                selectedIndex === images.length
+                  ? 'bg-black'
+                  : 'bg-black/30 hover:bg-black/50 active:bg-black/70'
+              }`}
+            />
+
+            {/* Show +N indicator if more than 5 image slides */}
+            {images.length > 5 && (
               <span className="ml-2 text-sm text-gray-400 md:text-xs">
-                +{images.length - 6}
+                +{images.length - 5}
               </span>
             )}
           </div>
         </div>
       </footer>
 
-      {/* Custom Cursor Counter */}
-      {showCursor && (
+      {/* Custom Cursor Counter with fallback */}
+      {showCursor && isReady && (
         <div
           className="cursor-counter"
           style={{
@@ -236,7 +276,14 @@ const ProjectSlider = memo(function ProjectSlider({
           }}
         >
           {String(selectedIndex + 1).padStart(2, '0')}/
-          {String(images.length).padStart(2, '0')}
+          {String(totalSlides).padStart(2, '0')}
+        </div>
+      )}
+
+      {/* Debug/fallback indicator (only in dev) */}
+      {process.env.NODE_ENV === 'development' && !isReady && (
+        <div className="fixed left-4 top-4 z-50 rounded bg-yellow-200 px-2 py-1 text-xs">
+          Cursor loading...
         </div>
       )}
     </motion.div>

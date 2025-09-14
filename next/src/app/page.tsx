@@ -1,18 +1,28 @@
 'use client'
 
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { usePageTransition } from '@/hooks/usePageTransition'
+import { useRouter } from 'next/navigation'
+import { useTransitionStore } from '@/store/transitionStore'
 import ImageReveal from '@/components/ui/media/ImageReveal'
 
 /**
  * Home page with clean image reveal animations
- * Following Next.js 15.5 and React 19 best practices
+ * Following Next.js 15+ and Framer Motion best practices
  */
 export default function Home() {
-  const { navigateWithTransition, isExiting } = usePageTransition()
+  const router = useRouter()
+  const { setTransition } = useTransitionStore()
+  const [isExiting, setIsExiting] = useState(false)
 
   const handleNavigate = (path: string) => {
-    navigateWithTransition(path)
+    setIsExiting(true)
+    setTransition(true, 'exiting')
+
+    // Wait for exit animation before navigating
+    setTimeout(() => {
+      router.push(path)
+    }, 1000)
   }
 
   const containerVariants = {
@@ -51,7 +61,7 @@ export default function Home() {
             fallbackSrc="/images/bw-cover.jpg"
             priority={true}
             onClick={() => handleNavigate('/black-and-white')}
-            delay={0}
+            delay={0.4}
             exitDelay={0}
             isExiting={isExiting}
           />
@@ -66,7 +76,7 @@ export default function Home() {
             fallbackSrc="/images/color-cover.jpg"
             priority={true}
             onClick={() => handleNavigate('/early-color')}
-            delay={0.4}
+            delay={0.7}
             exitDelay={0.2}
             isExiting={isExiting}
           />
