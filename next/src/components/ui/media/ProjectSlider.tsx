@@ -35,6 +35,7 @@ const ProjectSlider = memo(function ProjectSlider({
   const {
     cursorPosition,
     showCursor,
+    isHovering,
     handleMouseMove,
     handleMouseEnter,
     handleMouseLeave,
@@ -206,6 +207,7 @@ const ProjectSlider = memo(function ProjectSlider({
           style={{
             left: cursorPosition.x,
             top: cursorPosition.y,
+            opacity: isHovering ? 1 : 0,
           }}
         >
           {String(selectedIndex + 1).padStart(2, '0')}/

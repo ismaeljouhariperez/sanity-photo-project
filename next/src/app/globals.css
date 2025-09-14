@@ -98,6 +98,25 @@
   font-family: monospace;
   transform: translate(-50%, -100%);
   margin-top: -8px;
+
+  /* Elegant fade transition */
+  opacity: 1;
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Smooth scale on enter/leave */
+  animation: cursor-fade-in 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade in animation */
+@keyframes cursor-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
 }
 
 /* Project Detail Layout */
