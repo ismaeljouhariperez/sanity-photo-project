@@ -85,6 +85,8 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
     },
   }
 
+  // Go to project category page
+
   return (
     <motion.div
       variants={overlayVariants}

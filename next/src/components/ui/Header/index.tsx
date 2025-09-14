@@ -23,7 +23,7 @@ const Header = memo(function Header() {
   // Define page type variables
   const isProjectPage =
     pathname.includes('/black-and-white') || pathname.includes('/early-color')
-  
+
   // Check if we're on a project detail page (with slug)
   const isProjectDetailPage = isProjectPage && pathname.split('/').length === 3
 
@@ -32,38 +32,46 @@ const Header = memo(function Header() {
     setIsInfoOpen(true)
   }, [])
 
-  const handleMenuClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
+  const handleMenuClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
 
-    // If gallery is open, close it
-    if (isGalleryOpen) {
-      setIsGalleryOpen(false)
-      return
-    }
+      // If gallery is open, close it
+      if (isGalleryOpen) {
+        setIsGalleryOpen(false)
+        return
+      }
+      // If on project detail page, toggle gallery overlay
+      if (isProjectDetailPage) {
+        setIsGalleryOpen(!isGalleryOpen)
+      } else {
+        // Toggle menu overlay
+        setIsMenuOpen(!isMenuOpen)
+      }
+    },
+    [
+      isMenuOpen,
+      isGalleryOpen,
+      pathname,
+      router,
+      isProjectPage,
+      isProjectDetailPage,
+    ]
+  )
 
-    // If on project detail page, toggle gallery overlay
-    if (isProjectDetailPage) {
-      setIsGalleryOpen(!isGalleryOpen)
-    } 
-    // If on project category page, navigate to home
-    else if (isProjectPage) {
-      router.push('/')
-    } else {
-      // Toggle menu overlay
-      setIsMenuOpen(!isMenuOpen)
-    }
-  }, [isMenuOpen, isGalleryOpen, pathname, router, isProjectPage, isProjectDetailPage])
+  const handleIndexClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
 
-  const handleIndexClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    
-    // Navigate back to parent category
-    const pathSegments = pathname.split('/').filter(Boolean)
-    if (pathSegments.length >= 2) {
-      const category = pathSegments[0]
-      router.push(`/${category}`)
-    }
-  }, [pathname, router])
+      // Navigate back to parent category
+      const pathSegments = pathname.split('/').filter(Boolean)
+      if (pathSegments.length >= 2) {
+        const category = pathSegments[0]
+        router.push(`/${category}`)
+      }
+    },
+    [pathname, router]
+  )
 
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
@@ -80,7 +88,6 @@ const Header = memo(function Header() {
   // Dynamic header text - easily extensible for future content
   const getHeaderText = () => {
     if (isGalleryOpen) return 'Close'
-    if (isProjectPage) return 'Home'
     if (isMenuOpen) return 'Close'
     // Add more conditions here for future dynamic content
     return 'Menu'
@@ -126,12 +133,20 @@ const Header = memo(function Header() {
     },
   }
 
+  // Determine category title for index link
+  let categoryTitle = ''
+  if (pathname.includes('/black-and-white')) {
+    categoryTitle = 'Black & White'
+  } else if (pathname.includes('/early-color')) {
+    categoryTitle = 'Early Color'
+  }
+
   return (
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      <GalleryOverlay 
-        isOpen={isGalleryOpen} 
+      <GalleryOverlay
+        isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
         project={currentProject}
       />
@@ -148,6 +163,7 @@ const Header = memo(function Header() {
             <motion.button
               variants={headerElementVariants}
               onClick={handleAboutClick}
+              className="place-self-start transition-opacity hover:opacity-80"
             >
               About
             </motion.button>
@@ -158,7 +174,7 @@ const Header = memo(function Header() {
               >
                 <button
                   onClick={handleMenuClick}
-                  className="transition-opacity hover:opacity-80 relative overflow-hidden"
+                  className="relative overflow-hidden transition-opacity hover:opacity-80"
                 >
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -168,9 +184,9 @@ const Header = memo(function Header() {
                       exit={{ y: -20, opacity: 0 }}
                       transition={{
                         duration: 0.3,
-                        ease: [0.16, 1, 0.3, 1] as const
+                        ease: [0.16, 1, 0.3, 1] as const,
                       }}
-                      className="block"
+                      className="block min-w-[50px] text-center"
                     >
                       {isGalleryOpen ? 'Close' : 'Gallery'}
                     </motion.span>
@@ -181,7 +197,7 @@ const Header = memo(function Header() {
                   onClick={handleIndexClick}
                   className="transition-opacity hover:opacity-80"
                 >
-                  Index
+                  {categoryTitle}
                 </button>
               </motion.div>
             ) : (
@@ -198,7 +214,7 @@ const Header = memo(function Header() {
                     exit={{ y: -20, opacity: 0 }}
                     transition={{
                       duration: 0.3,
-                      ease: [0.16, 1, 0.3, 1] as const
+                      ease: [0.16, 1, 0.3, 1] as const,
                     }}
                     className="block"
                   >
@@ -207,7 +223,10 @@ const Header = memo(function Header() {
                 </AnimatePresence>
               </motion.button>
             )}
-            <motion.div variants={headerElementVariants}>
+            <motion.div
+              variants={headerElementVariants}
+              className={s.titleWrapper}
+            >
               <Link
                 href="/"
                 className="text-xl transition-opacity hover:opacity-80"

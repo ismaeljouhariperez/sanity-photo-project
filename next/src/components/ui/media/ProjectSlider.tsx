@@ -18,14 +18,14 @@ const ProjectSlider = memo(function ProjectSlider({
 }: ProjectSliderProps) {
   // Set current project in store for other components
   const setProject = useCurrentProjectStore((state) => state.setProject)
-  
+
   // Detect if device supports touch for responsive config
   const [isTouchDevice, setIsTouchDevice] = useState(false)
 
   // Set project in store when component mounts
   useEffect(() => {
     setProject(project)
-    
+
     // Clear project when component unmounts
     return () => setProject(null)
   }, [project, setProject])
@@ -113,7 +113,7 @@ const ProjectSlider = memo(function ProjectSlider({
   if (images.length === 0) {
     return (
       <div
-        className="bg-cream flex items-center justify-center"
+        className="bg-cream flex w-full items-center justify-center"
         style={{ height: 'calc(100vh - var(--header-height))' }}
       >
         <div className="text-gray-500">Aucune photo à afficher</div>

@@ -48,9 +48,27 @@ export default function ProjectSection({
     }, 300)
   }
 
+  // When clicking on a category title, navigate to that category page
+  const handleCategoryClick = () => {
+    // Set exiting transition state
+    setTransition(true, 'exiting')
+
+    // Start menu close animation first
+    onClose()
+
+    // Small delay to let menu and header animations start before navigation
+    setTimeout(() => {
+      router.push(`/${category}`)
+    }, 300)
+  }
+
   return (
     <div className="p-8">
-      <motion.h3 variants={itemVariants} className="mb-8 text-gray-900">
+      <motion.h3
+        variants={itemVariants}
+        className="mb-8 cursor-pointer place-self-start text-gray-900"
+        onClick={handleCategoryClick}
+      >
         {title}
       </motion.h3>
       <motion.div variants={listVariants} className="space-y-4">

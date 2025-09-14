@@ -122,6 +122,4 @@
 /* Project Detail Layout */
 .project-detail-layout {
   height: calc(100% - var(--header-height));
-  display: flex;
-  align-items: center;
 }

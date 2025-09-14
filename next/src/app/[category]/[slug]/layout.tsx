@@ -12,8 +12,8 @@ export default function ProjectDetailLayout({
   children,
 }: ProjectDetailLayoutProps) {
   return (
-    <div className="project-detail-layout bg-cream container mx-auto">
+    <main className="project-detail-layout container mx-auto flex items-center">
       {children}
-    </div>
+    </main>
   )
 }
