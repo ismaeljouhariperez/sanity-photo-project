@@ -183,7 +183,7 @@ export default function CategoryClient({
             return (
               <motion.div
                 key={project._id}
-                className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
+                className="cursor-pointer overflow-hidden text-5xl leading-[1.3] hover:text-gray-500"
                 onMouseEnter={() => setHoveredProject(project._id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onClick={() => handleProjectClick(project)}
