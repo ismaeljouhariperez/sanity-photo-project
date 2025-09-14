@@ -46,7 +46,8 @@ body {
 }
 
 /* Optimize images and media for scroll performance */
-img, video {
+img,
+video {
   will-change: transform;
 }
 
@@ -57,4 +58,16 @@ body {
   padding: 0;
   /* overflow: hidden; */
   box-sizing: border-box;
+}
+
+.embla {
+  overflow: hidden;
+  height: calc(100% - var(--header-height));
+}
+.embla__container {
+  display: flex;
+}
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
 }

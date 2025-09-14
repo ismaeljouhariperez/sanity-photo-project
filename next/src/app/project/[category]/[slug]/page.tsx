@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
-import { getSiteSettings } from '@/lib/sanity'
+import { getSiteSettings, getProjectBySlug } from '@/lib/sanity'
 import { generateCategoryMetadata } from '@/lib/seo'
 import { isValidCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
+import ProjectSlider from '@/components/ui/ProjectSlider'
 
 interface ProjectPageProps {
   params: Promise<{ category: string; slug: string }>
@@ -27,9 +28,6 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   }
 }
 
-/**
- * Project detail page
- */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { category, slug } = await params
   
@@ -37,13 +35,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
-  // Import dynamically to avoid SSR issues
-  const ProjectPhotosGrid = (await import('@/components/ui/ProjectPhotosGrid')).default
+  const project = await getProjectBySlug(slug, category)
+  
+  if (!project) {
+    notFound()
+  }
 
-  return (
-    <ProjectPhotosGrid 
-      projectSlug={slug}
-      category={category}
-    />
-  )
+  return <ProjectSlider project={project} />
 }

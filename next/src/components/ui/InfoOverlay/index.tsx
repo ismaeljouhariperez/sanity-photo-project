@@ -75,7 +75,7 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
             className="mt-16 h-full overflow-y-auto p-8"
             variants={contentAnimations}
           >
-            <h2 className="mb-8 text-3xl font-light">À propos</h2>
+            <h2 className="mb-8 text-3xl">À propos</h2>
 
             <div className="space-y-5 leading-relaxed text-gray-300">
               <p>

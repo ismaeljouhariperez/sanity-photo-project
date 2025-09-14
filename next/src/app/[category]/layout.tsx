@@ -23,15 +23,15 @@ export default function CategoryLayout({
   const pathname = usePathname()
   const router = useRouter()
 
-  // Extract category and slug from pathname
+  // Extract category from pathname
   const segments = pathname.split('/').filter(Boolean)
   const category = segments[0]
-  const currentSlug = segments[1] // Will be undefined on category page, defined on project page
-  const isDetailPage = Boolean(currentSlug)
 
-  // Initialize hasEntered as true if we're already on a detail page
-  const [hasEntered, setHasEntered] = useState(isDetailPage)
+  const [hasEntered, setHasEntered] = useState(false)
   const [hoveredProject, setHoveredProject] = useState<string | null>(null)
+  const [isExiting, setIsExiting] = useState(false) // For fade out animation
+  const [clickedProjectId, setClickedProjectId] = useState<string | null>(null) // Track which project was clicked
+  const [isSecondStage, setIsSecondStage] = useState(false) // For second stage animation
 
   const [displayedProjectId, setDisplayedProjectId] = useState<string | null>(
     null
@@ -42,6 +42,8 @@ export default function CategoryLayout({
   // Veiling effect setup
   const { shouldDisableParallax } = useReducedMotion()
   const containerRef = useRef<HTMLElement>(null)
+  const imageContainerRef = useRef<HTMLDivElement>(null)
+  const textContainerRef = useRef<HTMLElement>(null)
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -101,18 +103,17 @@ export default function CategoryLayout({
     return <div>Invalid category</div>
   }
 
-  // Show current project (on detail page), then hovered project, then null
-  const currentProject =
-    isDetailPage && currentSlug
-      ? projects.find((p) => (p.slug?.current || p.slug) === currentSlug)
-      : null
+  // Show hovered project
+  const displayedProjectData = displayedProjectId
+    ? projects.find((p) => p._id === displayedProjectId)
+    : null
 
-  // Show current project on detail pages, otherwise show hovered project
-  const displayedProjectData =
-    currentProject ||
-    (displayedProjectId
-      ? projects.find((p) => p._id === displayedProjectId)
-      : null)
+  // Get the image to display - use featuredImage or coverImage
+  const getDisplayedImage = () => {
+    return displayedProjectData?.featuredImage || displayedProjectData?.coverImage
+  }
+
+  const displayedImage = getDisplayedImage()
 
   // Category-specific default images
   const getDefaultImageProps = () => {
@@ -131,46 +132,65 @@ export default function CategoryLayout({
     }
   }
 
-  // Real URL navigation with View Transitions
+  // Two-stage animation with fade out
   const handleProjectClick = (project: Project) => {
-    const projectSlug = project.slug?.current || project.slug
+    if (isExiting) return // Prevent multiple clicks during animation
 
-    // Check if View Transitions API is supported
-    if ('startViewTransition' in document) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(document as any).startViewTransition(() => {
-        startTransition(() => {
-          router.push(`/${category}/${projectSlug}`)
-        })
-      })
-    } else {
-      // Fallback for browsers without View Transitions
-      router.push(`/${category}/${projectSlug}`)
-    }
+    const projectSlug = project.slug?.current || project.slug
+    setIsExiting(true)
+    setClickedProjectId(project._id) // Track which project was clicked
+
+    // Stage 1: Other titles fade out (600ms)
+    setTimeout(() => {
+      // Stage 2: Start second stage - remaining title and image fade out
+      setIsSecondStage(true)
+      
+      // Stage 3: Navigate after second stage completes (800ms)
+      setTimeout(() => {
+        // Check if View Transitions API is supported
+        if ('startViewTransition' in document) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ;(document as any).startViewTransition(() => {
+            startTransition(() => {
+              router.push(`/project/${category}/${projectSlug}`)
+            })
+          })
+        } else {
+          // Fallback for browsers without View Transitions
+          router.push(`/project/${category}/${projectSlug}`)
+        }
+      }, 800) // Second stage duration
+    }, 600) // First stage duration
   }
 
   return (
     <>
+      {/* Show layout for both list and detail views */}
       <main
         ref={containerRef}
-        className="container mx-auto flex h-[85vh] flex-1 items-center"
+        className="container mx-auto flex h-[85vh] flex-1 items-center relative"
       >
-        <div className="relative w-1/3 overflow-hidden">
+        <motion.div 
+          ref={imageContainerRef} 
+          className="relative w-1/3 overflow-hidden"
+          animate={{ 
+            opacity: isSecondStage ? 0 : 1,
+            scale: isSecondStage ? 0.95 : 1 
+          }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
           <AnimatePresence mode="wait">
-            {displayedProjectData ? (
+            {displayedImage ? (
               <motion.img
-                key={displayedProjectData._id}
-                src={urlFor(
-                  displayedProjectData.featuredImage ||
-                    displayedProjectData.coverImage
-                )
+                key={displayedProjectData?._id || 'project-image'}
+                src={urlFor(displayedImage)
                   .width(1000)
                   .height(1000)
                   .url()}
-                alt={`${displayedProjectData.title} - Featured Image`}
+                alt={`${displayedProjectData?.title || 'Project'} - Image`}
                 width={1000}
                 height={1200}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover layout-image"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -189,7 +209,7 @@ export default function CategoryLayout({
                   {...getDefaultImageProps()}
                   width={1000}
                   height={1200}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover layout-image"
                   folder="projects"
                   priority={true}
                 />
@@ -202,29 +222,34 @@ export default function CategoryLayout({
             style={{ y: veilY }}
             className="bg-cream absolute inset-0 z-10"
           />
-        </div>
+        </motion.div>
 
-        <nav className="flex w-2/3 flex-wrap justify-end gap-8 px-8">
+        <nav 
+          ref={textContainerRef} 
+          className="flex w-2/3 flex-wrap justify-end gap-8 px-8"
+        >
           {projects.map((project, index) => {
-            const projectSlug = project.slug?.current || project.slug
-            const isActiveProject = isDetailPage && currentSlug === projectSlug
+            const isClickedProject = clickedProjectId === project._id
+            const shouldFadeOut = isExiting && !isClickedProject
 
             return (
-              <div
+              <motion.div
                 key={project._id}
                 className="cursor-pointer overflow-hidden text-6xl leading-[1.3] hover:text-gray-500"
                 onMouseEnter={() => setHoveredProject(project._id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onClick={() => handleProjectClick(project)}
+                animate={{
+                  opacity: shouldFadeOut || (isSecondStage && isClickedProject) ? 0 : 1,
+                  y: shouldFadeOut ? -10 : 0,
+                }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <motion.h2
                   className="overflow-hidden"
                   initial={{ y: '-100%' }}
                   animate={{
-                    y:
-                      hasEntered && (!isDetailPage || isActiveProject)
-                        ? '0%'
-                        : '-100%',
+                    y: hasEntered ? '0%' : '-100%',
                   }}
                   transition={{
                     duration: 0.8,
@@ -234,14 +259,14 @@ export default function CategoryLayout({
                 >
                   {project.title}
                 </motion.h2>
-              </div>
+              </motion.div>
             )
           })}
         </nav>
       </main>
 
-      {/* Project photos render below the main section */}
-      {isDetailPage && <div>{children}</div>}
+      {/* Category content rendered by page component */}
+      <div>{children}</div>
     </>
   )
 }
