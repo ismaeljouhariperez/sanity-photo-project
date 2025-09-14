@@ -1,17 +1,18 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, memo } from 'react'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import useEmblaCarousel from 'embla-carousel-react'
 import { easeInOut, motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import { useCustomCursor } from '@/hooks/useCustomCursor'
 
 interface ProjectSliderProps {
   project: Project
 }
 
-export default function ProjectSlider({ project }: ProjectSliderProps) {
+const ProjectSlider = memo(function ProjectSlider({ project }: ProjectSliderProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     startIndex: 0,
@@ -22,8 +23,13 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
-  const [showCursor, setShowCursor] = useState(false)
+  const { 
+    cursorPosition, 
+    showCursor, 
+    handleMouseMove, 
+    handleMouseEnter, 
+    handleMouseLeave 
+  } = useCustomCursor()
   const images = project.images || []
 
   const onSelect = useCallback(() => {
@@ -59,18 +65,6 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
     [emblaApi]
   )
 
-  // Mouse tracking for custom cursor
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    setCursorPosition({ x: e.clientX, y: e.clientY })
-  }, [])
-
-  const handleMouseEnter = useCallback(() => {
-    setShowCursor(true)
-  }, [])
-
-  const handleMouseLeave = useCallback(() => {
-    setShowCursor(false)
-  }, [])
 
   if (images.length === 0) {
     return (
@@ -196,4 +190,6 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
       )}
     </motion.div>
   )
-}
+})
+
+export default ProjectSlider

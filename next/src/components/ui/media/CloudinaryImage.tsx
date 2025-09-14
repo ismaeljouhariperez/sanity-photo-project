@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, memo } from 'react'
 
 interface CloudinaryImageProps {
   src: string
@@ -22,7 +22,7 @@ interface CloudinaryImageProps {
  * CloudinaryImage component for loading images from Cloudinary with optimizations
  * Handles automatic format selection, quality optimization, and responsive delivery
  */
-export default function CloudinaryImage({
+const CloudinaryImage = memo(function CloudinaryImage({
   src,
   alt,
   width,
@@ -126,4 +126,6 @@ export default function CloudinaryImage({
       )}
     </div>
   )
-}
+})
+
+export default CloudinaryImage

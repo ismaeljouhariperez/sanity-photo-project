@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { getMenuData, type MenuData } from './MenuData'
 import MenuContent from './MenuContent'
@@ -10,7 +10,7 @@ interface MenuOverlayProps {
   onClose: () => void
 }
 
-function MenuWithData({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+const MenuWithData = memo(function MenuWithData({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [data, setData] = useState<MenuData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -48,12 +48,14 @@ function MenuWithData({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   }
 
   return null
-}
+})
 
-export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
+const MenuOverlay = memo(function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
   return (
     <AnimatePresence mode="wait">
       {isOpen && <MenuWithData key="menu-overlay" isOpen={isOpen} onClose={onClose} />}
     </AnimatePresence>
   )
-}
+})
+
+export default MenuOverlay

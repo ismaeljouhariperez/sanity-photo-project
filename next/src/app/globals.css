@@ -7,6 +7,25 @@
     --background: #fefefe;
     --header-height: 80px;
   }
+
+  /* Modern smooth scrolling - replaces Lenis */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--header-height);
+  }
+
+  /* Smooth scrolling with reduced motion support */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 @layer utilities {
@@ -63,7 +82,7 @@ body {
 /* Embla Carousel - Disable translate animations, use fade instead */
 .embla {
   overflow: hidden;
-  height: calc(100% - var(--header-height)) !important;
+  /* height: calc(100% - var(--header-height)) !important; */
 }
 .embla__container {
   display: flex;

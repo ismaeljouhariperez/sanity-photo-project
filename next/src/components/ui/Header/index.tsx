@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
@@ -9,19 +9,19 @@ import { useAnimationStore } from '@/store/animationStore'
 import { useRouter } from 'next/navigation'
 import s from './styles.module.css'
 
-export default function Header() {
+const Header = memo(function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
   const router = useRouter()
 
-  const handleAboutClick = (e: React.MouseEvent) => {
+  const handleAboutClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     setIsInfoOpen(true)
-  }
+  }, [])
 
-  const handleMenuClick = (e: React.MouseEvent) => {
+  const handleMenuClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
 
     // If on project page, navigate to category list or home
@@ -45,7 +45,7 @@ export default function Header() {
       // Toggle menu overlay
       setIsMenuOpen(!isMenuOpen)
     }
-  }
+  }, [isMenuOpen, pathname, router])
 
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
@@ -150,4 +150,6 @@ export default function Header() {
       </header>
     </>
   )
-}
+})
+
+export default Header

@@ -1,4 +1,5 @@
 'use client'
+import { memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface InfoOverlayProps {
@@ -6,7 +7,7 @@ interface InfoOverlayProps {
   onClose: () => void
 }
 
-export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
+const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
   // Slowed down animation configurations
   const overlayAnimations = {
     initial: {
@@ -136,4 +137,6 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
       )}
     </AnimatePresence>
   )
-}
+})
+
+export default InfoOverlay

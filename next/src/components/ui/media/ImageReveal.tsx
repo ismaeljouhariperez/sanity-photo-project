@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { motion } from 'framer-motion'
 import CloudinaryImage from './CloudinaryImage'
 
@@ -19,7 +19,7 @@ interface ImageRevealProps {
   isExiting?: boolean
 }
 
-export default function ImageReveal({
+const ImageReveal = memo(function ImageReveal({
   src,
   alt,
   width,
@@ -33,45 +33,20 @@ export default function ImageReveal({
   exitDelay = 0,
   isExiting = false,
 }: ImageRevealProps) {
-  const [isMounted, setIsMounted] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     console.log(`🖼️ ImageReveal ${alt}: useEffect running`)
-    // Fix hydration by ensuring client-side mount
-    setIsMounted(true)
-
-    // Trigger entrance animation after mount
-    const timer = setTimeout(
-      () => {
-        setIsVisible(true)
-      },
-      100 + delay * 1000
-    ) // Base delay + stagger
+    
+    // Trigger entrance animation after mount with delay
+    const timer = setTimeout(() => {
+      setIsVisible(true)
+    }, 100 + delay * 1000)
 
     return () => clearTimeout(timer)
-  }, []) // Remove delay dependency to prevent re-runs
+  }, [alt, delay])
 
-  // Prevent hydration mismatch - render static version on server
-  if (!isMounted) {
-    return (
-      <div
-        className={`relative aspect-[4/3] cursor-pointer overflow-hidden ${className}`}
-        onClick={onClick}
-      >
-        <CloudinaryImage
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          className="h-full w-full opacity-0"
-          folder={folder}
-          fallbackSrc={fallbackSrc}
-          priority={priority}
-        />
-      </div>
-    )
-  }
+  // Use CSS to handle initial state instead of conditional rendering
 
   const revealVariants = {
     hidden: {
@@ -119,6 +94,7 @@ export default function ImageReveal({
       initial="hidden"
       animate={getCurrentVariant()}
       variants={revealVariants}
+      suppressHydrationWarning
     >
       <CloudinaryImage
         src={src}
@@ -132,4 +108,6 @@ export default function ImageReveal({
       />
     </motion.div>
   )
-}
+})
+
+export default ImageReveal
