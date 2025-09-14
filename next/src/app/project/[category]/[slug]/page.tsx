@@ -3,7 +3,7 @@ import { getSiteSettings, getProjectBySlug } from '@/lib/sanity'
 import { generateCategoryMetadata } from '@/lib/seo'
 import { isValidCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
-import ProjectSlider from '@/components/ui/ProjectSlider'
+import ProjectSlider from '@/components/ui/media/ProjectSlider'
 
 interface ProjectPageProps {
   params: Promise<{ category: string; slug: string }>

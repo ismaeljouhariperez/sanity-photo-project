@@ -60,14 +60,19 @@ body {
   box-sizing: border-box;
 }
 
+/* Embla Carousel - Disable translate animations, use fade instead */
 .embla {
   overflow: hidden;
-  height: calc(100% - var(--header-height));
+  height: calc(100% - var(--header-height)) !important;
 }
 .embla__container {
   display: flex;
+  transform: none !important;
+  transition: none !important;
 }
 .embla__slide {
   flex: 0 0 100%;
   min-width: 0;
+  position: absolute;
+  inset: 0;
 }

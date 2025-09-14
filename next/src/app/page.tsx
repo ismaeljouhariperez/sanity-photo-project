@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useTransitionStore } from '@/store/transitionStore'
-import ImageReveal from '@/components/ui/ImageReveal'
+import ImageReveal from '@/components/ui/media/ImageReveal'
 
 /**
  * Home page with clean image reveal animations

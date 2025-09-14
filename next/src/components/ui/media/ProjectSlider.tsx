@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import useEmblaCarousel from 'embla-carousel-react'
-import { motion } from 'framer-motion'
+import { easeInOut, motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 
 interface ProjectSliderProps {
@@ -16,6 +16,9 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
     loop: true,
     startIndex: 0,
     containScroll: 'trimSnaps',
+    duration: 0, // Disable Embla's slide animation
+    dragFree: false,
+    watchDrag: false, // Disable drag to prevent conflicts with our fade
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -56,7 +59,7 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
 
   if (images.length === 0) {
     return (
-      <div className="bg-cream flex h-screen items-center justify-center">
+      <div className="bg-cream flex max-h-screen items-center justify-center">
         <div className="text-gray-500">Aucune photo à afficher</div>
       </div>
     )
@@ -66,10 +69,11 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="bg-cream container mx-auto flex h-full flex-col"
+      transition={{ duration: 1, ease: easeInOut, delay: 1 }}
+      className="flex w-full flex-col"
+      style={{ height: 'calc(100vh - var(--header-height))' }}
     >
-      {/* Embla Carousel */}
+      {/* Embla Carousel with fade transitions */}
       <div className="h-full">
         <div className="embla h-full" ref={emblaRef}>
           <div className="embla__container h-full">
@@ -89,21 +93,32 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
                   onClick={scrollNext}
                 />
 
-                <div className="relative max-h-[80vh] max-w-full">
-                  <Image
-                    src={urlFor(image.image)
-                      .width(1600)
-                      .height(1200)
-                      .quality(95)
-                      .url()}
-                    alt={`Image ${index + 1}`}
-                    width={1600}
-                    height={1200}
-                    className="h-full max-h-full w-auto object-contain"
-                    priority={index === 0}
-                    sizes="100vw"
-                  />
-                </div>
+                <AnimatePresence mode="wait">
+                  {index === selectedIndex && (
+                    <motion.div
+                      key={`image-${index}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, ease: easeInOut }}
+                      className="relative max-h-[80vh] max-w-full"
+                    >
+                      <Image
+                        src={urlFor(image.image)
+                          .width(1600)
+                          .height(1200)
+                          .quality(95)
+                          .url()}
+                        alt={`Image ${index + 1}`}
+                        width={1600}
+                        height={1200}
+                        className="h-full max-h-full w-auto object-contain"
+                        priority={index === 0}
+                        sizes="100vw"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
           </div>
@@ -112,7 +127,7 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
 
       {/* Footer Controls */}
       <footer className="absolute bottom-0 left-0 right-0 z-10 flex justify-center p-6">
-        <div className="flex items-center gap-6 rounded-full bg-white/80 px-6 py-3 backdrop-blur-sm">
+        <div className="flex items-center gap-6 rounded-full px-6 py-3 backdrop-blur-sm">
           {/* Image Counter */}
           <div className="flex items-center gap-2 font-mono text-sm text-gray-700">
             <span>{String(selectedIndex + 1).padStart(2, '0')}</span>
@@ -123,7 +138,7 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
           </div>
 
           {/* Dots Navigation */}
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {images.slice(0, 8).map((_, index) => (
               <button
                 key={index}

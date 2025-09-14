@@ -7,7 +7,7 @@ import { getProjects, urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import { isValidCategory } from '@/lib/constants'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import CloudinaryImage from '@/components/ui/CloudinaryImage'
+import CloudinaryImage from '@/components/ui/media/CloudinaryImage'
 
 /**
  * Single layout component that handles both list and detail views
