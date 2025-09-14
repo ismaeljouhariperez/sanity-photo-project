@@ -46,15 +46,15 @@ const ImageReveal = memo(function ImageReveal({
     return () => clearTimeout(timer)
   }, [alt, delay])
 
-  // Use CSS to handle initial state instead of conditional rendering
+  // Always render - no conditional mounting
 
   const revealVariants = {
     hidden: {
-      clipPath: 'inset(100% 0 0 0)', // Hidden from top
+      clipPath: 'inset(100% 0 0 0)',
       opacity: 0,
     },
     visible: {
-      clipPath: 'inset(0% 0 0 0)', // Reveal from top to bottom
+      clipPath: 'inset(0% 0 0 0)',
       opacity: 1,
       transition: {
         duration: 1.2,
@@ -70,7 +70,7 @@ const ImageReveal = memo(function ImageReveal({
       },
     },
     exit: {
-      clipPath: 'inset(0 0 100% 0)', // Hide to bottom (reverse)
+      clipPath: 'inset(0 0 100% 0)',
       opacity: 0,
       transition: {
         duration: 0.8,
@@ -94,6 +94,9 @@ const ImageReveal = memo(function ImageReveal({
       initial="hidden"
       animate={getCurrentVariant()}
       variants={revealVariants}
+      transition={{
+        delay: isVisible && !isExiting ? delay : 0 // Only apply delay on entrance
+      }}
       suppressHydrationWarning
     >
       <CloudinaryImage
