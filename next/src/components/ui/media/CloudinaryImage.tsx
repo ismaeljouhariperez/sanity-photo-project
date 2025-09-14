@@ -110,7 +110,7 @@ export default function CloudinaryImage({
         alt={alt}
         width={width}
         height={height}
-        className={`object-cover transition-opacity delay-200 duration-1000 ${
+        className={`object-contain transition-opacity delay-200 duration-1000 ${
           isLoading ? 'opacity-50' : 'opacity-100'
         }`}
         onLoad={handleLoad}

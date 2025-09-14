@@ -13,7 +13,7 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
       width: 0,
     },
     animate: {
-      width: '40%',
+      width: '35%',
       transition: {
         duration: 0.8,
         ease: [0.16, 1, 0.3, 1] as const,
@@ -72,7 +72,7 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
           </motion.button>
 
           <motion.div
-            className="mt-16 h-full overflow-y-auto p-8"
+            className="mt-16 h-full overflow-y-auto p-16"
             variants={contentAnimations}
           >
             <h2 className="mb-8 text-3xl">À propos</h2>

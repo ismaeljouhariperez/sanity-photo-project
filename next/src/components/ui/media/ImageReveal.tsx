@@ -114,7 +114,7 @@ export default function ImageReveal({
 
   return (
     <motion.div
-      className={`aspect-[4/3] w-full max-w-[450px] cursor-pointer overflow-hidden ${className}`}
+      className={`aspect-[4/3] w-full max-w-[70%] cursor-pointer overflow-hidden ${className}`}
       onClick={onClick}
       initial="hidden"
       animate={getCurrentVariant()}

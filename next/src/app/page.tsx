@@ -55,8 +55,8 @@ export default function Home() {
           <ImageReveal
             src="cover-bw.jpg"
             alt="Photographie Noir et Blanc"
-            width={900}
-            height={675}
+            width={1200}
+            height={975}
             folder="home"
             fallbackSrc="/images/bw-cover.jpg"
             priority={true}
@@ -70,8 +70,8 @@ export default function Home() {
           <ImageReveal
             src="cover-color.jpg"
             alt="Photographie Couleur"
-            width={900}
-            height={675}
+            width={1200}
+            height={975}
             folder="home"
             fallbackSrc="/images/color-cover.jpg"
             priority={true}

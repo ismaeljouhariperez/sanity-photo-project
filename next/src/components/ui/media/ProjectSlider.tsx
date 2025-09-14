@@ -59,7 +59,10 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
 
   if (images.length === 0) {
     return (
-      <div className="bg-cream flex max-h-screen items-center justify-center">
+      <div
+        className="bg-cream flex items-center justify-center"
+        style={{ height: 'calc(100vh - var(--header-height))' }}
+      >
         <div className="text-gray-500">Aucune photo à afficher</div>
       </div>
     )
