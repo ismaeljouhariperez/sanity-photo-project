@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react'
+import { memo } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { getMenuData, type MenuData } from './MenuData'
+import { useMenuStore } from '@/store/menuStore'
 import MenuContent from './MenuContent'
 
 interface MenuOverlayProps {
@@ -10,28 +10,10 @@ interface MenuOverlayProps {
   onClose: () => void
 }
 
-const MenuWithData = memo(function MenuWithData({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [data, setData] = useState<MenuData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    // Only fetch if we don't have data yet
-    if (!data && isOpen) {
-      setIsLoading(true)
-      const fetchData = async () => {
-        try {
-          const menuData = await getMenuData()
-          setData(menuData)
-        } catch (error) {
-          console.error('Failed to fetch menu data:', error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-
-      fetchData()
-    }
-  }, [isOpen, data])
+const MenuWithData = memo(function MenuWithData({ onClose }: { onClose: () => void }) {
+  // Get menu data from store (no fetching needed)
+  const data = useMenuStore((state) => state.data)
+  const isLoading = false // No loading state needed since data is pre-fetched
 
   // Show content immediately if we have data, even while loading fresh data
   if (data) {
@@ -53,7 +35,7 @@ const MenuWithData = memo(function MenuWithData({ isOpen, onClose }: { isOpen: b
 const MenuOverlay = memo(function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
   return (
     <AnimatePresence mode="wait">
-      {isOpen && <MenuWithData key="menu-overlay" isOpen={isOpen} onClose={onClose} />}
+      {isOpen && <MenuWithData key="menu-overlay" onClose={onClose} />}
     </AnimatePresence>
   )
 })

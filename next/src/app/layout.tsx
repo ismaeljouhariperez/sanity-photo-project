@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { getSiteSettings } from '@/lib/sanity'
 import { generateHomeMetadata } from '@/lib/seo'
+import { getMenuData } from '@/components/ui/MenuOverlay/MenuData'
 import ClientLayout from '@/components/layout/ClientLayout'
 import './globals.css'
 import { aujournuit } from './fonts'
@@ -16,11 +17,20 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Fetch menu data once at the server level
+  let menuData = null
+  try {
+    menuData = await getMenuData()
+  } catch (error) {
+    console.error('Failed to fetch menu data:', error)
+    // Continue with null data - MenuOverlay can handle this gracefully
+  }
+
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
       <head>
@@ -34,7 +44,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body className="bg-cream pt-header" suppressHydrationWarning>
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout menuData={menuData}>{children}</ClientLayout>
       </body>
     </html>
   )

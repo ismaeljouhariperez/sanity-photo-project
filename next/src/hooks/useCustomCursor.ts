@@ -1,18 +1,25 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 
 /**
  * Custom hook for managing cursor position and visibility
  * Performance optimized with elegant transitions
  * Desktop: Smooth custom cursor with fade transition
  * Mobile/Tablet: No custom cursor (native touch behavior)
+ * SSR/Hydration safe
  */
 export function useCustomCursor() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
   const [isHovering, setIsHovering] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
-  // Memoized device detection - only check once
+  // Official Next.js pattern for client-only content
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Memoized device detection - only after client-side hydration
   const isDesktop = useMemo(() => {
-    if (typeof window === 'undefined') return false
+    if (!isClient) return false
     
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
     const hasHover = window.matchMedia('(hover: hover)').matches
@@ -20,7 +27,7 @@ export function useCustomCursor() {
     const isLargeScreen = window.matchMedia('(min-width: 1024px)').matches
     
     return !hasTouch && hasHover && hasFineCursor && isLargeScreen
-  }, [])
+  }, [isClient])
 
   // Optimized mouse move handler - only update when needed
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -46,8 +53,8 @@ export function useCustomCursor() {
 
   return {
     cursorPosition,
-    showCursor: isDesktop, // Always render on desktop for performance
-    isHovering: isDesktop && isHovering, // For opacity control
+    showCursor: isClient && isDesktop, // Official Next.js client-only pattern
+    isHovering: isClient && isDesktop && isHovering, // For opacity control
     handleMouseMove,
     handleMouseEnter,
     handleMouseLeave

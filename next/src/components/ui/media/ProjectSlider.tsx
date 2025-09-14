@@ -7,6 +7,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { easeInOut, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useCustomCursor } from '@/hooks/useCustomCursor'
+import { useCurrentProjectStore } from '@/store/currentProjectStore'
 
 interface ProjectSliderProps {
   project: Project
@@ -15,8 +16,19 @@ interface ProjectSliderProps {
 const ProjectSlider = memo(function ProjectSlider({
   project,
 }: ProjectSliderProps) {
+  // Set current project in store for other components
+  const setProject = useCurrentProjectStore((state) => state.setProject)
+  
   // Detect if device supports touch for responsive config
   const [isTouchDevice, setIsTouchDevice] = useState(false)
+
+  // Set project in store when component mounts
+  useEffect(() => {
+    setProject(project)
+    
+    // Clear project when component unmounts
+    return () => setProject(null)
+  }, [project, setProject])
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)

@@ -3,7 +3,7 @@ import s from './CustomPanel.module.css'
 
 export function CustomPanel() {
   return (
-    <Card padding={4} className={`${s.customPanel} bg-gray-50 rounded-lg shadow-lg`}>
+    <Card padding={4} className={`${s.customPanel} bg-gray-50`}>
       <Box className={`${s.container} max-w-4xl mx-auto`}>
         <Stack space={4}>
           <Text size={2} weight="bold" className={`${s.title} text-2xl text-blue-600`}>
