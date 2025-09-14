@@ -18,8 +18,8 @@ const ProjectSlider = memo(function ProjectSlider({ project }: ProjectSliderProp
     startIndex: 0,
     containScroll: 'trimSnaps',
     duration: 0, // Disable Embla's slide animation
-    dragFree: false,
-    watchDrag: false, // Disable drag to prevent conflicts with our fade
+    dragFree: true, // Enable drag for mobile/tablet
+    watchDrag: true, // Enable drag for mobile/tablet
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -87,7 +87,7 @@ const ProjectSlider = memo(function ProjectSlider({ project }: ProjectSliderProp
     >
       {/* Embla Carousel with fade transitions */}
       <div 
-        className="h-full custom-cursor"
+        className="h-full custom-cursor touch-pan-x"
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -142,34 +142,34 @@ const ProjectSlider = memo(function ProjectSlider({ project }: ProjectSliderProp
         </div>
       </div>
 
-      {/* Footer Controls */}
-      <footer className="absolute bottom-0 left-0 right-0 z-10 flex justify-center p-6">
-        <div className="flex items-center gap-6 rounded-full px-6 py-3 backdrop-blur-sm">
-          {/* Image Counter */}
-          <div className="flex items-center gap-2 font-mono text-sm text-gray-700">
-            <span>{String(selectedIndex + 1).padStart(2, '0')}</span>
+      {/* Footer Controls - Hidden on desktop, optimized for mobile/tablet */}
+      <footer className="absolute bottom-0 left-0 right-0 z-10 flex justify-center p-4 md:p-6 lg:hidden">
+        <div className="flex items-center gap-4 md:gap-6 rounded-full px-4 py-2 md:px-6 md:py-3 backdrop-blur-sm bg-white/80">
+          {/* Image Counter - larger on mobile */}
+          <div className="flex items-center gap-2 font-mono text-base md:text-sm text-gray-700">
+            <span className="font-semibold">{String(selectedIndex + 1).padStart(2, '0')}</span>
             <span className="text-gray-400">/</span>
             <span className="text-gray-400">
               {String(images.length).padStart(2, '0')}
             </span>
           </div>
 
-          {/* Dots Navigation */}
-          <div className="flex items-center gap-2">
-            {images.slice(0, 8).map((_, index) => (
+          {/* Dots Navigation - larger touch targets */}
+          <div className="flex items-center gap-3 md:gap-2">
+            {images.slice(0, 6).map((_, index) => (
               <button
                 key={index}
                 onClick={() => scrollTo(index)}
-                className={`h-2 w-2 rounded-full transition-colors ${
+                className={`h-3 w-3 md:h-2 md:w-2 rounded-full transition-colors touch-manipulation ${
                   index === selectedIndex
                     ? 'bg-black'
-                    : 'bg-black/30 hover:bg-black/50'
+                    : 'bg-black/30 hover:bg-black/50 active:bg-black/70'
                 }`}
               />
             ))}
-            {images.length > 8 && (
-              <span className="ml-2 text-xs text-gray-400">
-                +{images.length - 8}
+            {images.length > 6 && (
+              <span className="ml-2 text-sm md:text-xs text-gray-400">
+                +{images.length - 6}
               </span>
             )}
           </div>
