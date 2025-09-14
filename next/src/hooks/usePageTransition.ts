@@ -43,8 +43,8 @@ export function usePageTransition() {
           })
         }
         
-        // Reset state after navigation
-        setIsExiting(false)
+        // Don't reset isExiting - let the component unmount naturally
+        // The new page will have its own fresh state
         setTransition(false, null)
       }, delay)
     } catch (error) {
@@ -55,6 +55,7 @@ export function usePageTransition() {
         router.push(path)
       })
       
+      // Only reset on error
       setIsExiting(false)
       setTransition(false, null)
     }

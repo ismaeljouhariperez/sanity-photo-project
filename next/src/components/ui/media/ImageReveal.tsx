@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react'
+import { memo } from 'react'
 import { motion } from 'framer-motion'
 import CloudinaryImage from './CloudinaryImage'
 
@@ -33,21 +33,7 @@ const ImageReveal = memo(function ImageReveal({
   exitDelay = 0,
   isExiting = false,
 }: ImageRevealProps) {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    console.log(`🖼️ ImageReveal ${alt}: useEffect running`)
-    
-    // Trigger entrance animation after mount with delay
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, 100 + delay * 1000)
-
-    return () => clearTimeout(timer)
-  }, [alt, delay])
-
-  // Always render - no conditional mounting
-
+  // Simple animation variants - no complex state management
   const revealVariants = {
     hidden: {
       clipPath: 'inset(100% 0 0 0)',
@@ -58,14 +44,15 @@ const ImageReveal = memo(function ImageReveal({
       opacity: 1,
       transition: {
         duration: 1.2,
-        ease: [0.16, 1, 0.3, 1] as const,
+        ease: [0.16, 1, 0.3, 1],
+        delay,
         clipPath: {
           duration: 1.0,
-          ease: [0.16, 1, 0.3, 1] as const,
+          ease: [0.16, 1, 0.3, 1],
         },
         opacity: {
           duration: 0.3,
-          delay: 0.3,
+          delay: delay + 0.3,
         },
       },
     },
@@ -74,17 +61,10 @@ const ImageReveal = memo(function ImageReveal({
       opacity: 0,
       transition: {
         duration: 0.8,
-        ease: [0.16, 1, 0.3, 1] as const,
+        ease: [0.16, 1, 0.3, 1],
         delay: exitDelay,
       },
     },
-  }
-
-  // Determine current state based on props and local state
-  const getCurrentVariant = () => {
-    if (isExiting) return 'exit'
-    if (isVisible) return 'visible'
-    return 'hidden'
   }
 
   return (
@@ -92,11 +72,8 @@ const ImageReveal = memo(function ImageReveal({
       className={`aspect-[4/3] w-full max-w-[70%] cursor-pointer overflow-hidden ${className}`}
       onClick={onClick}
       initial="hidden"
-      animate={getCurrentVariant()}
+      animate={isExiting ? 'exit' : 'visible'}
       variants={revealVariants}
-      transition={{
-        delay: isVisible && !isExiting ? delay : 0 // Only apply delay on entrance
-      }}
       suppressHydrationWarning
     >
       <CloudinaryImage
