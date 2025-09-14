@@ -45,28 +45,25 @@ const Header = memo(function Header() {
     if (isProjectDetailPage) {
       setIsGalleryOpen(!isGalleryOpen)
     } 
-    // If on project category page, navigate to category list or home
+    // If on project category page, navigate to home
     else if (isProjectPage) {
-      if (
-        pathname.includes('/black-and-white') ||
-        pathname.includes('/early-color')
-      ) {
-        const category = pathname.split('/')[1]
-        if (
-          category &&
-          (category === 'black-and-white' || category === 'early-color')
-        ) {
-          // Navigate to category list
-          router.push(`/${category}`)
-        } else {
-          router.push('/')
-        }
-      }
+      router.push('/')
     } else {
       // Toggle menu overlay
       setIsMenuOpen(!isMenuOpen)
     }
   }, [isMenuOpen, isGalleryOpen, pathname, router, isProjectPage, isProjectDetailPage])
+
+  const handleIndexClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    
+    // Navigate back to parent category
+    const pathSegments = pathname.split('/').filter(Boolean)
+    if (pathSegments.length >= 2) {
+      const category = pathSegments[0]
+      router.push(`/${category}`)
+    }
+  }, [pathname, router])
 
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
@@ -83,8 +80,7 @@ const Header = memo(function Header() {
   // Dynamic header text - easily extensible for future content
   const getHeaderText = () => {
     if (isGalleryOpen) return 'Close'
-    if (isProjectDetailPage) return 'Gallery'
-    if (isProjectPage) return 'Index'
+    if (isProjectPage) return 'Home'
     if (isMenuOpen) return 'Close'
     // Add more conditions here for future dynamic content
     return 'Menu'
@@ -155,13 +151,62 @@ const Header = memo(function Header() {
             >
               About
             </motion.button>
-            <motion.button
-              variants={headerElementVariants}
-              onClick={handleMenuClick}
-              className={s.title}
-            >
-              {getHeaderText()}
-            </motion.button>
+            {isProjectDetailPage ? (
+              <motion.div
+                variants={headerElementVariants}
+                className={`${s.title} flex items-center gap-2`}
+              >
+                <button
+                  onClick={handleMenuClick}
+                  className="transition-opacity hover:opacity-80 relative overflow-hidden"
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={isGalleryOpen ? 'close' : 'gallery'}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -20, opacity: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        ease: [0.16, 1, 0.3, 1] as const
+                      }}
+                      className="block"
+                    >
+                      {isGalleryOpen ? 'Close' : 'Gallery'}
+                    </motion.span>
+                  </AnimatePresence>
+                </button>
+                <span>/</span>
+                <button
+                  onClick={handleIndexClick}
+                  className="transition-opacity hover:opacity-80"
+                >
+                  Index
+                </button>
+              </motion.div>
+            ) : (
+              <motion.button
+                variants={headerElementVariants}
+                onClick={handleMenuClick}
+                className={`${s.title} relative overflow-hidden`}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={getHeaderText()}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      ease: [0.16, 1, 0.3, 1] as const
+                    }}
+                    className="block"
+                  >
+                    {getHeaderText()}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.button>
+            )}
             <motion.div variants={headerElementVariants}>
               <Link
                 href="/"

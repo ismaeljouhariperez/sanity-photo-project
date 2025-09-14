@@ -11,5 +11,9 @@ interface ProjectDetailLayoutProps {
 export default function ProjectDetailLayout({
   children,
 }: ProjectDetailLayoutProps) {
-  return <div className="project-detail-layout bg-cream">{children}</div>
+  return (
+    <div className="project-detail-layout bg-cream container mx-auto">
+      {children}
+    </div>
+  )
 }
