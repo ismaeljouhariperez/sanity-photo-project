@@ -29,8 +29,15 @@ const Header = memo(function Header() {
 
   const handleAboutClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    setIsInfoOpen(true)
-  }, [])
+    
+    // On root and category pages, open MenuOverlay instead of InfoOverlay
+    if (!isProjectDetailPage) {
+      setIsMenuOpen(true)
+    } else {
+      // On project detail pages, still open InfoOverlay
+      setIsInfoOpen(true)
+    }
+  }, [isProjectDetailPage])
 
   const handleMenuClick = useCallback(
     (e: React.MouseEvent) => {
@@ -44,14 +51,16 @@ const Header = memo(function Header() {
       // If on project detail page, toggle gallery overlay
       if (isProjectDetailPage) {
         setIsGalleryOpen(!isGalleryOpen)
-      } else {
-        // Toggle menu overlay
+      } 
+      else {
+        // On all other pages (root, category), toggle menu overlay
         setIsMenuOpen(!isMenuOpen)
       }
     },
     [
       isMenuOpen,
       isGalleryOpen,
+      isInfoOpen,
       pathname,
       router,
       isProjectPage,
@@ -63,14 +72,27 @@ const Header = memo(function Header() {
     (e: React.MouseEvent) => {
       e.preventDefault()
 
+      // Close any open overlays before navigation
+      if (isGalleryOpen) {
+        setIsGalleryOpen(false)
+      }
+      if (isMenuOpen) {
+        setIsMenuOpen(false)
+      }
+      if (isInfoOpen) {
+        setIsInfoOpen(false)
+      }
+
       // Navigate back to parent category
       const pathSegments = pathname.split('/').filter(Boolean)
       if (pathSegments.length >= 2) {
         const category = pathSegments[0]
-        router.push(`/${category}`)
+        setTimeout(() => {
+          router.push(`/${category}`)
+        }, 300) // Allow time for overlay close animations
       }
     },
-    [pathname, router]
+    [pathname, router, isGalleryOpen, isMenuOpen, isInfoOpen]
   )
 
   // Surveille les changements de pathname pour mettre à jour l'état
@@ -78,6 +100,11 @@ const Header = memo(function Header() {
     const isInProjects =
       pathname.includes('/black-and-white') || pathname.includes('/early-color')
     setInProjectsSection(isInProjects)
+
+    // Reset all overlay states on navigation
+    setIsGalleryOpen(false)
+    setIsMenuOpen(false)
+    setIsInfoOpen(false)
 
     // Réinitialiser l'animation si on quitte complètement la section projects
     if (!isInProjects) {
@@ -89,7 +116,7 @@ const Header = memo(function Header() {
   const getHeaderText = () => {
     if (isGalleryOpen) return 'Close'
     if (isMenuOpen) return 'Close'
-    // Add more conditions here for future dynamic content
+    // All pages show Menu (opens MenuOverlay)
     return 'Menu'
   }
 
