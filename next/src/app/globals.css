@@ -76,3 +76,22 @@ body {
   position: absolute;
   inset: 0;
 }
+
+/* Custom cursor for project slider */
+.custom-cursor {
+  cursor: none;
+}
+
+.cursor-counter {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+}

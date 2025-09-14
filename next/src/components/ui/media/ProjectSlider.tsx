@@ -22,6 +22,8 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
+  const [showCursor, setShowCursor] = useState(false)
   const images = project.images || []
 
   const onSelect = useCallback(() => {
@@ -57,6 +59,19 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
     [emblaApi]
   )
 
+  // Mouse tracking for custom cursor
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setCursorPosition({ x: e.clientX, y: e.clientY })
+  }, [])
+
+  const handleMouseEnter = useCallback(() => {
+    setShowCursor(true)
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    setShowCursor(false)
+  }, [])
+
   if (images.length === 0) {
     return (
       <div
@@ -77,7 +92,12 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
       style={{ height: 'calc(100vh - var(--header-height))' }}
     >
       {/* Embla Carousel with fade transitions */}
-      <div className="h-full">
+      <div 
+        className="h-full custom-cursor"
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="embla h-full" ref={emblaRef}>
           <div className="embla__container h-full">
             {images.map((image, index) => (
@@ -161,6 +181,19 @@ export default function ProjectSlider({ project }: ProjectSliderProps) {
           </div>
         </div>
       </footer>
+
+      {/* Custom Cursor Counter */}
+      {showCursor && (
+        <div
+          className="cursor-counter"
+          style={{
+            left: cursorPosition.x,
+            top: cursorPosition.y,
+          }}
+        >
+          {String(selectedIndex + 1).padStart(2, '0')}/{String(images.length).padStart(2, '0')}
+        </div>
+      )}
     </motion.div>
   )
 }
