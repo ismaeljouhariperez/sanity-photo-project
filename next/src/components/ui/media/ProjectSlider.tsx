@@ -8,6 +8,7 @@ import { easeInOut, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useCustomCursor } from '@/hooks/useCustomCursor'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
+import { useImageNavigationStore } from '@/store/imageNavigationStore'
 
 interface ProjectSliderProps {
   project: Project
@@ -18,6 +19,9 @@ const ProjectSlider = memo(function ProjectSlider({
 }: ProjectSliderProps) {
   // Set current project in store for other components
   const setProject = useCurrentProjectStore((state) => state.setProject)
+  
+  // Image navigation from gallery
+  const { targetImageIndex, clearTarget } = useImageNavigationStore()
 
   // Detect if device supports touch for responsive config
   const [isTouchDevice, setIsTouchDevice] = useState(false)
@@ -80,6 +84,15 @@ const ProjectSlider = memo(function ProjectSlider({
       emblaApi.off('reInit', onSelect)
     }
   }, [emblaApi, onSelect])
+
+  // Handle navigation from gallery overlay
+  useEffect(() => {
+    if (emblaApi && targetImageIndex !== null) {
+      console.log('Navigating to image from gallery:', targetImageIndex)
+      emblaApi.scrollTo(targetImageIndex)
+      clearTarget() // Clear the target after navigation
+    }
+  }, [emblaApi, targetImageIndex, clearTarget])
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) {

@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import { useTransitionStore } from '@/store/transitionStore'
+import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 
 interface Project {
   _id: string
   title: string
   slug: { current: string } | string
-  images?: Array<{ _key: string; asset: { _ref: string } }>
+  imageCount: number
 }
 
 interface ProjectSectionProps {
@@ -32,34 +31,16 @@ export default function ProjectSection({
   onClose,
 }: ProjectSectionProps) {
   const [hoveredProject, setHoveredProject] = useState<string | null>(null)
-  const router = useRouter()
-  const { setTransition } = useTransitionStore()
+  const { navigateToProject, navigateToCategory } = useTransitionNavigation({ 
+    onClose 
+  })
 
   const handleProjectClick = (slug: string) => {
-    // Set exiting transition state
-    setTransition(true, 'exiting')
-
-    // Start menu close animation first
-    onClose()
-
-    // Small delay to let menu and header animations start before navigation
-    setTimeout(() => {
-      router.push(`/${category}/${slug}`)
-    }, 300)
+    navigateToProject(category, slug)
   }
 
-  // When clicking on a category title, navigate to that category page
   const handleCategoryClick = () => {
-    // Set exiting transition state
-    setTransition(true, 'exiting')
-
-    // Start menu close animation first
-    onClose()
-
-    // Small delay to let menu and header animations start before navigation
-    setTimeout(() => {
-      router.push(`/${category}`)
-    }, 300)
+    navigateToCategory(category)
   }
 
   return (
@@ -101,7 +82,7 @@ export default function ProjectSection({
                     exit="hidden"
                     className="absolute left-full top-0 ml-4 text-sm text-gray-500"
                   >
-                    {project.images?.length || 0}
+                    {project.imageCount || 0}
                   </motion.span>
                 )}
               </AnimatePresence>

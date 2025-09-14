@@ -4,7 +4,7 @@ interface Project {
   _id: string
   title: string
   slug: { current: string } | string
-  images?: Array<{ _key: string; asset: { _ref: string } }>
+  imageCount: number
 }
 
 export interface MenuData {

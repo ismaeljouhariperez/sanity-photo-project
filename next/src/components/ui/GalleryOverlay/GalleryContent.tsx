@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import Image from 'next/image'
+import { useImageNavigationStore } from '@/store/imageNavigationStore'
 
 interface GalleryContentProps {
   project: Project | null
@@ -15,6 +16,12 @@ export default function GalleryContent({
   onClose,
 }: GalleryContentProps) {
   const images = project?.images || []
+  const setTargetImage = useImageNavigationStore((state) => state.setTargetImage)
+
+  const handleImageClick = (index: number) => {
+    setTargetImage(index)
+    onClose() // Close gallery overlay
+  }
 
   // Animation variants matching MenuOverlay for consistency
   const overlayVariants = {
@@ -111,6 +118,7 @@ export default function GalleryContent({
               key={image._key || index}
               variants={itemVariants}
               className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
+              onClick={() => handleImageClick(index)}
             >
               <Image
                 src={urlFor(image.image)

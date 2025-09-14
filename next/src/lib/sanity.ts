@@ -46,7 +46,8 @@ export const queries = {
     order,
     coverImage,
     featuredImage,
-    _createdAt
+    _createdAt,
+    "imageCount": count(images)
   }`,
   
   projectBySlug: `*[_type == "project" && slug.current == $slug && category == $category][0] {
