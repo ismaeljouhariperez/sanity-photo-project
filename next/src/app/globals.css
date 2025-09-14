@@ -79,9 +79,11 @@
   backface-visibility: hidden;
 }
 
-/* Project Slider Custom Cursor */
-.custom-cursor {
-  cursor: none;
+/* Project Slider Custom Cursor - Desktop only */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .custom-cursor {
+    cursor: none;
+  }
 }
 
 .cursor-counter {
