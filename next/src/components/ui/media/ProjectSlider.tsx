@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, memo, useRef } from 'react'
+import { useEffect, useState, useCallback, memo } from 'react'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import useEmblaCarousel from 'embla-carousel-react'
@@ -42,10 +42,14 @@ const ProjectSlider = memo(function ProjectSlider({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     startIndex: 0,
-    // Disable native sliding for fade effect
+    // Enable touch/swipe while maintaining fade effect
     dragFree: false,
-    watchDrag: false, // Disable drag for fade mode
-    duration: 0, // No slide animation
+    watchDrag: true, // Enable touch interactions
+    duration: 0, // No slide animation (fade effect)
+    // Mobile-optimized settings
+    skipSnaps: false,
+    dragThreshold: 10, // Lower threshold for easier swipes
+    inViewThreshold: 0.7, // Better mobile detection
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -164,7 +168,8 @@ const ProjectSlider = memo(function ProjectSlider({
                   height={1200}
                   className="h-full max-h-[80vh] w-auto object-contain"
                   priority={index <= 1}
-                  sizes="100vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                  loading={index <= 1 ? "eager" : "lazy"}
                 />
               </div>
             ))}
@@ -194,9 +199,9 @@ const ProjectSlider = memo(function ProjectSlider({
         />
       </div>
 
-      {/* Footer Controls - Hidden on desktop, optimized for mobile/tablet */}
-      <footer className="absolute bottom-0 left-0 right-0 z-10 flex justify-center p-4 md:p-6 lg:hidden">
-        <div className="flex items-center gap-4 rounded-full bg-white/80 px-4 py-2 backdrop-blur-sm md:gap-6 md:px-6 md:py-3">
+      {/* Footer Controls - Mobile/tablet optimized */}
+      <footer className="absolute bottom-0 left-0 right-0 z-10 flex justify-center p-4 md:p-6 lg:hidden pb-safe-bottom">
+        <div className="flex items-center gap-4 rounded-full bg-white/90 px-4 py-3 backdrop-blur-sm md:gap-6 md:px-6 md:py-4 shadow-lg">
           {/* Image Counter - larger on mobile */}
           <div className="flex items-center gap-2 font-mono text-base text-gray-700 md:text-sm">
             <span className="font-semibold">
@@ -208,31 +213,43 @@ const ProjectSlider = memo(function ProjectSlider({
             </span>
           </div>
 
-          {/* Dots Navigation - larger touch targets */}
+          {/* Dots Navigation - optimized for touch */}
           <div className="flex items-center gap-3 md:gap-2">
             {/* Image dots (show first 5 images if we have text slide) */}
             {images.slice(0, Math.min(5, images.length)).map((_, index) => (
               <button
                 key={index}
                 onClick={() => scrollTo(index)}
-                className={`h-3 w-3 touch-manipulation rounded-full transition-colors md:h-2 md:w-2 ${
+                className={`min-h-touch min-w-touch flex items-center justify-center p-2 touch-manipulation transition-colors ${
                   index === selectedIndex
-                    ? 'bg-black'
-                    : 'bg-black/30 hover:bg-black/50 active:bg-black/70'
+                    ? 'opacity-100'
+                    : 'opacity-50 hover:opacity-75 active:opacity-100'
                 }`}
-              />
+              >
+                <div className={`h-2 w-2 rounded-full transition-all duration-200 ${
+                  index === selectedIndex
+                    ? 'bg-black scale-125'
+                    : 'bg-black/60'
+                }`} />
+              </button>
             ))}
 
             {/* Text slide dot (always show as last dot) */}
             <button
               key="text-slide"
               onClick={() => scrollTo(images.length)}
-              className={`h-3 w-3 touch-manipulation rounded-full transition-colors md:h-2 md:w-2 ${
+              className={`min-h-touch min-w-touch flex items-center justify-center p-2 touch-manipulation transition-colors ${
                 selectedIndex === images.length
-                  ? 'bg-black'
-                  : 'bg-black/30 hover:bg-black/50 active:bg-black/70'
+                  ? 'opacity-100'
+                  : 'opacity-50 hover:opacity-75 active:opacity-100'
               }`}
-            />
+            >
+              <div className={`h-2 w-2 rounded-full transition-all duration-200 ${
+                selectedIndex === images.length
+                  ? 'bg-black scale-125'
+                  : 'bg-black/60'
+              }`} />
+            </button>
 
             {/* Show +N indicator if more than 5 image slides */}
             {images.length > 5 && (
