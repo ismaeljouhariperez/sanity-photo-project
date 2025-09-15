@@ -7,6 +7,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { easeInOut, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useSimpleCursor } from '@/hooks/useSimpleCursor'
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
 import { useImageNavigationStore } from '@/store/imageNavigationStore'
 import TextSlide from './TextSlide'
@@ -42,18 +43,21 @@ const ProjectSlider = memo(function ProjectSlider({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     startIndex: 0,
-    // Enable touch/swipe while maintaining fade effect
     dragFree: false,
-    watchDrag: true, // Enable touch interactions
-    duration: 0, // No slide animation (fade effect)
+    watchDrag: true,
+    duration: 0, // No slide animation for fade effect
     // Mobile-optimized settings
     skipSnaps: false,
-    dragThreshold: 10, // Lower threshold for easier swipes
-    inViewThreshold: 0.7, // Better mobile detection
+    dragThreshold: isTouchDevice ? 15 : 10, // More forgiving on touch
+    inViewThreshold: 0.7,
+    // Performance optimizations
+    containScroll: 'trimSnaps',
+    slidesToScroll: 1,
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
   const { cursorPosition, showCursor } = useSimpleCursor()
+  const { getAnimationConfig, prefersReducedMotion } = useMobileOptimizations()
   const images = project.images || []
   const totalSlides = images.length + 1 // Images + text slide
 
@@ -124,6 +128,7 @@ const ProjectSlider = memo(function ProjectSlider({
     [emblaApi]
   )
 
+
   if (images.length === 0) {
     return (
       <div
@@ -139,10 +144,10 @@ const ProjectSlider = memo(function ProjectSlider({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1, ease: easeInOut, delay: 1 }}
+      transition={getAnimationConfig({ duration: 1, ease: easeInOut, delay: 1 })}
       className="flex h-[80%] w-full flex-col"
     >
-      {/* Embla Carousel - responsive touch handling */}
+      {/* Touch-friendly carousel container */}
       <div className={`custom-cursor h-full ${isTouchDevice ? 'touch-pan-x' : ''}`}>
         <div className="embla h-full" ref={emblaRef}>
           <div className="embla__container h-full">
@@ -153,7 +158,7 @@ const ProjectSlider = memo(function ProjectSlider({
                 className="embla__slide absolute inset-0 flex items-center justify-center"
                 style={{
                   opacity: index === selectedIndex ? 1 : 0,
-                  transition: 'opacity 0.4s ease-in-out',
+                  transition: prefersReducedMotion ? 'opacity 0.1s ease-out' : 'opacity 0.4s ease-in-out',
                   zIndex: index === selectedIndex ? 1 : 0,
                 }}
               >
@@ -179,7 +184,7 @@ const ProjectSlider = memo(function ProjectSlider({
               className="embla__slide absolute inset-0"
               style={{
                 opacity: selectedIndex === images.length ? 1 : 0,
-                transition: 'opacity 0.4s ease-in-out',
+                transition: prefersReducedMotion ? 'opacity 0.1s ease-out' : 'opacity 0.4s ease-in-out',
                 zIndex: selectedIndex === images.length ? 1 : 0,
               }}
             >

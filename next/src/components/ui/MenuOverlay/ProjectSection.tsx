@@ -68,7 +68,7 @@ export default function ProjectSection({
             >
               <button
                 onClick={() => handleProjectClick(slug)}
-                className="text-left text-xl transition-colors duration-200 hover:text-gray-600"
+                className="text-left text-xl transition-colors duration-200 hover:text-gray-600 active:text-gray-500 touch-manipulation min-h-touch"
               >
                 {project.title}
               </button>

@@ -185,7 +185,7 @@ const Header = memo(function Header() {
             <motion.button
               variants={headerElementVariants}
               onClick={handleAboutClick}
-              className="md:place-self-start transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
+              className="md:place-self-start transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
             >
               About
             </motion.button>
@@ -196,7 +196,7 @@ const Header = memo(function Header() {
               >
                 <button
                   onClick={handleMenuClick}
-                  className="relative overflow-hidden transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center"
+                  className="relative overflow-hidden transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center"
                 >
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -217,7 +217,7 @@ const Header = memo(function Header() {
                 <span>/</span>
                 <button
                   onClick={handleIndexClick}
-                  className="transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
+                  className="transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
                 >
                   {categoryTitle}
                 </button>
@@ -251,7 +251,7 @@ const Header = memo(function Header() {
             >
               <Link
                 href="/"
-                className="text-sm md:text-xl transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center"
+                className="text-sm md:text-xl transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center"
               >
                 Ismael Perez Léon
               </Link>

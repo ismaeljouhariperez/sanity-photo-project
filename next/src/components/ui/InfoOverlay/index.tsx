@@ -103,7 +103,7 @@ const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayPr
                   <br />
                   <a
                     href="mailto:contact@ismaelleon.com"
-                    className="text-gray-100 transition-colors hover:text-white"
+                    className="text-gray-100 transition-colors hover:text-white active:text-gray-300 touch-manipulation min-h-touch"
                   >
                     contact@ismaelperez.com
                   </a>
@@ -114,7 +114,7 @@ const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayPr
                     href="https://instagram.com/hypsanda"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-gray-100 transition-colors hover:text-white"
+                    className="inline-flex items-center gap-2 text-gray-100 transition-colors hover:text-white active:text-gray-300 touch-manipulation min-h-touch"
                   >
                     <svg
                       width="20"
