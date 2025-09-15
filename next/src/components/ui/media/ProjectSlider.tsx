@@ -147,13 +147,13 @@ const ProjectSlider = memo(function ProjectSlider({
       {/* Touch-friendly carousel container */}
       <div className={`custom-cursor h-full ${isTouchDevice ? 'touch-pan-x' : ''}`}>
         <div className="embla h-full" ref={emblaRef}>
-          <div className="embla__container h-full">
+          <div className={`embla__container h-full ${isTouchDevice ? 'flex' : ''}`}>
             {/* Image slides */}
             {images.map((image, index) => (
               <div
                 key={image._key || index}
                 className={`embla__slide flex items-center justify-center ${
-                  isTouchDevice ? 'relative w-full' : 'absolute inset-0'
+                  isTouchDevice ? 'flex-[0_0_100%]' : 'absolute inset-0'
                 }`}
                 style={isTouchDevice ? {} : {
                   opacity: index === selectedIndex ? 1 : 0,
@@ -181,7 +181,7 @@ const ProjectSlider = memo(function ProjectSlider({
             {/* Text slide - final slide */}
             <div
               className={`embla__slide ${
-                isTouchDevice ? 'relative w-full' : 'absolute inset-0'
+                isTouchDevice ? 'flex-[0_0_100%]' : 'absolute inset-0'
               }`}
               style={isTouchDevice ? {} : {
                 opacity: selectedIndex === images.length ? 1 : 0,
