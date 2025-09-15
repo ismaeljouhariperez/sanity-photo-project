@@ -73,17 +73,6 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
     },
   }
 
-  const countVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.3,
-        ease: 'easeOut' as const,
-      },
-    },
-  }
 
   // Go to project category page
 
@@ -100,16 +89,15 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="lg:pt-header container mx-auto h-full py-12"
+        className="lg:pt-header container mx-auto h-full md:overflow-hidden overflow-y-auto px-4 py-12 md:px-0 md:py-12 pb-safe-bottom md:pb-0"
       >
-        <div className="grid h-full grid-cols-2 gap-16">
+        <div className="grid min-h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-16">
           <ProjectSection
             title="Black and White"
             projects={data.blackAndWhiteProjects}
             category="black-and-white"
             itemVariants={itemVariants}
             listVariants={listVariants}
-            countVariants={countVariants}
             onClose={onClose}
           />
 
@@ -119,7 +107,6 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
             category="early-color"
             itemVariants={itemVariants}
             listVariants={listVariants}
-            countVariants={countVariants}
             onClose={onClose}
           />
         </div>

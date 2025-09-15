@@ -21,18 +21,18 @@ const CarouselNavigation = memo(function CarouselNavigation({
   const remainingSlides = totalSlides - maxDots
 
   return (
-    <div className={`flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5 backdrop-blur-sm ${className}`}>
+    <div className={`flex items-center gap-1 rounded-full bg-black/20 px-2 py-1 backdrop-blur-sm ${className}`}>
       {/* Navigation dots */}
       {Array.from({ length: showDots }).map((_, index) => (
         <button
           key={index}
           onClick={() => onNavigate(index)}
-          className="touch-manipulation min-h-touch min-w-touch flex items-center justify-center p-3"
+          className="touch-manipulation min-h-touch min-w-touch flex items-center justify-center p-2"
           aria-label={`Go to slide ${index + 1}`}
         >
           <div
-            className={`h-1.5 w-1.5 rounded-full transition-all ${
-              index === selectedIndex ? 'scale-125 bg-white' : 'bg-white/50'
+            className={`h-1 w-1 rounded-full transition-all ${
+              index === selectedIndex ? 'scale-150 bg-white' : 'bg-white/50'
             }`}
           />
         </button>

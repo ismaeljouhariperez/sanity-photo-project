@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence, Variants } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
 
 interface Project {
@@ -17,7 +16,6 @@ interface ProjectSectionProps {
   category: string
   itemVariants: Variants
   listVariants: Variants
-  countVariants: Variants
   onClose: () => void
 }
 
@@ -27,12 +25,10 @@ export default function ProjectSection({
   category,
   itemVariants,
   listVariants,
-  countVariants,
   onClose,
 }: ProjectSectionProps) {
-  const [hoveredProject, setHoveredProject] = useState<string | null>(null)
-  const { navigateToProject, navigateToCategory } = useTransitionNavigation({ 
-    onClose 
+  const { navigateToProject, navigateToCategory } = useTransitionNavigation({
+    onClose,
   })
 
   const handleProjectClick = (slug: string) => {
@@ -44,15 +40,15 @@ export default function ProjectSection({
   }
 
   return (
-    <div className="p-8">
+    <div className="pt-8 md:py-8">
       <motion.h3
         variants={itemVariants}
-        className="mb-8 cursor-pointer place-self-start text-gray-900"
+        className="min-h-touch min-w-touch flex cursor-pointer touch-manipulation items-center place-self-start text-lg text-gray-900 md:mb-8 md:text-xl"
         onClick={handleCategoryClick}
       >
         {title}
       </motion.h3>
-      <motion.div variants={listVariants} className="space-y-4">
+      <motion.div variants={listVariants} className="md:space-y-4">
         {projects.map((project: Project) => {
           const slug =
             typeof project.slug === 'string'
@@ -62,30 +58,18 @@ export default function ProjectSection({
             <motion.div
               key={project._id}
               variants={itemVariants}
-              className="relative"
-              onMouseEnter={() => setHoveredProject(project._id)}
-              onMouseLeave={() => setHoveredProject(null)}
+              className="group relative"
             >
               <button
                 onClick={() => handleProjectClick(slug)}
-                className="text-left text-xl transition-colors duration-200 hover:text-gray-600 active:text-gray-500 touch-manipulation min-h-touch"
+                className="min-h-touch min-w-touch flex w-full touch-manipulation items-center justify-between text-left text-lg transition-colors duration-200 hover:text-gray-600 active:text-gray-500 md:text-xl"
               >
-                {project.title}
+                <span>{project.title}</span>
+                {/* Show count on mobile always, on desktop only on hover */}
+                <span className="text-sm text-gray-500 transition-opacity duration-500 group-hover:opacity-100 md:opacity-0">
+                  {project.imageCount || 0}
+                </span>
               </button>
-
-              <AnimatePresence>
-                {hoveredProject === project._id && (
-                  <motion.span
-                    variants={countVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    className="absolute left-full top-0 ml-4 text-sm text-gray-500"
-                  >
-                    {project.imageCount || 0}
-                  </motion.span>
-                )}
-              </AnimatePresence>
             </motion.div>
           )
         })}

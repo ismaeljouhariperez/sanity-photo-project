@@ -1,5 +1,5 @@
 'use client'
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface InfoOverlayProps {
@@ -7,14 +7,29 @@ interface InfoOverlayProps {
   onClose: () => void
 }
 
-const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
-  // Slowed down animation configurations
+const InfoOverlay = memo(function InfoOverlay({
+  isOpen,
+  onClose,
+}: InfoOverlayProps) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024) // lg breakpoint
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Responsive animation configurations
   const overlayAnimations = {
     initial: {
       width: 0,
     },
     animate: {
-      width: '35%',
+      width: isMobile ? '100%' : '35%', // Full-screen on mobile/tablet, 35% on desktop
       transition: {
         duration: 0.8,
         ease: [0.16, 1, 0.3, 1] as const,
@@ -66,19 +81,19 @@ const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayPr
         >
           <motion.button
             onClick={onClose}
-            className="absolute right-8 top-8 text-white min-h-touch min-w-touch flex items-center justify-center touch-manipulation"
+            className="min-h-touch min-w-touch absolute right-4 top-4 z-10 flex touch-manipulation items-center justify-center text-white md:right-8 md:top-8"
             variants={contentAnimations}
           >
             Fermer
           </motion.button>
 
           <motion.div
-            className="mt-16 h-full overflow-y-auto p-16"
+            className="mt-16 h-full md:overflow-hidden overflow-y-auto p-8 pb-safe-bottom md:pb-8"
             variants={contentAnimations}
           >
-            <h2 className="mb-8 text-3xl">À propos</h2>
+            <h2 className="mb-6 text-2xl md:mb-8 md:text-3xl">À propos</h2>
 
-            <div className="space-y-5 leading-relaxed text-gray-300">
+            <div className="space-y-4 leading-relaxed text-gray-300 md:space-y-5">
               <p>
                 Ismael Perez León est né à Marseille et vit actuellement à
                 Bordeaux. Autodidacte, il a voyagé en Amérique du Nord et du
@@ -103,7 +118,7 @@ const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayPr
                   <br />
                   <a
                     href="mailto:contact@ismaelleon.com"
-                    className="text-gray-100 transition-colors hover:text-white active:text-gray-300 touch-manipulation min-h-touch"
+                    className="min-h-touch touch-manipulation text-gray-100 transition-colors hover:text-white active:text-gray-300"
                   >
                     contact@ismaelperez.com
                   </a>
@@ -114,7 +129,7 @@ const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayPr
                     href="https://instagram.com/hypsanda"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-gray-100 transition-colors hover:text-white active:text-gray-300 touch-manipulation min-h-touch"
+                    className="min-h-touch inline-flex touch-manipulation items-center gap-2 text-gray-100 transition-colors hover:text-white active:text-gray-300"
                   >
                     <svg
                       width="20"

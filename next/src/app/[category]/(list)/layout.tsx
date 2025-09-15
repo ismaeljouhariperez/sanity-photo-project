@@ -11,9 +11,5 @@ interface CategoryListLayoutProps {
 export default function CategoryListLayout({
   children,
 }: CategoryListLayoutProps) {
-  return (
-    <div className="category-list-layout min-h-screen">
-      {children}
-    </div>
-  )
+  return <div className="category-list-layout h-full">{children}</div>
 }

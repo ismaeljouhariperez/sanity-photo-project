@@ -120,7 +120,7 @@ export default function CategoryClient({
     <>
       <main
         ref={containerRef}
-        className="container relative mx-auto flex h-[90vh] flex-1 items-center px-4 md:h-[85vh] md:px-8"
+        className="container relative mx-auto flex h-[90vh] flex-1 items-center px-4 md:h-[85vh] md:px-0"
       >
         <motion.div
           ref={imageContainerRef}
@@ -183,7 +183,7 @@ export default function CategoryClient({
             return (
               <motion.div
                 key={project._id}
-                className="max-w-[280px] cursor-pointer touch-manipulation overflow-hidden text-center text-3xl leading-[1.4] transition-colors hover:text-gray-500 active:text-gray-400 md:max-w-none md:text-left lg:text-5xl"
+                className="max-w-[280px] cursor-pointer touch-manipulation overflow-hidden text-center text-3xl transition-colors hover:text-gray-500 active:text-gray-400 md:max-w-none md:text-left lg:text-5xl"
                 onMouseEnter={() => setHoveredProject(project._id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onClick={() => handleProjectClick(project)}
@@ -197,7 +197,7 @@ export default function CategoryClient({
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <motion.h2
-                  className="overflow-hidden"
+                  className="overflow-hidden leading-[1.4]"
                   initial={{ y: '-100%' }}
                   animate={{
                     y: hasEntered ? '0%' : '-100%',
@@ -215,26 +215,6 @@ export default function CategoryClient({
           })}
         </nav>
       </main>
-
-      {/* Mobile/Tablet Homepage Link - Isolated at bottom */}
-      <button
-        onClick={() => {
-          if ('startViewTransition' in document) {
-            ;(
-              document as Document & {
-                startViewTransition?: (callback: () => void) => void
-              }
-            ).startViewTransition!(() => {
-              router.push('/')
-            })
-          } else {
-            router.push('/')
-          }
-        }}
-        className="min-h-touch min-w-touch absolute bottom-4 left-1/2 flex -translate-x-1/2 touch-manipulation items-center justify-center text-lg transition-opacity hover:opacity-80 active:opacity-60 md:hidden"
-      >
-        Back Home
-      </button>
     </>
   )
 }

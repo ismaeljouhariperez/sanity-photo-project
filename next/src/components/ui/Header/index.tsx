@@ -2,6 +2,7 @@
 import React, { useState, useEffect, memo, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import Link from 'next/link'
 import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
@@ -19,6 +20,7 @@ const Header = memo(function Header() {
   const { resetHeaderAnimation, setInProjectsSection } = useAnimationStore()
   const currentProject = useCurrentProjectStore((state) => state.project)
   const router = useRouter()
+  const { isMobile } = useMobileOptimizations()
 
   // Define page type variables
   const isProjectPage =
@@ -29,7 +31,7 @@ const Header = memo(function Header() {
 
   const handleAboutClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    
+
     // About button always opens InfoOverlay on all pages
     setIsInfoOpen(true)
   }, [])
@@ -46,8 +48,7 @@ const Header = memo(function Header() {
       // If on project detail page, toggle gallery overlay
       if (isProjectDetailPage) {
         setIsGalleryOpen(!isGalleryOpen)
-      } 
-      else {
+      } else {
         // On all other pages (root, category), toggle menu overlay
         setIsMenuOpen(!isMenuOpen)
       }
@@ -107,19 +108,19 @@ const Header = memo(function Header() {
     return 'Menu'
   }
 
-  // Header elements animation variants
+  // Responsive animation variants - disabled on mobile/tablet to prevent flash
   const headerElementVariants = {
-    initial: { y: 50, opacity: 0 },
+    initial: isMobile ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 },
     enter: {
       y: 0,
       opacity: 1,
-      transition: {
+      transition: isMobile ? {} : {
         duration: 1,
         ease: [0.16, 1, 0.3, 1] as const,
         delay: 0.2,
       },
     },
-    exit: {
+    exit: isMobile ? { y: 0, opacity: 1 } : {
       y: -50,
       opacity: 0,
       transition: {
@@ -130,17 +131,17 @@ const Header = memo(function Header() {
   }
 
   const containerVariants = {
-    initial: { opacity: 0 },
+    initial: isMobile ? { opacity: 1 } : { opacity: 0 },
     enter: {
       opacity: 1,
-      transition: {
+      transition: isMobile ? {} : {
         staggerChildren: 0.1,
         delayChildren: 0.1,
       },
     },
     exit: {
       opacity: 1,
-      transition: {
+      transition: isMobile ? {} : {
         staggerChildren: 0.05,
         staggerDirection: -1,
       },
@@ -164,7 +165,7 @@ const Header = memo(function Header() {
         onClose={() => setIsGalleryOpen(false)}
         project={currentProject}
       />
-      <header className="container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-3 md:py-5 px-safe-left pr-safe-right pt-safe-top">
+      <header className="px-safe-left pr-safe-right pt-safe-top container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-2 md:py-5">
         <AnimatePresence mode="wait">
           <motion.nav
             key={pathname}
@@ -177,7 +178,7 @@ const Header = memo(function Header() {
             <motion.button
               variants={headerElementVariants}
               onClick={handleAboutClick}
-              className="md:place-self-start transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
+              className="min-h-touch min-w-touch flex touch-manipulation items-center justify-center place-self-start transition-opacity hover:opacity-80 active:opacity-60"
             >
               About
             </motion.button>
@@ -188,7 +189,7 @@ const Header = memo(function Header() {
               >
                 <button
                   onClick={handleMenuClick}
-                  className="relative overflow-hidden transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center"
+                  className="min-h-touch min-w-touch relative flex touch-manipulation items-center justify-center overflow-hidden transition-opacity hover:opacity-80 active:opacity-60"
                 >
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -209,7 +210,7 @@ const Header = memo(function Header() {
                 <span>/</span>
                 <button
                   onClick={handleIndexClick}
-                  className="transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
+                  className="min-h-touch min-w-touch flex touch-manipulation items-center justify-center transition-opacity hover:opacity-80 active:opacity-60"
                 >
                   {categoryTitle}
                 </button>
@@ -218,7 +219,7 @@ const Header = memo(function Header() {
               <motion.button
                 variants={headerElementVariants}
                 onClick={handleMenuClick}
-                className={`${s.title} relative overflow-hidden min-h-touch min-w-touch flex items-center justify-center`}
+                className={`${s.title} min-h-touch min-w-touch relative flex items-center justify-center overflow-hidden`}
               >
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -243,9 +244,10 @@ const Header = memo(function Header() {
             >
               <Link
                 href="/"
-                className="text-sm md:text-xl transition-opacity hover:opacity-80 active:opacity-60 touch-manipulation min-h-touch min-w-touch flex items-center justify-center"
+                className="min-h-touch min-w-touch flex touch-manipulation items-center justify-center transition-opacity hover:opacity-80 active:opacity-60 md:text-xl"
               >
-                Ismael Perez Léon
+                <span className="md:hidden">Home</span>
+                <span className="hidden md:inline">Ismael Perez Léon</span>
               </Link>
             </motion.div>
           </motion.nav>

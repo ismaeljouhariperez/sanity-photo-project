@@ -105,7 +105,7 @@ const ProjectSlider = memo(function ProjectSlider({
       </div>
 
       {/* Mobile navigation */}
-      <footer className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 lg:hidden">
+      <footer className="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 lg:hidden">
         <CarouselNavigation
           selectedIndex={selectedIndex}
           totalSlides={totalSlides}

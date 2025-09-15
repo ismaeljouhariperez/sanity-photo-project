@@ -105,11 +105,11 @@ export default function GalleryContent({
       onClick={onClose}
     >
       <div
-        className="container mx-auto max-h-screen overflow-y-auto py-20"
+        className="container mx-auto max-h-screen md:overflow-hidden overflow-y-auto py-12 md:py-20 px-4 md:px-8 pb-safe-bottom md:pb-0"
         onClick={(e) => e.stopPropagation()}
       >
         <motion.div
-          className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-10 2xl:grid-cols-10"
+          className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-6 xl:grid-cols-10 2xl:grid-cols-10"
           variants={listVariants}
           initial="hidden"
           animate="visible"
@@ -119,7 +119,7 @@ export default function GalleryContent({
             <motion.div
               key={image._key || index}
               variants={itemVariants}
-              className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
+              className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100 touch-manipulation"
               onClick={() => handleImageClick(index)}
             >
               <Image
@@ -136,9 +136,9 @@ export default function GalleryContent({
                 loading="lazy"
               />
 
-              {/* Overlay with image number */}
-              <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/20">
-                <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              {/* Overlay with image number - always visible on mobile, hover on desktop */}
+              <div className="absolute inset-0 bg-black/0 transition-all duration-300 md:group-hover:bg-black/20">
+                <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
                   {String(index + 1).padStart(2, '0')}
                 </div>
               </div>
