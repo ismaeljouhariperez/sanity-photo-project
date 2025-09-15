@@ -43,16 +43,13 @@ const ProjectSlider = memo(function ProjectSlider({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     startIndex: 0,
+    // Enable slide animation for mobile/tablet only
+    duration: isTouchDevice ? 20 : 0,
+    // Mobile touch optimizations
     dragFree: false,
-    watchDrag: true,
-    duration: 0, // No slide animation for fade effect
-    // Mobile-optimized settings
+    watchDrag: isTouchDevice,
+    dragThreshold: 15,
     skipSnaps: false,
-    dragThreshold: isTouchDevice ? 15 : 10, // More forgiving on touch
-    inViewThreshold: 0.7,
-    // Performance optimizations
-    containScroll: 'trimSnaps',
-    slidesToScroll: 1,
   })
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -155,8 +152,10 @@ const ProjectSlider = memo(function ProjectSlider({
             {images.map((image, index) => (
               <div
                 key={image._key || index}
-                className="embla__slide absolute inset-0 flex items-center justify-center"
-                style={{
+                className={`embla__slide flex items-center justify-center ${
+                  isTouchDevice ? 'relative w-full' : 'absolute inset-0'
+                }`}
+                style={isTouchDevice ? {} : {
                   opacity: index === selectedIndex ? 1 : 0,
                   transition: prefersReducedMotion ? 'opacity 0.1s ease-out' : 'opacity 0.4s ease-in-out',
                   zIndex: index === selectedIndex ? 1 : 0,
@@ -181,8 +180,10 @@ const ProjectSlider = memo(function ProjectSlider({
 
             {/* Text slide - final slide */}
             <div
-              className="embla__slide absolute inset-0"
-              style={{
+              className={`embla__slide ${
+                isTouchDevice ? 'relative w-full' : 'absolute inset-0'
+              }`}
+              style={isTouchDevice ? {} : {
                 opacity: selectedIndex === images.length ? 1 : 0,
                 transition: prefersReducedMotion ? 'opacity 0.1s ease-out' : 'opacity 0.4s ease-in-out',
                 zIndex: selectedIndex === images.length ? 1 : 0,
@@ -204,65 +205,29 @@ const ProjectSlider = memo(function ProjectSlider({
         />
       </div>
 
-      {/* Footer Controls - Mobile/tablet optimized */}
-      <footer className="absolute bottom-0 left-0 right-0 z-10 flex justify-center p-4 md:p-6 lg:hidden pb-safe-bottom">
-        <div className="flex items-center gap-4 rounded-full bg-white/90 px-4 py-3 backdrop-blur-sm md:gap-6 md:px-6 md:py-4 shadow-lg">
-          {/* Image Counter - larger on mobile */}
-          <div className="flex items-center gap-2 font-mono text-base text-gray-700 md:text-sm">
-            <span className="font-semibold">
-              {String(selectedIndex + 1).padStart(2, '0')}
-            </span>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-400">
-              {String(totalSlides).padStart(2, '0')}
-            </span>
-          </div>
-
-          {/* Dots Navigation - optimized for touch */}
-          <div className="flex items-center gap-3 md:gap-2">
-            {/* Image dots (show first 5 images if we have text slide) */}
-            {images.slice(0, Math.min(5, images.length)).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => scrollTo(index)}
-                className={`min-h-touch min-w-touch flex items-center justify-center p-2 touch-manipulation transition-colors ${
-                  index === selectedIndex
-                    ? 'opacity-100'
-                    : 'opacity-50 hover:opacity-75 active:opacity-100'
-                }`}
-              >
-                <div className={`h-2 w-2 rounded-full transition-all duration-200 ${
-                  index === selectedIndex
-                    ? 'bg-black scale-125'
-                    : 'bg-black/60'
-                }`} />
-              </button>
-            ))}
-
-            {/* Text slide dot (always show as last dot) */}
+      {/* Simple mobile footer */}
+      <footer className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 lg:hidden">
+        <div className="flex items-center gap-2 rounded-full bg-black/20 backdrop-blur-sm px-3 py-1.5">
+          {/* Simple dots - show max 7 */}
+          {Array.from({ length: Math.min(totalSlides, 7) }).map((_, index) => (
             <button
-              key="text-slide"
-              onClick={() => scrollTo(images.length)}
-              className={`min-h-touch min-w-touch flex items-center justify-center p-2 touch-manipulation transition-colors ${
-                selectedIndex === images.length
-                  ? 'opacity-100'
-                  : 'opacity-50 hover:opacity-75 active:opacity-100'
-              }`}
+              key={index}
+              onClick={() => scrollTo(index)}
+              className="touch-manipulation p-1"
             >
-              <div className={`h-2 w-2 rounded-full transition-all duration-200 ${
-                selectedIndex === images.length
-                  ? 'bg-black scale-125'
-                  : 'bg-black/60'
-              }`} />
+              <div 
+                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  index === selectedIndex 
+                    ? 'bg-white scale-125' 
+                    : 'bg-white/50'
+                }`} 
+              />
             </button>
-
-            {/* Show +N indicator if more than 5 image slides */}
-            {images.length > 5 && (
-              <span className="ml-2 text-sm text-gray-400 md:text-xs">
-                +{images.length - 5}
-              </span>
-            )}
-          </div>
+          ))}
+          {/* Show +N if more slides */}
+          {totalSlides > 7 && (
+            <span className="text-xs text-white/70 ml-1">+{totalSlides - 7}</span>
+          )}
         </div>
       </footer>
 
