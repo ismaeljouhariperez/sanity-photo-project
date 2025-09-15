@@ -1,16 +1,49 @@
+/* Mobile-first responsive navigation */
 .nav {
-  display: grid;
   width: 100%;
-  grid-template-columns: 1fr 1fr 1fr;
-  place-items: center;
+  /* Mobile: Flex with justify-between for 2 elements */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+/* Tablet and up: Grid with 3 elements including brand logo */
+@media (min-width: 768px) {
+  .nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    place-items: center;
+    padding: 0;
+  }
 }
 
 .titleWrapper {
   overflow: hidden;
-  place-self: end;
+  /* Mobile: Hidden brand logo */
+  display: none;
+}
+
+/* Tablet and up: Show brand logo with grid positioning */
+@media (min-width: 768px) {
+  .titleWrapper {
+    display: block;
+    font-size: 1.25rem;
+    place-self: end;
+  }
 }
 
 .title {
   transform-origin: center;
   will-change: transform, opacity;
+  /* Mobile: Smaller font size and better spacing */
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Tablet and up: Larger title */
+@media (min-width: 768px) {
+  .title {
+    font-size: 1rem;
+  }
 }

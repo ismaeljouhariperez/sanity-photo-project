@@ -172,7 +172,7 @@ const Header = memo(function Header() {
         onClose={() => setIsGalleryOpen(false)}
         project={currentProject}
       />
-      <header className="container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-5">
+      <header className="container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-3 md:py-5 px-safe-left pr-safe-right pt-safe-top">
         <AnimatePresence mode="wait">
           <motion.nav
             key={pathname}
@@ -185,7 +185,7 @@ const Header = memo(function Header() {
             <motion.button
               variants={headerElementVariants}
               onClick={handleAboutClick}
-              className="place-self-start transition-opacity hover:opacity-80"
+              className="md:place-self-start transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
             >
               About
             </motion.button>
@@ -196,7 +196,7 @@ const Header = memo(function Header() {
               >
                 <button
                   onClick={handleMenuClick}
-                  className="relative overflow-hidden transition-opacity hover:opacity-80"
+                  className="relative overflow-hidden transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center"
                 >
                   <AnimatePresence mode="wait">
                     <motion.span
@@ -217,7 +217,7 @@ const Header = memo(function Header() {
                 <span>/</span>
                 <button
                   onClick={handleIndexClick}
-                  className="transition-opacity hover:opacity-80"
+                  className="transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center text-sm md:text-base"
                 >
                   {categoryTitle}
                 </button>
@@ -226,7 +226,7 @@ const Header = memo(function Header() {
               <motion.button
                 variants={headerElementVariants}
                 onClick={handleMenuClick}
-                className={`${s.title} relative overflow-hidden`}
+                className={`${s.title} relative overflow-hidden min-h-touch min-w-touch flex items-center justify-center`}
               >
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -251,7 +251,7 @@ const Header = memo(function Header() {
             >
               <Link
                 href="/"
-                className="text-xl transition-opacity hover:opacity-80"
+                className="text-sm md:text-xl transition-opacity hover:opacity-80 min-h-touch min-w-touch flex items-center justify-center"
               >
                 Ismael Perez Léon
               </Link>

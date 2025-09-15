@@ -40,6 +40,10 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#faf9f6" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="apple-touch-icon"
@@ -47,7 +51,6 @@ export default async function RootLayout({
           href="/apple-touch-icon.png"
         />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#000000" />
       </head>
       <body className="bg-cream pt-header" suppressHydrationWarning>
         <ClientLayout menuData={menuData}>{children}</ClientLayout>
