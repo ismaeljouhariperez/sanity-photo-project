@@ -52,15 +52,7 @@ const Header = memo(function Header() {
         setIsMenuOpen(!isMenuOpen)
       }
     },
-    [
-      isMenuOpen,
-      isGalleryOpen,
-      isInfoOpen,
-      pathname,
-      router,
-      isProjectPage,
-      isProjectDetailPage,
-    ]
+    [isMenuOpen, isGalleryOpen, isProjectDetailPage]
   )
 
   const handleIndexClick = useCallback(

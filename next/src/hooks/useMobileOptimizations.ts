@@ -34,7 +34,7 @@ export function useMobileOptimizations() {
 
     // Connection speed detection
     const checkConnection = () => {
-      const connection = (navigator as any).connection
+      const connection = (navigator as unknown as { connection?: { effectiveType: string } }).connection
       if (connection) {
         const effectiveType = connection.effectiveType
         setConnectionSpeed(effectiveType === '2g' || effectiveType === 'slow-2g' ? 'slow' : 'fast')
@@ -53,7 +53,7 @@ export function useMobileOptimizations() {
   }, [])
 
   // Optimized animation configs
-  const getAnimationConfig = (baseConfig: any) => {
+  const getAnimationConfig = (baseConfig: Record<string, unknown>) => {
     if (prefersReducedMotion) {
       return {
         ...baseConfig,
@@ -63,9 +63,10 @@ export function useMobileOptimizations() {
     }
 
     if (isMobile && connectionSpeed === 'slow') {
+      const duration = typeof baseConfig.duration === 'number' ? baseConfig.duration : 0.3
       return {
         ...baseConfig,
-        duration: (baseConfig.duration || 0.3) * 0.7, // 30% faster
+        duration: duration * 0.7, // 30% faster
         ease: 'easeOut'
       }
     }
