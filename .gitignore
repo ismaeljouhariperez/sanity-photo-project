@@ -70,3 +70,7 @@ sanity/static/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Markdown
+*.md
+*.mdx
