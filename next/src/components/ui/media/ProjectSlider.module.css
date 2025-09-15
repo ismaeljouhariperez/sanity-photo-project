@@ -1,0 +1,42 @@
+/* Mobile-first carousel styles */
+.emblaContainer {
+  display: flex;
+  height: 100%;
+}
+
+.emblaSlide {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1; /* Always visible on mobile - Embla handles positioning */
+}
+
+/* Desktop: fade effect with absolute positioning */
+@media (min-width: 1024px) {
+  .emblaContainer {
+    display: block;
+    position: relative;
+  }
+  
+  .emblaSlide {
+    position: absolute;
+    inset: 0;
+    flex: none;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 0;
+    opacity: 0; /* Use opacity for fade effect on desktop */
+  }
+  
+  .emblaSlide.active {
+    z-index: 1;
+    opacity: 1;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .emblaSlide {
+    transition: opacity 0.1s ease-out !important;
+  }
+}

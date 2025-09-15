@@ -93,14 +93,14 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="bg-cream pt-header fixed inset-0 z-40"
+      className="bg-cream lg:pt-header fixed inset-0 z-40"
     >
       <motion.div
         variants={listVariants}
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="pt-header container mx-auto h-full py-12"
+        className="lg:pt-header container mx-auto h-full py-12"
       >
         <div className="grid h-full grid-cols-2 gap-16">
           <ProjectSection

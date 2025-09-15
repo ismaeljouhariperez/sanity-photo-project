@@ -11,6 +11,7 @@ import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
 import { useImageNavigationStore } from '@/store/imageNavigationStore'
 import TextSlide from './TextSlide'
+import styles from './ProjectSlider.module.css'
 
 interface ProjectSliderProps {
   project: Project
@@ -25,9 +26,6 @@ const ProjectSlider = memo(function ProjectSlider({
   // Image navigation from gallery
   const { targetImageIndex, clearTarget } = useImageNavigationStore()
 
-  // Detect if device supports touch for responsive config
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
-
   // Set project in store when component mounts
   useEffect(() => {
     setProject(project)
@@ -36,18 +34,12 @@ const ProjectSlider = memo(function ProjectSlider({
     return () => setProject(null)
   }, [project, setProject])
 
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
-
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     startIndex: 0,
-    // Enable slide animation for mobile/tablet only
-    duration: isTouchDevice ? 20 : 0,
-    // Mobile touch optimizations
     dragFree: false,
-    watchDrag: isTouchDevice,
+    watchDrag: true, // Always enable drag, CSS will handle the layout
+    duration: 0, // No slide animation - let CSS handle transitions
     dragThreshold: 15,
     skipSnaps: false,
   })
@@ -125,12 +117,11 @@ const ProjectSlider = memo(function ProjectSlider({
     [emblaApi]
   )
 
-
   if (images.length === 0) {
     return (
       <div
         className="bg-cream flex w-full items-center justify-center"
-        style={{ height: 'calc(100vh - var(--header-height))' }}
+        style={{ height: 'calc(100dvh - var(--header-height))' }}
       >
         <div className="text-gray-500">Aucune photo à afficher</div>
       </div>
@@ -141,25 +132,22 @@ const ProjectSlider = memo(function ProjectSlider({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={getAnimationConfig({ duration: 1, ease: easeInOut, delay: 1 })}
-      className="flex h-[80%] w-full flex-col"
+      transition={getAnimationConfig({
+        duration: 1,
+        ease: easeInOut,
+        delay: 1,
+      })}
+      className="flex h-full w-full flex-col xl:h-[80%]"
     >
       {/* Touch-friendly carousel container */}
-      <div className={`custom-cursor h-full ${isTouchDevice ? 'touch-pan-x' : ''}`}>
+      <div className="custom-cursor h-full touch-pan-x lg:touch-auto">
         <div className="embla h-full" ref={emblaRef}>
-          <div className={`embla__container h-full ${isTouchDevice ? 'flex' : ''}`}>
+          <div className={styles.emblaContainer}>
             {/* Image slides */}
             {images.map((image, index) => (
               <div
                 key={image._key || index}
-                className={`embla__slide flex items-center justify-center ${
-                  isTouchDevice ? 'flex-[0_0_100%]' : 'absolute inset-0'
-                }`}
-                style={isTouchDevice ? {} : {
-                  opacity: index === selectedIndex ? 1 : 0,
-                  transition: prefersReducedMotion ? 'opacity 0.1s ease-out' : 'opacity 0.4s ease-in-out',
-                  zIndex: index === selectedIndex ? 1 : 0,
-                }}
+                className={`${styles.emblaSlide} ${index === selectedIndex ? styles.active : ''}`}
               >
                 <Image
                   src={urlFor(image.image)
@@ -173,21 +161,14 @@ const ProjectSlider = memo(function ProjectSlider({
                   className="h-full max-h-[80vh] w-auto object-contain"
                   priority={index <= 1}
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                  loading={index <= 1 ? "eager" : "lazy"}
+                  loading={index <= 1 ? 'eager' : 'lazy'}
                 />
               </div>
             ))}
 
             {/* Text slide - final slide */}
             <div
-              className={`embla__slide ${
-                isTouchDevice ? 'flex-[0_0_100%]' : 'absolute inset-0'
-              }`}
-              style={isTouchDevice ? {} : {
-                opacity: selectedIndex === images.length ? 1 : 0,
-                transition: prefersReducedMotion ? 'opacity 0.1s ease-out' : 'opacity 0.4s ease-in-out',
-                zIndex: selectedIndex === images.length ? 1 : 0,
-              }}
+              className={`${styles.emblaSlide} ${selectedIndex === images.length ? styles.active : ''}`}
             >
               <TextSlide project={project} />
             </div>
@@ -206,8 +187,8 @@ const ProjectSlider = memo(function ProjectSlider({
       </div>
 
       {/* Simple mobile footer */}
-      <footer className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 lg:hidden">
-        <div className="flex items-center gap-2 rounded-full bg-black/20 backdrop-blur-sm px-3 py-1.5">
+      <footer className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 lg:hidden">
+        <div className="flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5 backdrop-blur-sm">
           {/* Simple dots - show max 7 */}
           {Array.from({ length: Math.min(totalSlides, 7) }).map((_, index) => (
             <button
@@ -215,18 +196,18 @@ const ProjectSlider = memo(function ProjectSlider({
               onClick={() => scrollTo(index)}
               className="touch-manipulation p-1"
             >
-              <div 
-                className={`w-1.5 h-1.5 rounded-full transition-all ${
-                  index === selectedIndex 
-                    ? 'bg-white scale-125' 
-                    : 'bg-white/50'
-                }`} 
+              <div
+                className={`h-1.5 w-1.5 rounded-full transition-all ${
+                  index === selectedIndex ? 'scale-125 bg-white' : 'bg-white/50'
+                }`}
               />
             </button>
           ))}
           {/* Show +N if more slides */}
           {totalSlides > 7 && (
-            <span className="text-xs text-white/70 ml-1">+{totalSlides - 7}</span>
+            <span className="ml-1 text-xs text-white/70">
+              +{totalSlides - 7}
+            </span>
           )}
         </div>
       </footer>

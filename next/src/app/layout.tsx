@@ -40,7 +40,10 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={aujournuit.className} suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <meta name="theme-color" content="#faf9f6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -52,7 +55,7 @@ export default async function RootLayout({
         />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="bg-cream pt-header" suppressHydrationWarning>
+      <body className="bg-cream lg:pt-header" suppressHydrationWarning>
         <ClientLayout menuData={menuData}>{children}</ClientLayout>
       </body>
     </html>

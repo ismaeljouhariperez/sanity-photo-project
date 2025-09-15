@@ -9,7 +9,7 @@ interface TextSlideProps {
 
 export default function TextSlide({ project }: TextSlideProps) {
   return (
-    <div className="embla__slide absolute inset-0 flex items-center justify-center">
+    <div className="w-full h-full flex items-center justify-center">
       <motion.div
         className="container pointer-events-none mx-auto max-w-2xl"
         initial={{ opacity: 0, y: 20 }}
