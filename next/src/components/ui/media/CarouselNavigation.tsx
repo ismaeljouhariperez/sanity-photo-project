@@ -27,7 +27,7 @@ const CarouselNavigation = memo(function CarouselNavigation({
         <button
           key={index}
           onClick={() => onNavigate(index)}
-          className="touch-manipulation p-1"
+          className="touch-manipulation min-h-touch min-w-touch flex items-center justify-center p-3"
           aria-label={`Go to slide ${index + 1}`}
         >
           <div

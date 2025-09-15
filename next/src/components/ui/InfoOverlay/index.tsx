@@ -66,7 +66,7 @@ const InfoOverlay = memo(function InfoOverlay({ isOpen, onClose }: InfoOverlayPr
         >
           <motion.button
             onClick={onClose}
-            className="absolute right-8 top-8 text-white"
+            className="absolute right-8 top-8 text-white min-h-touch min-w-touch flex items-center justify-center touch-manipulation"
             variants={contentAnimations}
           >
             Fermer

@@ -48,9 +48,9 @@ export default function Home() {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="container mx-auto flex h-full items-center"
+        className="container mx-auto flex h-full items-center px-4 md:px-8"
       >
-        <div className="grid w-full grid-cols-2 place-items-center gap-8">
+        <div className="grid w-full grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-8">
           {/* Black & White Project */}
           <ImageReveal
             src="cover-bw.jpg"
@@ -64,6 +64,7 @@ export default function Home() {
             delay={0.4}
             exitDelay={0}
             isExiting={isExiting}
+            className="md:max-w-[70%]"
           />
 
           {/* Early Color Project */}
@@ -76,9 +77,10 @@ export default function Home() {
             fallbackSrc="/images/color-cover.jpg"
             priority={true}
             onClick={() => handleNavigate('/early-color')}
-            delay={0.7}
+            delay={0.6}
             exitDelay={0.2}
             isExiting={isExiting}
+            className="md:max-w-[70%]"
           />
         </div>
       </motion.div>

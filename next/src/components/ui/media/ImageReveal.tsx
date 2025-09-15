@@ -70,7 +70,9 @@ const ImageReveal = memo(function ImageReveal({
 
   return (
     <motion.div
-      className={`aspect-[4/3] w-full max-w-[70%] cursor-pointer overflow-hidden ${className}`}
+      className={`aspect-[4/3] w-full max-w-[85%] cursor-pointer overflow-hidden touch-manipulation
+                  md:max-w-[70%] transition-transform duration-300 ease-out
+                  hover:scale-[1.02] active:scale-[0.98] ${className}`}
       onClick={onClick}
       initial="hidden"
       animate={isExiting ? 'exit' : 'visible'}

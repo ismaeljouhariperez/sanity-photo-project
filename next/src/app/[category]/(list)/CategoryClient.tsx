@@ -120,11 +120,11 @@ export default function CategoryClient({
     <>
       <main
         ref={containerRef}
-        className="container relative mx-auto flex h-[85vh] flex-1 items-center"
+        className="container relative mx-auto flex h-[90vh] flex-1 items-center px-4 md:h-[85vh] md:px-8"
       >
         <motion.div
           ref={imageContainerRef}
-          className="relative w-1/3 overflow-hidden"
+          className="relative hidden overflow-hidden md:block md:w-1/3"
           animate={{
             opacity: isSecondStage ? 0 : 1,
             scale: isSecondStage ? 0.95 : 1,
@@ -174,7 +174,7 @@ export default function CategoryClient({
 
         <nav
           ref={textContainerRef}
-          className="flex w-2/3 flex-wrap justify-end gap-8 px-8"
+          className="flex w-full flex-wrap justify-center gap-6 md:w-2/3 md:justify-end md:gap-8 md:px-8"
         >
           {projects.map((project, index) => {
             const isClickedProject = clickedProjectId === project._id
@@ -183,7 +183,7 @@ export default function CategoryClient({
             return (
               <motion.div
                 key={project._id}
-                className="cursor-pointer overflow-hidden text-5xl leading-[1.3] transition-colors hover:text-gray-500 active:text-gray-400 touch-manipulation"
+                className="max-w-[280px] cursor-pointer touch-manipulation overflow-hidden text-center text-3xl leading-[1.4] transition-colors hover:text-gray-500 active:text-gray-400 md:max-w-none md:text-left lg:text-5xl"
                 onMouseEnter={() => setHoveredProject(project._id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onClick={() => handleProjectClick(project)}
@@ -215,6 +215,26 @@ export default function CategoryClient({
           })}
         </nav>
       </main>
+
+      {/* Mobile/Tablet Homepage Link - Isolated at bottom */}
+      <button
+        onClick={() => {
+          if ('startViewTransition' in document) {
+            ;(
+              document as Document & {
+                startViewTransition?: (callback: () => void) => void
+              }
+            ).startViewTransition!(() => {
+              router.push('/')
+            })
+          } else {
+            router.push('/')
+          }
+        }}
+        className="min-h-touch min-w-touch absolute bottom-4 left-1/2 flex -translate-x-1/2 touch-manipulation items-center justify-center text-lg transition-opacity hover:opacity-80 active:opacity-60 md:hidden"
+      >
+        Back Home
+      </button>
     </>
   )
 }
