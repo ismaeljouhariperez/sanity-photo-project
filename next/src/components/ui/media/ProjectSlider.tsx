@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState, useCallback, memo } from 'react'
+import { useEffect, memo } from 'react'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
-import useEmblaCarousel from 'embla-carousel-react'
 import { easeInOut, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useSimpleCursor } from '@/hooks/useSimpleCursor'
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
-import { useImageNavigationStore } from '@/store/imageNavigationStore'
+import { useProjectCarousel } from '@/hooks/useProjectCarousel'
 import TextSlide from './TextSlide'
+import CarouselSlide from './CarouselSlide'
+import CarouselNavigation from './CarouselNavigation'
 import styles from './ProjectSlider.module.css'
 
 interface ProjectSliderProps {
@@ -22,100 +23,22 @@ const ProjectSlider = memo(function ProjectSlider({
 }: ProjectSliderProps) {
   // Set current project in store for other components
   const setProject = useCurrentProjectStore((state) => state.setProject)
-
-  // Image navigation from gallery
-  const { targetImageIndex, clearTarget } = useImageNavigationStore()
+  
+  const images = project.images || []
+  const totalSlides = images.length + 1 // Images + text slide
+  
+  // Custom carousel hook with all Embla logic
+  const { emblaRef, selectedIndex, scrollPrev, scrollNext, scrollTo } = useProjectCarousel()
+  
+  // UI hooks
+  const { cursorPosition, showCursor } = useSimpleCursor()
+  const { getAnimationConfig } = useMobileOptimizations()
 
   // Set project in store when component mounts
   useEffect(() => {
     setProject(project)
-
-    // Clear project when component unmounts
     return () => setProject(null)
   }, [project, setProject])
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    startIndex: 0,
-    dragFree: false,
-    watchDrag: true, // Always enable drag, CSS will handle the layout
-    duration: 0, // No slide animation - let CSS handle transitions
-    dragThreshold: 15,
-    skipSnaps: false,
-  })
-
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const { cursorPosition, showCursor } = useSimpleCursor()
-  const { getAnimationConfig, prefersReducedMotion } = useMobileOptimizations()
-  const images = project.images || []
-  const totalSlides = images.length + 1 // Images + text slide
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return
-    const newIndex = emblaApi.selectedScrollSnap()
-    console.log(
-      'onSelect - new index:',
-      newIndex,
-      'can scroll next:',
-      emblaApi.canScrollNext(),
-      'can scroll prev:',
-      emblaApi.canScrollPrev()
-    )
-    setSelectedIndex(newIndex)
-  }, [emblaApi])
-
-  useEffect(() => {
-    if (!emblaApi) return
-
-    onSelect()
-    emblaApi.on('select', onSelect)
-    emblaApi.on('reInit', onSelect)
-
-    return () => {
-      emblaApi.off('select', onSelect)
-      emblaApi.off('reInit', onSelect)
-    }
-  }, [emblaApi, onSelect])
-
-  // Handle navigation from gallery overlay
-  useEffect(() => {
-    if (emblaApi && targetImageIndex !== null) {
-      console.log('Navigating to image from gallery:', targetImageIndex)
-      emblaApi.scrollTo(targetImageIndex)
-      clearTarget() // Clear the target after navigation
-    }
-  }, [emblaApi, targetImageIndex, clearTarget])
-
-  // Simplified - no container registration needed
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) {
-      console.log('Scrolling prev from:', selectedIndex)
-      emblaApi.scrollPrev()
-    }
-  }, [emblaApi, selectedIndex])
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) {
-      console.log(
-        'Scrolling next from:',
-        selectedIndex,
-        'total images:',
-        images.length
-      )
-      emblaApi.scrollNext()
-    }
-  }, [emblaApi, selectedIndex, images.length])
-
-  const scrollTo = useCallback(
-    (index: number) => {
-      if (emblaApi) {
-        console.log('Scrolling to:', index)
-        emblaApi.scrollTo(index)
-      }
-    },
-    [emblaApi]
-  )
 
   if (images.length === 0) {
     return (
@@ -145,10 +68,7 @@ const ProjectSlider = memo(function ProjectSlider({
           <div className={styles.emblaContainer}>
             {/* Image slides */}
             {images.map((image, index) => (
-              <div
-                key={image._key || index}
-                className={`${styles.emblaSlide} ${index === selectedIndex ? styles.active : ''}`}
-              >
+              <CarouselSlide key={image._key || index} isActive={index === selectedIndex}>
                 <Image
                   src={urlFor(image.image)
                     .width(1600)
@@ -163,15 +83,13 @@ const ProjectSlider = memo(function ProjectSlider({
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 80vw"
                   loading={index <= 1 ? 'eager' : 'lazy'}
                 />
-              </div>
+              </CarouselSlide>
             ))}
 
             {/* Text slide - final slide */}
-            <div
-              className={`${styles.emblaSlide} ${selectedIndex === images.length ? styles.active : ''}`}
-            >
+            <CarouselSlide isActive={selectedIndex === images.length}>
               <TextSlide project={project} />
-            </div>
+            </CarouselSlide>
           </div>
         </div>
 
@@ -186,30 +104,14 @@ const ProjectSlider = memo(function ProjectSlider({
         />
       </div>
 
-      {/* Simple mobile footer */}
+      {/* Mobile navigation */}
       <footer className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 lg:hidden">
-        <div className="flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5 backdrop-blur-sm">
-          {/* Simple dots - show max 7 */}
-          {Array.from({ length: Math.min(totalSlides, 7) }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollTo(index)}
-              className="touch-manipulation p-1"
-            >
-              <div
-                className={`h-1.5 w-1.5 rounded-full transition-all ${
-                  index === selectedIndex ? 'scale-125 bg-white' : 'bg-white/50'
-                }`}
-              />
-            </button>
-          ))}
-          {/* Show +N if more slides */}
-          {totalSlides > 7 && (
-            <span className="ml-1 text-xs text-white/70">
-              +{totalSlides - 7}
-            </span>
-          )}
-        </div>
+        <CarouselNavigation
+          selectedIndex={selectedIndex}
+          totalSlides={totalSlides}
+          onNavigate={scrollTo}
+          maxDots={7}
+        />
       </footer>
 
       {/* Simple Custom Cursor Counter */}
