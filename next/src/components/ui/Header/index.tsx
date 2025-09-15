@@ -30,14 +30,9 @@ const Header = memo(function Header() {
   const handleAboutClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     
-    // On root and category pages, open MenuOverlay instead of InfoOverlay
-    if (!isProjectDetailPage) {
-      setIsMenuOpen(true)
-    } else {
-      // On project detail pages, still open InfoOverlay
-      setIsInfoOpen(true)
-    }
-  }, [isProjectDetailPage])
+    // About button always opens InfoOverlay on all pages
+    setIsInfoOpen(true)
+  }, [])
 
   const handleMenuClick = useCallback(
     (e: React.MouseEvent) => {
