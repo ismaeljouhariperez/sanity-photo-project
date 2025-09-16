@@ -23,13 +23,14 @@ const ProjectSlider = memo(function ProjectSlider({
 }: ProjectSliderProps) {
   // Set current project in store for other components
   const setProject = useCurrentProjectStore((state) => state.setProject)
-  
+
   const images = project.images || []
   const totalSlides = images.length + 1 // Images + text slide
-  
+
   // Custom carousel hook with all Embla logic
-  const { emblaRef, selectedIndex, scrollPrev, scrollNext, scrollTo } = useProjectCarousel()
-  
+  const { emblaRef, selectedIndex, scrollPrev, scrollNext, scrollTo } =
+    useProjectCarousel()
+
   // UI hooks
   const { cursorPosition, showCursor } = useSimpleCursor()
   const { getAnimationConfig } = useMobileOptimizations()
@@ -68,19 +69,21 @@ const ProjectSlider = memo(function ProjectSlider({
           <div className={styles.emblaContainer}>
             {/* Image slides */}
             {images.map((image, index) => (
-              <CarouselSlide key={image._key || index} isActive={index === selectedIndex}>
-                <div className="relative h-full w-full flex items-center justify-center p-4 md:p-8">
+              <CarouselSlide
+                key={image._key || index}
+                isActive={index === selectedIndex}
+              >
+                <div className="relative h-full w-full p-4 md:p-8">
                   <Image
-                    src={urlFor(image.image)
-                      .auto('format')
-                      .quality(90)
-                      .url()}
+                    src={urlFor(image.image).url()}
                     alt={`Image ${index + 1}`}
                     fill
                     className="object-contain"
                     priority={index <= 1}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
                     loading={index <= 1 ? 'eager' : 'lazy'}
+                    placeholder="blur"
+                    blurDataURL={urlFor(image.image).width(20).quality(20).blur(50).url()}
                   />
                 </div>
               </CarouselSlide>
