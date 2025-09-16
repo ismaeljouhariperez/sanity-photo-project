@@ -23,36 +23,44 @@ interface SanityImageProps {
   maxRetries?: number
   timeoutMs?: number
   emblaOptimized?: boolean // Special optimizations for Embla carousel
+  galleryMode?: boolean // Minimal placeholder for gallery grids
 }
 
 // Reusable loader component with modern animations
-const ImageLoader = ({ className }: { className?: string }) => (
+const ImageLoader = ({ className, galleryMode = false }: { className?: string, galleryMode?: boolean }) => (
   <motion.div
     initial={{ opacity: 0.8 }}
     exit={{ opacity: 0 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
-    className={`absolute inset-0 z-10 bg-gray-50/80 ${className || ''}`}
+    className={`absolute inset-0 z-10 ${galleryMode ? 'bg-gray-100/90' : 'bg-gray-50/80'} ${className || ''}`}
   >
-    <div className="w-full h-full bg-gradient-to-br from-gray-100/60 via-gray-50/60 to-gray-100/60 animate-pulse">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex space-x-1">
-          {[0, 0.2, 0.4].map((delay, index) => (
-            <motion.div
-              key={index}
-              initial={{ scale: 0.8, opacity: 0.3 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ 
-                duration: 0.8,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay
-              }}
-              className="w-2 h-2 bg-gray-400 rounded-full"
-            />
-          ))}
+    <div className={`w-full h-full ${galleryMode ? 'bg-gray-200/50' : 'bg-gradient-to-br from-gray-100/60 via-gray-50/60 to-gray-100/60'} animate-pulse`}>
+      {!galleryMode && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex space-x-1">
+            {[0, 0.2, 0.4].map((delay, index) => (
+              <motion.div
+                key={index}
+                initial={{ scale: 0.8, opacity: 0.3 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ 
+                  duration: 0.8,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                  delay
+                }}
+                className="w-2 h-2 bg-gray-400 rounded-full"
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+      {galleryMode && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-4 h-4 bg-gray-300 rounded-full animate-pulse" />
+        </div>
+      )}
     </div>
   </motion.div>
 )
@@ -91,6 +99,7 @@ export default function SanityImage({
   maxRetries = 2,
   timeoutMs,
   emblaOptimized = false,
+  galleryMode = false,
 }: SanityImageProps) {
   
   // Image loading state management
@@ -179,7 +188,7 @@ export default function SanityImage({
     <div className={`relative ${fill ? 'w-full h-full' : ''} ${className}`}>
       {/* Modern loading placeholder with proper visibility */}
       <AnimatePresence>
-        {loader.showPlaceholder && <ImageLoader />}
+        {loader.showPlaceholder && <ImageLoader galleryMode={galleryMode} />}
       </AnimatePresence>
 
       {/* Optimized Next.js Image with 2025 best practices */}

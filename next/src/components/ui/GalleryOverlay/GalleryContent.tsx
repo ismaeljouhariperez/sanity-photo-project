@@ -1,9 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
-import Image from 'next/image'
+import SanityImage from '@/components/ui/media/SanityImage'
 import { useImageNavigationStore } from '@/store/imageNavigationStore'
 
 interface GalleryContentProps {
@@ -105,7 +104,7 @@ export default function GalleryContent({
       onClick={onClose}
     >
       <div
-        className="container mx-auto max-h-screen md:overflow-hidden overflow-y-auto py-12 md:py-20 px-4 md:px-8 pb-safe-bottom md:pb-0"
+        className="pb-safe-bottom container mx-auto max-h-screen overflow-y-auto px-4 py-12 md:overflow-hidden md:px-8 md:py-20 md:pb-0"
         onClick={(e) => e.stopPropagation()}
       >
         <motion.div
@@ -119,21 +118,20 @@ export default function GalleryContent({
             <motion.div
               key={image._key || index}
               variants={itemVariants}
-              className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100 touch-manipulation"
+              className="group relative aspect-square cursor-pointer touch-manipulation overflow-hidden"
               onClick={() => handleImageClick(index)}
             >
-              <Image
-                src={urlFor(image.image)
-                  .width(300)
-                  .height(300)
-                  .quality(80)
-                  .url()}
+              <SanityImage
+                image={image.image}
                 alt={`Gallery image ${index + 1}`}
-                width={150}
-                height={150}
-                className="h-full w-full object-contain transition-transform duration-300 bg-gray-50"
+                width={300}
+                height={300}
+                className="h-full w-full object-contain transition-transform duration-300"
                 sizes="(max-width: 768px) 150px, (max-width: 1024px) 200px, 250px"
-                loading="lazy"
+                quality={75}
+                maxRetries={1}
+                timeoutMs={600}
+                galleryMode={true}
               />
 
               {/* Overlay with image number - always visible on mobile, hover on desktop */}
