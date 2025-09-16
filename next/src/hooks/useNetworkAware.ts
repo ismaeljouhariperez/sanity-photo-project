@@ -10,6 +10,14 @@ interface NetworkState {
   isSlowConnection: boolean
 }
 
+interface NetworkConnection {
+  effectiveType?: string
+  downlink?: number
+  saveData?: boolean
+  addEventListener?: (event: string, handler: () => void) => void
+  removeEventListener?: (event: string, handler: () => void) => void
+}
+
 export function useNetworkAware(): NetworkState {
   const [networkState, setNetworkState] = useState<NetworkState>({
     isOnline: true,
@@ -26,16 +34,20 @@ export function useNetworkAware(): NetworkState {
       const isOnline = navigator.onLine
       
       // Use Network Information API if available
-      const connection = (navigator as any).connection || 
-                        (navigator as any).mozConnection || 
-                        (navigator as any).webkitConnection
+      const nav = navigator as Navigator & {
+        connection?: NetworkConnection
+        mozConnection?: NetworkConnection
+        webkitConnection?: NetworkConnection
+      }
+      
+      const connection = nav.connection || nav.mozConnection || nav.webkitConnection
 
       let effectiveType: NetworkState['effectiveType'] = 'unknown'
       let downlink = 0
       let saveData = false
 
       if (connection) {
-        effectiveType = connection.effectiveType || 'unknown'
+        effectiveType = (connection.effectiveType as NetworkState['effectiveType']) || 'unknown'
         downlink = connection.downlink || 0
         saveData = connection.saveData || false
       }
@@ -66,8 +78,9 @@ export function useNetworkAware(): NetworkState {
     window.addEventListener('offline', updateNetworkState)
 
     // Listen for connection changes if supported
-    const connection = (navigator as any).connection
-    if (connection) {
+    const nav = navigator as Navigator & { connection?: NetworkConnection }
+    const connection = nav.connection
+    if (connection?.addEventListener) {
       connection.addEventListener('change', updateNetworkState)
     }
 
@@ -75,7 +88,7 @@ export function useNetworkAware(): NetworkState {
       window.removeEventListener('online', updateNetworkState)
       window.removeEventListener('offline', updateNetworkState)
       
-      if (connection) {
+      if (connection?.removeEventListener) {
         connection.removeEventListener('change', updateNetworkState)
       }
     }
