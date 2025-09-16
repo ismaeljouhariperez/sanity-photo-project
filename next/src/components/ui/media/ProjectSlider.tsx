@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, memo } from 'react'
-import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import { easeInOut, motion } from 'framer-motion'
-import Image from 'next/image'
+import RobustImage from './RobustImage'
 import { useSimpleCursor } from '@/hooks/useSimpleCursor'
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
@@ -61,7 +60,7 @@ const ProjectSlider = memo(function ProjectSlider({
         ease: easeInOut,
         delay: 1,
       })}
-      className="flex h-full w-full flex-col xl:h-[80%]"
+      className="flex h-full w-full flex-col"
     >
       {/* Touch-friendly carousel container */}
       <div className="custom-cursor h-full touch-pan-x lg:touch-auto">
@@ -73,17 +72,14 @@ const ProjectSlider = memo(function ProjectSlider({
                 key={image._key || index}
                 isActive={index === selectedIndex}
               >
-                <div className="relative h-full w-full p-4 md:p-8">
-                  <Image
-                    src={urlFor(image.image).url()}
+                <div className="relative h-full w-full p-4 md:p-8 min-h-[50vh]">
+                  <RobustImage
+                    image={image.image}
                     alt={`Image ${index + 1}`}
                     fill
-                    className="object-contain"
                     priority={index <= 1}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
-                    loading={index <= 1 ? 'eager' : 'lazy'}
-                    placeholder="blur"
-                    blurDataURL={urlFor(image.image).width(20).quality(20).blur(50).url()}
+                    maxRetries={3}
                   />
                 </div>
               </CarouselSlide>

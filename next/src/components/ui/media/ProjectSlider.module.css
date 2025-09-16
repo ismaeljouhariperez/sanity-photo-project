@@ -10,6 +10,8 @@
   align-items: center;
   justify-content: center;
   opacity: 1; /* Always visible on mobile - Embla handles positioning */
+  min-height: 50vh; /* Ensure minimum height for Next.js Image fill */
+  height: 100%;
 }
 
 /* Desktop: fade effect with absolute positioning */
