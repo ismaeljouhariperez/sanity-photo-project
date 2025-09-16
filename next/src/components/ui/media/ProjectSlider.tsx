@@ -69,20 +69,20 @@ const ProjectSlider = memo(function ProjectSlider({
             {/* Image slides */}
             {images.map((image, index) => (
               <CarouselSlide key={image._key || index} isActive={index === selectedIndex}>
-                <Image
-                  src={urlFor(image.image)
-                    .width(1600)
-                    .height(1200)
-                    .quality(95)
-                    .url()}
-                  alt={`Image ${index + 1}`}
-                  width={1600}
-                  height={1200}
-                  className="h-full max-h-[80vh] w-auto object-contain"
-                  priority={index <= 1}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 80vw"
-                  loading={index <= 1 ? 'eager' : 'lazy'}
-                />
+                <div className="relative h-full w-full flex items-center justify-center p-4 md:p-8">
+                  <Image
+                    src={urlFor(image.image)
+                      .auto('format')
+                      .quality(90)
+                      .url()}
+                    alt={`Image ${index + 1}`}
+                    fill
+                    className="object-contain"
+                    priority={index <= 1}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                    loading={index <= 1 ? 'eager' : 'lazy'}
+                  />
+                </div>
               </CarouselSlide>
             ))}
 

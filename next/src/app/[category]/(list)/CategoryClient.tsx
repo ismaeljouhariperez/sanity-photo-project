@@ -174,7 +174,7 @@ export default function CategoryClient({
 
         <nav
           ref={textContainerRef}
-          className="flex w-full flex-wrap justify-center gap-6 md:w-2/3 md:justify-end md:gap-8 md:px-8"
+          className="flex w-full flex-wrap justify-center gap-6 md:w-2/3 md:justify-end md:gap-8 md:px-16"
         >
           {projects.map((project, index) => {
             const isClickedProject = clickedProjectId === project._id

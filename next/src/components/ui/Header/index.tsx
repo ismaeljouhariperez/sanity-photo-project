@@ -114,37 +114,45 @@ const Header = memo(function Header() {
     enter: {
       y: 0,
       opacity: 1,
-      transition: isMobile ? {} : {
-        duration: 1,
-        ease: [0.16, 1, 0.3, 1] as const,
-        delay: 0.2,
-      },
+      transition: isMobile
+        ? {}
+        : {
+            duration: 1,
+            ease: [0.16, 1, 0.3, 1] as const,
+            delay: 0.2,
+          },
     },
-    exit: isMobile ? { y: 0, opacity: 1 } : {
-      y: -50,
-      opacity: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.16, 1, 0.3, 1] as const,
-      },
-    },
+    exit: isMobile
+      ? { y: 0, opacity: 1 }
+      : {
+          y: -50,
+          opacity: 0,
+          transition: {
+            duration: 0.8,
+            ease: [0.16, 1, 0.3, 1] as const,
+          },
+        },
   }
 
   const containerVariants = {
     initial: isMobile ? { opacity: 1 } : { opacity: 0 },
     enter: {
       opacity: 1,
-      transition: isMobile ? {} : {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
+      transition: isMobile
+        ? {}
+        : {
+            staggerChildren: 0.1,
+            delayChildren: 0.1,
+          },
     },
     exit: {
       opacity: 1,
-      transition: isMobile ? {} : {
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-      },
+      transition: isMobile
+        ? {}
+        : {
+            staggerChildren: 0.05,
+            staggerDirection: -1,
+          },
     },
   }
 

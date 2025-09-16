@@ -131,7 +131,7 @@ export default function GalleryContent({
                 alt={`Gallery image ${index + 1}`}
                 width={150}
                 height={150}
-                className="h-full w-full object-cover transition-transform duration-300"
+                className="h-full w-full object-contain transition-transform duration-300 bg-gray-50"
                 sizes="(max-width: 768px) 150px, (max-width: 1024px) 200px, 250px"
                 loading="lazy"
               />
