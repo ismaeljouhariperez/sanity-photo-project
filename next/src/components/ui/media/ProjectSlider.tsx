@@ -3,7 +3,7 @@
 import { useEffect, memo } from 'react'
 import type { Project } from '@/lib/sanity.types'
 import { easeInOut, motion } from 'framer-motion'
-import RobustImage from './RobustImage'
+import SanityImage from './SanityImage'
 import { useSimpleCursor } from '@/hooks/useSimpleCursor'
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
@@ -56,9 +56,9 @@ const ProjectSlider = memo(function ProjectSlider({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={getAnimationConfig({
-        duration: 1,
+        duration: 0.6,
         ease: easeInOut,
-        delay: 1,
+        delay: 0.1,
       })}
       className="flex h-full w-full flex-col"
     >
@@ -73,13 +73,16 @@ const ProjectSlider = memo(function ProjectSlider({
                 isActive={index === selectedIndex}
               >
                 <div className="relative h-full w-full p-4 md:p-8 min-h-[50vh]">
-                  <RobustImage
+                  <SanityImage
                     image={image.image}
                     alt={`Image ${index + 1}`}
                     fill
                     priority={index <= 1}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
-                    maxRetries={3}
+                    maxRetries={2}
+                    emblaOptimized={true}
+                    timeoutMs={index <= 1 ? 800 : 1200}
+                    quality={index <= 1 ? 90 : 80}
                   />
                 </div>
               </CarouselSlide>
