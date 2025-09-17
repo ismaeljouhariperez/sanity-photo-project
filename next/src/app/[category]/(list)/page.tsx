@@ -1,10 +1,9 @@
 import { Metadata } from 'next'
-import { getSiteSettings, getProjects } from '@/lib/sanity'
+import { getProjects } from '@/lib/sanity'
 import { generateCategoryMetadata } from '@/lib/seo'
 import { isValidCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import CategoryClient from './CategoryClient'
-import { cache } from 'react'
 
 interface CategoryListPageProps {
   params: Promise<{ category: string }>
@@ -27,10 +26,7 @@ function getDefaultImageProps(category: string) {
   }
 }
 
-// Cached site settings to avoid duplicate requests
-const getCachedSettings = cache(async () => {
-  return await getSiteSettings()
-})
+// Removed getCachedSettings - SEO now handled in Next.js for better performance
 
 export async function generateMetadata({ params }: CategoryListPageProps): Promise<Metadata> {
   try {
@@ -43,8 +39,7 @@ export async function generateMetadata({ params }: CategoryListPageProps): Promi
       }
     }
 
-    const siteSettings = await getCachedSettings()
-    return generateCategoryMetadata(category, siteSettings)
+    return generateCategoryMetadata(category)
   } catch (error) {
     console.error('Error generating metadata:', error)
     return generateCategoryMetadata('black-and-white')

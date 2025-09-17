@@ -1,19 +1,15 @@
 import { Metadata } from 'next'
-import { getSiteSettings, getProjectBySlug } from '@/lib/sanity'
-import { generateCategoryMetadata } from '@/lib/seo'
+import { getProjectBySlug, urlFor } from '@/lib/sanity'
+import { generateCategoryMetadata, generateProjectMetadata } from '@/lib/seo'
 import { isValidCategory } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import ProjectSlider from '@/components/ui/media/ProjectSlider'
-import { cache } from 'react'
 
 interface ProjectPageProps {
   params: Promise<{ category: string; slug: string }>
 }
 
-// Cached site settings to avoid duplicate requests (React cache deduplicates automatically)
-const getCachedSettings = cache(async () => {
-  return await getSiteSettings()
-})
+// Removed getCachedSettings - SEO now handled in Next.js for better performance
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   try {
@@ -27,23 +23,19 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     }
 
     // Use cached settings to avoid duplicate requests
-    const [siteSettings, project] = await Promise.all([
-      getCachedSettings(),
-      getProjectBySlug(slug, category).catch(() => null)
-    ])
-
-    // Enhanced metadata with project-specific information
-    const baseMetadata = generateCategoryMetadata(category, siteSettings)
+    const project = await getProjectBySlug(slug, category).catch(() => null)
     
     if (project) {
-      return {
-        ...baseMetadata,
-        title: `${project.title} | ${baseMetadata.title}`,
-        description: project.description || baseMetadata.description,
-      }
+      return generateProjectMetadata({
+        title: project.title,
+        description: project.description,
+        category: project.category,
+        slug: project.slug?.current,
+        coverImage: project.coverImage ? urlFor(project.coverImage).width(1200).height(630).url() : undefined
+      })
     }
 
-    return baseMetadata
+    return generateCategoryMetadata(category)
   } catch (error) {
     console.error('Error generating metadata:', error)
     return generateCategoryMetadata('black-and-white')

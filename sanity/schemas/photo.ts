@@ -93,17 +93,8 @@ export default {
       subtitle: 'description',
       project: 'project.title',
     },
-    prepare({
-      title,
-      media,
-      subtitle,
-      project,
-    }: {
-      title: string
-      media: any
-      subtitle?: string
-      project?: string
-    }) {
+    prepare(value: Record<string, any>) {
+      const { title, media, subtitle, project } = value
       return {
         title,
         subtitle: project ? `${project} - ${subtitle || ''}` : subtitle,

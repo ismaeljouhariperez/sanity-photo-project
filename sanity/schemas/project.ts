@@ -2,24 +2,13 @@ export const project = {
   name: 'project',
   title: 'Projets',
   type: 'document',
-  groups: [
-    {
-      name: 'content',
-      title: 'Contenu',
-      default: true,
-    },
-    {
-      name: 'seo',
-      title: 'SEO',
-    },
-  ],
+  // Removed groups - simplified schema without SEO tab
   fields: [
     {
       name: 'title',
       title: 'Titre',
       type: 'string',
       validation: (Rule: any) => Rule.required(),
-      group: 'content',
     },
     {
       name: 'slug',
@@ -30,13 +19,11 @@ export const project = {
         maxLength: 96,
       },
       validation: (Rule: any) => Rule.required(),
-      group: 'content',
     },
     {
       name: 'description',
       title: 'Description',
       type: 'text',
-      group: 'content',
     },
     {
       name: 'coverImage',
@@ -46,7 +33,6 @@ export const project = {
         hotspot: true,
       },
       validation: (Rule: any) => Rule.required(),
-      group: 'content',
     },
     {
       name: 'category',
@@ -59,14 +45,12 @@ export const project = {
         ],
       },
       validation: (Rule: any) => Rule.required(),
-      group: 'content',
     },
     {
       name: 'images',
       title: 'Images du projet',
       description: 'Ajoutez des images à ce projet',
       type: 'array',
-      group: 'content',
       of: [
         {
           type: 'object',
@@ -130,12 +114,7 @@ export const project = {
       ],
     },
     // Removed 'order' field - using _createdAt for chronological ordering
-    {
-      name: 'seo',
-      title: 'SEO',
-      type: 'seoMetaFields',
-      group: 'seo',
-    },
+    // Removed 'seo' field - SEO handled in Next.js for better performance
   ],
   preview: {
     select: {

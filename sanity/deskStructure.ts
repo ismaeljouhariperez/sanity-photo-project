@@ -5,7 +5,6 @@ import {
   MdCollections,
   MdInvertColors,
   MdColorLens,
-  MdSettings,
 } from 'react-icons/md'
 
 // Liste des types de documents que nous voulons cacher dans la liste par défaut
@@ -14,12 +13,7 @@ export const structure = (S: StructureBuilder) =>
   S.list()
     .title('Contenu')
     .items([
-      S.listItem()
-        .title('Paramètres du site')
-        .icon(MdSettings as React.ComponentType)
-        .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
-
-      S.divider(),
+      // Removed 'Paramètres du site' - SEO now handled in Next.js
 
       S.listItem()
         .title('Collections')
@@ -42,7 +36,7 @@ export const structure = (S: StructureBuilder) =>
                   S.documentList()
                     .title('Projets Noir et Blanc')
                     .filter('_type == "project" && category == "black-and-white"')
-                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                    .defaultOrdering([{field: '_createdAt', direction: 'desc'}]),
                 ),
               S.listItem()
                 .title('Couleur')
@@ -51,7 +45,7 @@ export const structure = (S: StructureBuilder) =>
                   S.documentList()
                     .title('Projets Couleur')
                     .filter('_type == "project" && category == "early-color"')
-                    .defaultOrdering([{field: 'order', direction: 'asc'}]),
+                    .defaultOrdering([{field: '_createdAt', direction: 'desc'}]),
                 ),
               S.divider(),
               S.listItem()

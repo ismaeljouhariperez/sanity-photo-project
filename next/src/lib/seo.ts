@@ -1,129 +1,99 @@
 import { Metadata } from 'next'
-import { urlFor } from './sanity'
-import type { SanityImage } from './sanity.types'
 
-// Site defaults - these can be fetched from Sanity siteSettings
-const SITE_DEFAULTS = {
-  title: 'Ismael Perez León | Portfolio Photographique',
-  description:
-    "Portfolio de photographie analogique d'Ismael Perez León présentant des collections en noir et blanc et en couleur. Découvrez l'art de la photographie argentique.",
+/**
+ * SEO Configuration for Photography Portfolio
+ * Hardcoded for optimal performance - no API calls needed
+ */
+export const siteMetadata = {
+  title: 'Ismael Perez León - Photographie Analogique',
+  description: "Portfolio de photographie analogique d'Ismael Perez León présentant des collections en noir et blanc et en couleur. Découvrez l'art de la photographie argentique à travers des projets personnels et artistiques.",
   author: 'Ismael Perez León',
   siteUrl: 'https://ismaelperezleon.com',
   keywords: [
     'photographie analogique',
-    'photographie argentique',
+    'photographie argentique', 
     'noir et blanc',
     'early color',
     'portfolio photographique',
     'photographie artistique',
     'film photography',
+    'analog photography',
+    'Ismael Perez León'
   ],
-  ogImage: '/images/og-default.jpg',
-}
+  openGraph: {
+    type: 'website' as const,
+    locale: 'fr_FR',
+    siteName: 'Ismael Perez León Photography',
+    image: '/images/og-default.jpg'
+  },
+  twitter: {
+    card: 'summary_large_image' as const,
+    creator: '@ismaelperezleon', // Update with actual handle if exists
+  }
+} as const
 
-// Remove the local interface since we're importing it
-
-export interface SEOData {
-  title?: string
+export interface ProjectData {
+  title: string
   description?: string
-  keywords?: string[]
-  ogImage?: SanityImage
-  siteUrl?: string
-  author?: string
-}
-
-export interface ProjectSEOData extends SEOData {
   category?: 'black-and-white' | 'early-color'
   slug?: string
-  coverImage?: SanityImage
-  seo?: {
-    metaTitle?: string
-    metaDescription?: string
-    ogImage?: SanityImage
-    keywords?: string[]
-  }
+  coverImage?: string // Sanity image URL
 }
 
 /**
  * Generate metadata for project pages
  */
-export function generateProjectMetadata(
-  project: ProjectSEOData,
-  siteSettings?: SEOData
-): Metadata {
-  const siteUrl = siteSettings?.siteUrl || SITE_DEFAULTS.siteUrl
-  const author = siteSettings?.author || SITE_DEFAULTS.author
+export function generateProjectMetadata(project: ProjectData): Metadata {
+  const categoryLabel = getCategoryLabel(project.category)
+  const title = `${project.title} - ${categoryLabel} | ${siteMetadata.title}`
+  
+  const description = project.description 
+    ? `${project.description} - Collection ${categoryLabel} de photographie argentique.`
+    : `Projet ${categoryLabel} de photographie argentique par ${siteMetadata.author}.`
 
-  // Use project SEO fields first, then fallback to project data, then site defaults
-  const title =
-    project.seo?.metaTitle ||
-    `${project.title} | ${getCategoryLabel(project.category)}` ||
-    siteSettings?.title ||
-    SITE_DEFAULTS.title
-
-  const description =
-    project.seo?.metaDescription ||
-    project.description ||
-    `Découvrez le projet photographique "${project.title}" dans la collection ${getCategoryLabel(project.category)}` ||
-    siteSettings?.description ||
-    SITE_DEFAULTS.description
-
-  // Combine keywords: project SEO > project tags > site keywords > defaults
   const keywords = [
-    ...(project.seo?.keywords || []),
-    ...(siteSettings?.keywords || []),
-    ...SITE_DEFAULTS.keywords,
-    getCategoryLabel(project.category).toLowerCase(),
-  ].filter(Boolean)
+    ...siteMetadata.keywords,
+    categoryLabel.toLowerCase(),
+    project.category === 'black-and-white' ? 'photographie noir et blanc' : 'photographie couleur vintage'
+  ]
 
-  // Choose best image: project SEO OG > project cover > site OG > default
-  const ogImage =
-    project.seo?.ogImage || project.coverImage || siteSettings?.ogImage
-  const ogImageUrl = ogImage
-    ? urlFor(ogImage).width(1200).height(630).quality(90).url()
-    : `${siteUrl}${SITE_DEFAULTS.ogImage}`
-
-  const url = `${siteUrl}/${project.category}/${project.slug}`
+  const url = `${siteMetadata.siteUrl}/${project.category}/${project.slug}`
+  const ogImageUrl = project.coverImage || `${siteMetadata.siteUrl}${siteMetadata.openGraph.image}`
 
   return {
     title,
     description,
     keywords: keywords.join(', '),
-    authors: [{ name: author }],
-    creator: author,
-    publisher: author,
+    authors: [{ name: siteMetadata.author }],
+    creator: siteMetadata.author,
 
     openGraph: {
       type: 'article',
       title,
       description,
       url,
-      siteName: siteSettings?.title || SITE_DEFAULTS.title,
+      siteName: siteMetadata.openGraph.siteName,
+      locale: siteMetadata.openGraph.locale,
       images: [
         {
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: project.title || title,
+          alt: project.title,
         },
       ],
     },
 
     twitter: {
-      card: 'summary_large_image',
+      card: siteMetadata.twitter.card,
       title,
       description,
       images: [ogImageUrl],
-      creator: `@${author.replace(/\s+/g, '').toLowerCase()}`, // Simple conversion
+      creator: siteMetadata.twitter.creator,
     },
 
     alternates: {
       canonical: url,
-    },
-
-    other: {
-      'article:author': author,
-      'article:section': getCategoryLabel(project.category),
     },
   }
 }
@@ -132,40 +102,36 @@ export function generateProjectMetadata(
  * Generate metadata for category pages
  */
 export function generateCategoryMetadata(
-  category: 'black-and-white' | 'early-color',
-  siteSettings?: SEOData
+  category: 'black-and-white' | 'early-color'
 ): Metadata {
-  const siteUrl = siteSettings?.siteUrl || SITE_DEFAULTS.siteUrl
-  const author = siteSettings?.author || SITE_DEFAULTS.author
   const categoryLabel = getCategoryLabel(category)
-
-  const title = `${categoryLabel} | ${siteSettings?.title || SITE_DEFAULTS.title}`
-  const description = `Découvrez la collection ${categoryLabel.toLowerCase()} de notre portfolio de photographie analogique. ${getCategoryDescription(category)}`
+  const title = `Photographie ${categoryLabel} | ${siteMetadata.title}`
+  const description = `Découvrez la collection ${categoryLabel.toLowerCase()} de photographie analogique. ${getCategoryDescription(category)}`
 
   const keywords = [
-    ...(siteSettings?.keywords || []),
-    ...SITE_DEFAULTS.keywords,
+    ...siteMetadata.keywords,
     categoryLabel.toLowerCase(),
-    category === 'black-and-white'
+    category === 'black-and-white' 
       ? 'photographie noir et blanc'
-      : 'photographie couleur vintage',
+      : 'photographie couleur vintage'
   ]
 
-  const url = `${siteUrl}/${category}`
-  const ogImageUrl = `${siteUrl}/images/og-${category}.jpg` // Category-specific OG images
+  const url = `${siteMetadata.siteUrl}/${category}`
+  const ogImageUrl = `${siteMetadata.siteUrl}/images/og-${category}.jpg`
 
   return {
     title,
     description,
     keywords: keywords.join(', '),
-    authors: [{ name: author }],
+    authors: [{ name: siteMetadata.author }],
 
     openGraph: {
-      type: 'website',
+      type: siteMetadata.openGraph.type,
       title,
       description,
       url,
-      siteName: siteSettings?.title || SITE_DEFAULTS.title,
+      siteName: siteMetadata.openGraph.siteName,
+      locale: siteMetadata.openGraph.locale,
       images: [
         {
           url: ogImageUrl,
@@ -177,10 +143,11 @@ export function generateCategoryMetadata(
     },
 
     twitter: {
-      card: 'summary_large_image',
+      card: siteMetadata.twitter.card,
       title,
       description,
       images: [ogImageUrl],
+      creator: siteMetadata.twitter.creator,
     },
 
     alternates: {
@@ -192,54 +159,43 @@ export function generateCategoryMetadata(
 /**
  * Generate metadata for home page
  */
-export function generateHomeMetadata(siteSettings?: SEOData): Metadata {
-  const siteUrl = siteSettings?.siteUrl || SITE_DEFAULTS.siteUrl
-  const author = siteSettings?.author || SITE_DEFAULTS.author
-
-  const title = siteSettings?.title || SITE_DEFAULTS.title
-  const description = siteSettings?.description || SITE_DEFAULTS.description
-  const keywords = [
-    ...(siteSettings?.keywords || []),
-    ...SITE_DEFAULTS.keywords,
-  ]
-
-  const ogImageUrl = siteSettings?.ogImage
-    ? urlFor(siteSettings.ogImage).width(1200).height(630).quality(90).url()
-    : `${siteUrl}${SITE_DEFAULTS.ogImage}`
+export function generateHomeMetadata(): Metadata {
+  const ogImageUrl = `${siteMetadata.siteUrl}${siteMetadata.openGraph.image}`
 
   return {
-    title,
-    description,
-    keywords: keywords.join(', '),
-    authors: [{ name: author }],
-    creator: author,
-    publisher: author,
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    keywords: siteMetadata.keywords.join(', '),
+    authors: [{ name: siteMetadata.author }],
+    creator: siteMetadata.author,
 
     openGraph: {
-      type: 'website',
-      title,
-      description,
-      url: siteUrl,
-      siteName: title,
+      type: siteMetadata.openGraph.type,
+      title: siteMetadata.title,
+      description: siteMetadata.description,
+      url: siteMetadata.siteUrl,
+      siteName: siteMetadata.openGraph.siteName,
+      locale: siteMetadata.openGraph.locale,
       images: [
         {
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: siteMetadata.title,
         },
       ],
     },
 
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
+      card: siteMetadata.twitter.card,
+      title: siteMetadata.title,
+      description: siteMetadata.description,
       images: [ogImageUrl],
+      creator: siteMetadata.twitter.creator,
     },
 
     alternates: {
-      canonical: siteUrl,
+      canonical: siteMetadata.siteUrl,
     },
 
     robots: {
@@ -254,10 +210,7 @@ export function generateHomeMetadata(siteSettings?: SEOData): Metadata {
       },
     },
 
-    verification: {
-      // Add your verification IDs here
-      // google: 'your-google-verification-id',
-    },
+    metadataBase: new URL(siteMetadata.siteUrl),
   }
 }
 
