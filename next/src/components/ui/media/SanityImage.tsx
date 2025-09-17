@@ -142,17 +142,17 @@ export default function SanityImage({
   // Simple image URL - no complex retry URL switching
   const imageUrl = imageData?.url || ''
 
-  // Custom loader for Sanity CDN optimization (2025 best practice)
-  const customLoader = ({ width: loaderWidth, quality: loaderQuality = quality }: { width: number, quality?: number }) => {
-    const url = urlFor(image)
-      .auto('format')
-      .width(loaderWidth)
-      .quality(loaderQuality)
-      .fit('max')
-      .url()
-    
-    return url
-  }
+  // Custom loader for Sanity CDN optimization (cached)
+  const customLoader = useMemo(() => {
+    return ({ width: loaderWidth, quality: loaderQuality = quality }: { width: number, quality?: number }) => {
+      return urlFor(image)
+        .auto('format')
+        .width(loaderWidth)
+        .quality(loaderQuality)
+        .fit('max')
+        .url()
+    }
+  }, [image, quality])
 
   // Handle missing image
   if (!image?.asset) {

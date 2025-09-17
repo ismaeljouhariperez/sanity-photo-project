@@ -17,7 +17,7 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: process.env.NODE_ENV === 'production', // CDN for production, direct for dev
+  useCdn: false, // Disable CDN for SSG and ISR (recommended for Next.js)
   perspective: 'published', // Only published content
   // Disable stega for maximum performance
   stega: { enabled: false },
@@ -99,9 +99,11 @@ export const queries = {
   }`
 }
 
-// High-performance fetch functions with Next.js 15.5+ optimized caching
+// High-performance fetch functions with Next.js 15.5+ optimized caching and React cache() deduplication
+const cachedClientFetch = cache(client.fetch.bind(client))
+
 export async function getProjects(category?: string) {
-  return client.fetch(
+  return cachedClientFetch(
     queries.projects, 
     { category },
     { 
@@ -114,7 +116,7 @@ export async function getProjects(category?: string) {
 }
 
 export async function getProjectBySlug(slug: string, category: string) {
-  return client.fetch(
+  return cachedClientFetch(
     queries.projectBySlug, 
     { slug, category },
     { 
@@ -127,7 +129,7 @@ export async function getProjectBySlug(slug: string, category: string) {
 }
 
 export async function getSiteSettings() {
-  return client.fetch(
+  return cachedClientFetch(
     queries.siteSettings,
     {},
     { 
