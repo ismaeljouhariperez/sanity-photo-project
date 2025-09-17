@@ -13,6 +13,7 @@ import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import CloudinaryImage from '@/components/ui/media/CloudinaryImage'
+import ProjectLink from '@/components/ui/ProjectLink'
 
 interface CategoryClientProps {
   category: string
@@ -183,10 +184,7 @@ export default function CategoryClient({
             return (
               <motion.div
                 key={project._id}
-                className="max-w-[280px] cursor-pointer touch-manipulation overflow-hidden text-center text-3xl transition-colors hover:text-gray-500 active:text-gray-400 md:max-w-none md:text-left lg:text-5xl"
-                onMouseEnter={() => setHoveredProject(project._id)}
-                onMouseLeave={() => setHoveredProject(null)}
-                onClick={() => handleProjectClick(project)}
+                className="max-w-[280px] overflow-hidden text-center text-3xl md:max-w-none md:text-left lg:text-5xl"
                 animate={{
                   opacity:
                     shouldFadeOut || (isSecondStage && isClickedProject)
@@ -196,20 +194,28 @@ export default function CategoryClient({
                 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
-                <motion.h2
-                  className="overflow-hidden leading-[1.4]"
-                  initial={{ y: '-100%' }}
-                  animate={{
-                    y: hasEntered ? '0%' : '-100%',
-                  }}
-                  transition={{
-                    duration: 0.8,
-                    ease: [0.16, 1, 0.3, 1] as const,
-                    delay: 0.15 * index,
-                  }}
+                <ProjectLink
+                  href={`/${category}/${project.slug?.current || project.slug}`}
+                  className="cursor-pointer touch-manipulation transition-colors hover:text-gray-500 active:text-gray-400"
+                  onMouseEnter={() => setHoveredProject(project._id)}
+                  onMouseLeave={() => setHoveredProject(null)}
+                  onClick={() => handleProjectClick(project)}
                 >
-                  {project.title}
-                </motion.h2>
+                  <motion.h2
+                    className="overflow-hidden leading-[1.4]"
+                    initial={{ y: '-100%' }}
+                    animate={{
+                      y: hasEntered ? '0%' : '-100%',
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      ease: [0.16, 1, 0.3, 1] as const,
+                      delay: 0.15 * index,
+                    }}
+                  >
+                    {project.title}
+                  </motion.h2>
+                </ProjectLink>
               </motion.div>
             )
           })}
