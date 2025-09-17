@@ -25,95 +25,10 @@ export default {
         layout: 'tags',
       },
     },
-    {
-      name: 'author',
-      title: 'Auteur',
-      type: 'string',
-    },
-    {
-      name: 'logo',
-      title: 'Logo',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-    },
-    {
-      name: 'socialLinks',
-      title: 'Réseaux sociaux',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'platform',
-              title: 'Plateforme',
-              type: 'string',
-              options: {
-                list: [
-                  {title: 'Instagram', value: 'instagram'},
-                  {title: 'Twitter', value: 'twitter'},
-                  {title: 'Facebook', value: 'facebook'},
-                  {title: 'LinkedIn', value: 'linkedin'},
-                  {title: 'Behance', value: 'behance'},
-                  {title: 'Autre', value: 'other'},
-                ],
-              },
-            },
-            {
-              name: 'url',
-              title: 'URL',
-              type: 'url',
-              validation: (Rule: any) =>
-                Rule.uri({
-                  scheme: ['http', 'https'],
-                }),
-            },
-            {
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-            },
-          ],
-          preview: {
-            select: {
-              title: 'platform',
-              subtitle: 'url',
-            },
-          },
-        },
-      ],
-    },
-    {
-      name: 'mainNavigation',
-      title: 'Navigation principale',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'text',
-              title: 'Texte du lien',
-              type: 'string',
-            },
-            {
-              name: 'url',
-              title: 'URL',
-              type: 'string',
-              description: 'Chemin relatif (ex: /about)',
-            },
-          ],
-          preview: {
-            select: {
-              title: 'text',
-              subtitle: 'url',
-            },
-          },
-        },
-      ],
-    },
+    // Removed 'author' field - hardcoded as 'Ismael Perez León' in frontend
+    // Removed 'logo' field - not used in minimal photography design
+    // Removed 'socialLinks' field - social links not implemented in current design
+    // Removed 'mainNavigation' field - navigation is hardcoded in header component
     {
       name: 'seo',
       title: 'SEO Global',
@@ -126,45 +41,7 @@ export default {
       description: 'URL principale du site (ex: https://monsite.com)',
       validation: (Rule: any) => Rule.required(),
     },
-    {
-      name: 'themeColors',
-      title: 'Couleurs du thème',
-      type: 'object',
-      fields: [
-        {
-          name: 'primaryColor',
-          title: 'Couleur principale',
-          type: 'color',
-          options: {
-            disableAlpha: true,
-          },
-        },
-        {
-          name: 'secondaryColor',
-          title: 'Couleur secondaire', 
-          type: 'color',
-          options: {
-            disableAlpha: true,
-          },
-        },
-        {
-          name: 'backgroundColor',
-          title: 'Couleur de fond',
-          type: 'color',
-          options: {
-            disableAlpha: true,
-          },
-        },
-        {
-          name: 'textColor',
-          title: 'Couleur du texte',
-          type: 'color',
-          options: {
-            disableAlpha: true,
-          },
-        },
-      ],
-    },
+    // Removed 'themeColors' field - theme colors defined in Tailwind CSS
   ],
   preview: {
     select: {

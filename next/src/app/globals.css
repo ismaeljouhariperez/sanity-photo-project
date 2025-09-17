@@ -44,9 +44,56 @@
   }
 }
 
-/* View Transitions API - disabled for now */
+/* View Transitions API - Optimized for Photography Portfolio */
 @view-transition {
-  navigation: none;
+  navigation: auto;
+}
+
+/* Optimize image transitions for photography portfolio */
+[data-view-transition="hero-image"] {
+  view-transition-name: hero-image;
+}
+
+::view-transition-old(hero-image),
+::view-transition-new(hero-image) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth layout transitions */
+::view-transition-old(main-layout),
+::view-transition-new(main-layout) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-out;
+}
+
+/* Fast text transitions */
+::view-transition-old(text-content),
+::view-transition-new(text-content) {
+  animation-duration: 200ms;
+  animation-timing-function: ease-in-out;
+}
+
+/* Project titles smooth transition */
+[data-view-transition="project-title"] {
+  view-transition-name: project-title;
+}
+
+::view-transition-old(project-title),
+::view-transition-new(project-title) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-out;
+}
+
+/* Navigation transitions */
+[data-view-transition="main-nav"] {
+  view-transition-name: main-nav;
+}
+
+::view-transition-old(main-nav),
+::view-transition-new(main-nav) {
+  animation-duration: 250ms;
+  animation-timing-function: ease-in-out;
 }
 
 /* Embla Carousel - Fade Mode Configuration */

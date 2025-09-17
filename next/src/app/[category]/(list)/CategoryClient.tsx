@@ -40,7 +40,7 @@ export default function CategoryClient({
   const debouncedSetHoveredProject = useDebounce(setHoveredProject, 150)
   const [isExiting, setIsExiting] = useState(false)
   const [clickedProjectId, setClickedProjectId] = useState<string | null>(null)
-  const [isSecondStage, setIsSecondStage] = useState(false)
+  // Removed unused isSecondStage state (simplified navigation)
   const [displayedProjectId, setDisplayedProjectId] = useState<string | null>(
     null
   )
@@ -87,7 +87,7 @@ export default function CategoryClient({
   const displayedImage =
     displayedProjectData?.featuredImage || displayedProjectData?.coverImage
 
-  // Two-stage animation with navigation
+  // Simplified navigation with automatic view transitions
   const handleProjectClick = useCallback(
     (project: Project) => {
       if (isExiting) return
@@ -96,27 +96,12 @@ export default function CategoryClient({
       setIsExiting(true)
       setClickedProjectId(project._id)
 
-      // Stage 1: Other titles fade out (600ms)
+      // Quick visual feedback, then navigate (Next.js handles view transition)
       setTimeout(() => {
-        setIsSecondStage(true)
-
-        // Stage 2: Navigate after second stage (800ms)
-        setTimeout(() => {
-          if ('startViewTransition' in document) {
-            ;(
-              document as Document & {
-                startViewTransition?: (callback: () => void) => void
-              }
-            ).startViewTransition!(() => {
-              startTransition(() => {
-                router.push(`/${category}/${projectSlug}`)
-              })
-            })
-          } else {
-            router.push(`/${category}/${projectSlug}`)
-          }
-        }, 800)
-      }, 600)
+        startTransition(() => {
+          router.push(`/${category}/${projectSlug}`)
+        })
+      }, 200) // Reduced delay for faster navigation
     },
     [isExiting, category, router]
   )
@@ -131,8 +116,8 @@ export default function CategoryClient({
           ref={imageContainerRef}
           className="relative hidden overflow-hidden md:block md:w-1/3"
           animate={{
-            opacity: isSecondStage ? 0 : 1,
-            scale: isSecondStage ? 0.95 : 1,
+            opacity: 1,
+            scale: 1,
           }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
@@ -164,6 +149,7 @@ export default function CategoryClient({
                   width={1000}
                   height={1200}
                   className="layout-image h-full w-full object-cover"
+                  data-view-transition="hero-image"
                   folder="projects"
                   priority={true}
                 />
@@ -191,7 +177,7 @@ export default function CategoryClient({
                 className="max-w-[280px] overflow-hidden text-center text-3xl md:max-w-none md:text-left lg:text-5xl"
                 animate={{
                   opacity:
-                    shouldFadeOut || (isSecondStage && isClickedProject)
+                    shouldFadeOut
                       ? 0
                       : 1,
                   y: shouldFadeOut ? -10 : 0,
@@ -204,7 +190,7 @@ export default function CategoryClient({
                   onMouseEnter={() => debouncedSetHoveredProject(project._id)}
                   onMouseLeave={() => debouncedSetHoveredProject(null)}
                   onClick={() => handleProjectClick(project)}
-                  enablePrefetch={index < 3} // Only prefetch first 3 projects
+                  enablePrefetch={index < 5} // Prefetch first 5 projects for smooth transitions
                 >
                   <motion.h2
                     className="overflow-hidden leading-[1.4]"

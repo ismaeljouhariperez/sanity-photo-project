@@ -15,16 +15,31 @@ export default {
       type: 'image',
       options: {
         hotspot: true,
-        metadata: ['exif', 'location', 'palette'],
+        metadata: ['lqip', 'dimensions', 'palette'], // Optimized metadata for web
         storeOriginalFilename: true,
       },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: any) => Rule.required().custom(async (image: any, context: any) => {
+        if (!image?.asset) return 'Image required'
+        
+        // Photography portfolio validation
+        const asset = await context.getClient({}).fetch(
+          '*[_id == $assetId][0].metadata.dimensions',
+          { assetId: image.asset._ref }
+        )
+        
+        if (asset && (asset.width < 1200 || asset.height < 800)) {
+          return 'Image too small for photography portfolio (minimum 1200x800px)'
+        }
+        
+        return true
+      }),
     },
     {
-      name: 'alt',
-      title: 'Alt Text',
+      name: 'altDescription',
+      title: 'Description alternative (accessibilité)',
       type: 'string',
-      description: "Important pour l'accessibilité et le SEO",
+      description: 'Description précise pour les lecteurs d’écran et l’accessibilité',
+      validation: (Rule: any) => Rule.required().min(10).max(200),
     },
     {
       name: 'slug',
@@ -57,13 +72,7 @@ export default {
         layout: 'tags',
       },
     },
-    {
-      name: 'order',
-      title: "Ordre d'affichage",
-      type: 'number',
-      description: "Ordre d'affichage dans un projet",
-      initialValue: 0,
-    },
+    // Removed 'order' field - using array position for ordering
     {
       name: 'featured',
       title: 'Photo mise en avant',

@@ -123,7 +123,7 @@ export default function GalleryContent({
             >
               <SanityImage
                 image={image.image}
-                alt={`Gallery image ${index + 1}`}
+                alt={image.title || image.description || `${project?.title || 'Gallery'} - Image ${index + 1}`}
                 width={300}
                 height={300}
                 className="h-full w-full object-contain transition-transform duration-300"

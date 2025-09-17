@@ -13,8 +13,8 @@ interface ProjectLinkProps {
 }
 
 /**
- * Project link with hover prefetching for Next.js 15.5
- * Optimizes navigation performance by prefetching routes only on hover
+ * Project link optimized for View Transitions API + Next.js 15.5
+ * Intelligent prefetching strategy for smooth view transitions
  */
 export default function ProjectLink({
   href,
@@ -23,12 +23,13 @@ export default function ProjectLink({
   onMouseEnter,
   onMouseLeave,
   onClick,
-  enablePrefetch = false, // Default to no prefetch
+  enablePrefetch = true, // Enable by default for view transitions
 }: ProjectLinkProps) {
   const [shouldPrefetch, setShouldPrefetch] = useState(false)
 
   const handleMouseEnter = () => {
     if (enablePrefetch) {
+      // Immediate prefetch for smooth view transitions
       setShouldPrefetch(true)
     }
     onMouseEnter?.()
@@ -41,7 +42,7 @@ export default function ProjectLink({
   return (
     <Link
       href={href}
-      prefetch={enablePrefetch && shouldPrefetch ? null : false}
+      prefetch={enablePrefetch && shouldPrefetch ? true : false}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}

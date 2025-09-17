@@ -77,8 +77,23 @@ export const project = {
               type: 'image',
               options: {
                 hotspot: true,
+                metadata: ['lqip', 'dimensions', 'palette'], // Extract useful metadata
               },
-              validation: (Rule: any) => Rule.required(),
+              validation: (Rule: any) => Rule.required().custom(async (image: any, context: any) => {
+                if (!image?.asset) return 'Image required'
+                
+                // Get image dimensions for photography validation
+                const asset = await context.getClient({}).fetch(
+                  '*[_id == $assetId][0].metadata.dimensions',
+                  { assetId: image.asset._ref }
+                )
+                
+                if (asset && (asset.width < 1200 || asset.height < 800)) {
+                  return 'Image too small for photography portfolio (minimum 1200x800px)'
+                }
+                
+                return true
+              }),
             },
             {
               name: 'title',
@@ -92,10 +107,11 @@ export const project = {
               rows: 2,
             },
             {
-              name: 'order',
-              title: "Ordre d'affichage",
-              type: 'number',
-              initialValue: 0,
+              name: 'altDescription',
+              title: 'Description alternative (accessibilité)',
+              type: 'string',
+              description: 'Description précise pour les lecteurs d’écran et l’accessibilité',
+              validation: (Rule: any) => Rule.required().min(10).max(200),
             },
           ],
           preview: {
@@ -103,7 +119,7 @@ export const project = {
               title: 'title',
               media: 'image',
             },
-            prepare({title, media}) {
+            prepare({title, media}: {title?: string; media?: any}) {
               return {
                 title: title || 'Image sans titre',
                 media,
@@ -113,13 +129,7 @@ export const project = {
         },
       ],
     },
-    {
-      name: 'order',
-      title: "Ordre d'affichage",
-      type: 'number',
-      description: 'Ordre dans lequel ce projet apparaît dans sa catégorie',
-      group: 'content',
-    },
+    // Removed 'order' field - using _createdAt for chronological ordering
     {
       name: 'seo',
       title: 'SEO',
@@ -133,7 +143,7 @@ export const project = {
       media: 'coverImage',
       category: 'category',
     },
-    prepare({title, media, category}) {
+    prepare({title, media, category}: {title?: string; media?: any; category?: string}) {
       return {
         title,
         subtitle: category === 'black-and-white' ? 'Noir et Blanc' : 'Couleur',
