@@ -111,59 +111,50 @@ export default function SanityImage({
     onError
   })
 
-  // Memoized image data and URLs (2025 best practice)
+  // Simplified image data with single URL generation (2025 best practice)
   const imageData = useMemo(() => {
     if (!image?.asset) return null
     
     const dimensions = getImageDimensions(image.asset)
     
-    // Progressive quality optimization for different scenarios
-    const generateUrl = (q: number, maxWidth?: number) => {
-      const builder = urlFor(image)
-        .auto('format') // Automatic WebP/AVIF in 2025
-        .quality(q)
-        .fit('max')
-      
-      if (maxWidth) builder.width(maxWidth)
-      if (dimensions) {
-        builder.width(dimensions.width).height(dimensions.height)
-      }
-      
-      return builder.url()
-    }
+    // Single URL with optimal settings - no complex fallback logic
+    const imageUrl = urlFor(image)
+      .auto('format') // Automatic WebP/AVIF 
+      .quality(quality)
+      .fit('max')
+      .url()
+    
+    const blurUrl = urlFor(image)
+      .width(24)
+      .height(24)
+      .quality(20)
+      .blur(10)
+      .url()
+    
+    console.log('Generated Sanity image URL:', imageUrl)
     
     return {
       dimensions,
-      urls: {
-        primary: generateUrl(quality),
-        fallback: generateUrl(Math.max(60, quality - 20), emblaOptimized ? 1200 : 1600),
-        emergency: generateUrl(45, 800),
-        blur: urlFor(image).width(24).height(24).quality(20).blur(10).url()
-      }
+      url: imageUrl,
+      blurUrl
     }
-  }, [image, quality, emblaOptimized])
+  }, [image, quality])
 
-  // Current image URL based on retry count
-  const imageUrl = useMemo(() => {
-    if (!imageData) return ''
-    const { urls } = imageData
-    return loader.retryCount === 0 ? urls.primary :
-           loader.retryCount === 1 ? urls.fallback :
-           urls.emergency
-  }, [imageData, loader.retryCount])
+  // Simple image URL - no complex retry URL switching
+  const imageUrl = imageData?.url || ''
 
   // Custom loader for Sanity CDN optimization (2025 best practice)
-  const customLoader = useMemo(() => {
-    if (loader.retryCount > 0) return undefined
+  const customLoader = ({ width: loaderWidth, quality: loaderQuality = quality }: { width: number, quality?: number }) => {
+    const url = urlFor(image)
+      .auto('format')
+      .width(loaderWidth)
+      .quality(loaderQuality)
+      .fit('max')
+      .url()
     
-    return ({ width: loaderWidth, quality: loaderQuality = quality }) => 
-      urlFor(image)
-        .auto('format')
-        .width(loaderWidth)
-        .quality(loaderQuality)
-        .fit('max')
-        .url()
-  }, [image, quality, loader.retryCount])
+    console.log('Custom loader URL:', url, { width: loaderWidth, quality: loaderQuality })
+    return url
+  }
 
   // Handle missing image
   if (!image?.asset) {
@@ -204,10 +195,9 @@ export default function SanityImage({
         sizes={sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"}
         loading={priority ? 'eager' : 'lazy'}
         placeholder="blur"
-        blurDataURL={imageData?.urls.blur}
+        blurDataURL={imageData?.blurUrl}
         onLoad={loader.handleLoad}
         onError={loader.handleError}
-        unoptimized={loader.retryCount > 0}
         loader={customLoader}
       />
     </div>

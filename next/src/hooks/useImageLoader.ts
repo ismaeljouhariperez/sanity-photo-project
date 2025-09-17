@@ -35,10 +35,10 @@ export function useImageLoader({
   const [showPlaceholder, setShowPlaceholder] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout>()
 
-  // Calculate timeout based on priority and retry count
+  // Calculate timeout based on priority and retry count - less aggressive timeouts
   const getTimeoutDuration = useCallback(() => {
     if (timeoutMs) return timeoutMs
-    return priority ? 800 : 1500 + (retryCount * 1000)
+    return priority ? 3000 : 5000 + (retryCount * 1000)
   }, [priority, retryCount, timeoutMs])
 
   const clearImageTimeout = useCallback(() => {
@@ -57,12 +57,19 @@ export function useImageLoader({
     onLoad?.()
   }, [onLoad, clearImageTimeout])
 
-  const handleError = useCallback(() => {
+  const handleError = useCallback((error?: Event) => {
     clearImageTimeout()
     
+    // Console logging for debugging
+    console.warn(`Image loading failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, {
+      error: error?.type || 'timeout',
+      retryCount,
+      timestamp: new Date().toISOString()
+    })
+    
     if (retryCount < maxRetries) {
-      // Fast retry with minimal delay
-      const delay = Math.min(200 * (retryCount + 1), 500)
+      // Retry with progressive delay
+      const delay = Math.min(500 * (retryCount + 1), 2000)
       setTimeout(() => {
         setRetryCount(prev => prev + 1)
         setIsLoading(true)
@@ -70,6 +77,7 @@ export function useImageLoader({
         setIsLoaded(false)
       }, delay)
     } else {
+      console.error('Image loading failed after all retries')
       setHasError(true)
       setIsLoading(false)
       setShowPlaceholder(false)
