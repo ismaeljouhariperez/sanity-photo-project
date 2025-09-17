@@ -24,8 +24,8 @@ const nextConfig = {
     ],
     // High-quality photography configuration for Next.js 15.5+
     formats: ['image/webp', 'image/avif'], // Modern formats with fallback
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512], // Added 512 for larger thumbnails
-    deviceSizes: [640, 828, 1200, 1920, 2048, 3840], // Optimized for photography display
+    imageSizes: [16, 32, 48, 64, 96, 128, 256], // Essential thumbnail sizes
+    deviceSizes: [640, 1024, 1920, 3840], // Optimized breakpoints: mobile, tablet, desktop, 4K
     minimumCacheTTL: 86400, // 24 hours cache for better performance
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

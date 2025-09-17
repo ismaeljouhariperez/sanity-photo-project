@@ -132,6 +132,7 @@ export default function GalleryContent({
                 maxRetries={1}
                 timeoutMs={600}
                 galleryMode={true}
+                priority={index < 6} // Only prioritize first 6 images
               />
 
               {/* Overlay with image number - always visible on mobile, hover on desktop */}

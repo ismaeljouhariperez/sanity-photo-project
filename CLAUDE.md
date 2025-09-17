@@ -9,21 +9,21 @@ This is a photography portfolio website showcasing analog/film photography proje
 ## Development Commands
 
 ```bash
-# Main development
-yarn dev              # Start Next.js development server on localhost:3000
-yarn build            # Build for production  
-yarn start            # Start production server
-yarn lint             # Run ESLint
-yarn format           # Format code with Prettier
+# Main development (Next.js - uses pnpm)
+pnpm dev              # Start Next.js development server on localhost:3000
+pnpm build            # Build for production  
+pnpm start            # Start production server
+pnpm lint             # Run ESLint
+pnpm format           # Format code with Prettier
 
-# Sanity CMS Studio (run from sanity/ directory)
+# Sanity CMS Studio (run from sanity/ directory - uses yarn)
 cd sanity/
 yarn dev              # Start Sanity Studio (separate port)
 yarn build            # Build Sanity Studio
 yarn deploy           # Deploy Studio to Sanity
 ```
 
-**Important**: This project uses Yarn as the package manager - npm is blocked in package.json.
+**Important**: This project uses **pnpm** for Next.js and **yarn** for Sanity Studio (different package managers for each workspace).
 
 ## Architecture Overview
 

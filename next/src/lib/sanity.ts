@@ -1,6 +1,7 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
 import type { SanityImage } from './sanity.types'
+import { cache } from 'react'
 
 // Sanity configuration
 export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
@@ -32,11 +33,16 @@ export const previewClient = createClient({
   perspective: 'previewDrafts',
 })
 
-// Image URL builder
+// Image URL builder with caching
 const builder = imageUrlBuilder({ projectId, dataset })
 
-export function urlFor(source: SanityImage) {
+// Cached URL generation to prevent duplicate requests
+const cachedUrlFor = cache((source: SanityImage) => {
   return builder.image(source)
+})
+
+export function urlFor(source: SanityImage) {
+  return cachedUrlFor(source)
 }
 
 // GROQ queries
@@ -146,13 +152,3 @@ export async function getCollections() {
   )
 }
 
-// Cache invalidation helpers for webhooks (future implementation)
-export function revalidateProject(slug: string, category: string) {
-  // Use with revalidateTag in webhook handlers
-  console.log(`Would revalidate project:${slug} and category:${category}`)
-}
-
-export function revalidateProjects(category?: string) {
-  // Use with revalidateTag in webhook handlers  
-  console.log(`Would revalidate projects${category ? ` for ${category}` : ''}`)
-}

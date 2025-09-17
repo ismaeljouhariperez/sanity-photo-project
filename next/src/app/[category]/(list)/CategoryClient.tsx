@@ -12,6 +12,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { urlFor } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useDebounce } from '@/hooks/useDebounce'
 import CloudinaryImage from '@/components/ui/media/CloudinaryImage'
 import ProjectLink from '@/components/ui/ProjectLink'
 
@@ -34,6 +35,9 @@ export default function CategoryClient({
 
   const [hasEntered, setHasEntered] = useState(false)
   const [hoveredProject, setHoveredProject] = useState<string | null>(null)
+  
+  // Debounced hover handler to prevent excessive URL generation
+  const debouncedSetHoveredProject = useDebounce(setHoveredProject, 150)
   const [isExiting, setIsExiting] = useState(false)
   const [clickedProjectId, setClickedProjectId] = useState<string | null>(null)
   const [isSecondStage, setIsSecondStage] = useState(false)
@@ -66,7 +70,7 @@ export default function CategoryClient({
     return () => clearTimeout(timer)
   }, [])
 
-  // Update displayed project when hovering
+  // Update displayed project when hovering (debounced)
   useEffect(() => {
     if (hoveredProject) {
       setDisplayedProjectId(hoveredProject)
@@ -197,9 +201,10 @@ export default function CategoryClient({
                 <ProjectLink
                   href={`/${category}/${project.slug?.current || project.slug}`}
                   className="cursor-pointer touch-manipulation transition-colors hover:text-gray-500 active:text-gray-400"
-                  onMouseEnter={() => setHoveredProject(project._id)}
-                  onMouseLeave={() => setHoveredProject(null)}
+                  onMouseEnter={() => debouncedSetHoveredProject(project._id)}
+                  onMouseLeave={() => debouncedSetHoveredProject(null)}
                   onClick={() => handleProjectClick(project)}
+                  enablePrefetch={index < 3} // Only prefetch first 3 projects
                 >
                   <motion.h2
                     className="overflow-hidden leading-[1.4]"

@@ -9,6 +9,7 @@ interface ProjectLinkProps {
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onClick?: () => void
+  enablePrefetch?: boolean // Control prefetching
 }
 
 /**
@@ -22,11 +23,14 @@ export default function ProjectLink({
   onMouseEnter,
   onMouseLeave,
   onClick,
+  enablePrefetch = false, // Default to no prefetch
 }: ProjectLinkProps) {
   const [shouldPrefetch, setShouldPrefetch] = useState(false)
 
   const handleMouseEnter = () => {
-    setShouldPrefetch(true)
+    if (enablePrefetch) {
+      setShouldPrefetch(true)
+    }
     onMouseEnter?.()
   }
 
@@ -37,7 +41,7 @@ export default function ProjectLink({
   return (
     <Link
       href={href}
-      prefetch={shouldPrefetch ? null : false}
+      prefetch={enablePrefetch && shouldPrefetch ? null : false}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}

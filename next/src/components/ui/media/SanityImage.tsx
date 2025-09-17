@@ -131,7 +131,6 @@ export default function SanityImage({
       .blur(10)
       .url()
     
-    console.log('Generated Sanity image URL:', imageUrl)
     
     return {
       dimensions,
@@ -152,7 +151,6 @@ export default function SanityImage({
       .fit('max')
       .url()
     
-    console.log('Custom loader URL:', url, { width: loaderWidth, quality: loaderQuality })
     return url
   }
 
@@ -192,7 +190,7 @@ export default function SanityImage({
         height={fill ? undefined : (height || imageData?.dimensions?.height)}
         className={fill ? 'object-contain' : 'object-contain w-full h-full'}
         priority={priority}
-        sizes={sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"}
+        sizes={sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1920px"}
         loading={priority ? 'eager' : 'lazy'}
         placeholder="blur"
         blurDataURL={imageData?.blurUrl}

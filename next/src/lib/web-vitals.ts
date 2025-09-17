@@ -7,8 +7,7 @@ interface WebVitalMetric {
 }
 
 export function reportWebVitals(metric: WebVitalMetric) {
-  // Log all metrics for development
-  console.log(`📊 ${metric.name}: ${metric.value}${metric.name === 'CLS' ? '' : 'ms'}`)
+  // Track metrics in production mode only for critical issues
   
   // Track critical metrics for photography portfolio
   switch (metric.name) {
@@ -16,8 +15,6 @@ export function reportWebVitals(metric: WebVitalMetric) {
       // Largest Contentful Paint - Critical for image loading
       if (metric.value > 2500) {
         console.warn(`⚠️ LCP too slow: ${metric.value}ms (target: <2500ms)`)
-      } else {
-        console.log(`✅ LCP good: ${metric.value}ms`)
       }
       break
       
@@ -25,8 +22,6 @@ export function reportWebVitals(metric: WebVitalMetric) {
       // Cumulative Layout Shift - Important for gallery stability
       if (metric.value > 0.1) {
         console.warn(`⚠️ CLS too high: ${metric.value} (target: <0.1)`)
-      } else {
-        console.log(`✅ CLS good: ${metric.value}`)
       }
       break
       
@@ -34,8 +29,6 @@ export function reportWebVitals(metric: WebVitalMetric) {
       // Interaction to Next Paint - User interaction responsiveness (replaces FID)
       if (metric.value > 200) {
         console.warn(`⚠️ INP too slow: ${metric.value}ms (target: <200ms)`)
-      } else {
-        console.log(`✅ INP good: ${metric.value}ms`)
       }
       break
       
@@ -43,8 +36,6 @@ export function reportWebVitals(metric: WebVitalMetric) {
       // First Contentful Paint - Initial loading perception
       if (metric.value > 1800) {
         console.warn(`⚠️ FCP too slow: ${metric.value}ms (target: <1800ms)`)
-      } else {
-        console.log(`✅ FCP good: ${metric.value}ms`)
       }
       break
       
@@ -52,8 +43,6 @@ export function reportWebVitals(metric: WebVitalMetric) {
       // Time to First Byte - Server response time
       if (metric.value > 800) {
         console.warn(`⚠️ TTFB too slow: ${metric.value}ms (target: <800ms)`)
-      } else {
-        console.log(`✅ TTFB good: ${metric.value}ms`)
       }
       break
   }
@@ -81,9 +70,7 @@ export function trackImageLoad(imageSrc: string, loadTime: number) {
 
 // Helper function to track navigation performance
 export function trackNavigation(from: string, to: string, duration: number) {
-  console.log(`🧭 Navigation: ${from} → ${to} in ${duration}ms`)
-  
   if (duration > 500) {
-    console.warn(`⚠️ Slow navigation: ${duration}ms`)
+    console.warn(`⚠️ Slow navigation: ${from} → ${to} in ${duration}ms`)
   }
 }

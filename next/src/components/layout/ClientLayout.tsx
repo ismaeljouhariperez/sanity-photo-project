@@ -64,9 +64,9 @@ export default function ClientLayout({
       // Observe performance entries
       try {
         observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint'] })
-        console.log('📊 Web Vitals tracking initialized (built-in)')
+        // Web Vitals tracking initialized
       } catch {
-        console.log('📊 Web Vitals tracking not supported')
+        // Web Vitals tracking not supported
       }
       
       return () => observer.disconnect()
