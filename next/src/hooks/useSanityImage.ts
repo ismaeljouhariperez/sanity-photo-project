@@ -41,7 +41,9 @@ export function useSanityImage(
     if (!image?.asset) return
 
     // Generate optimized URLs for different screen sizes
-    const baseUrl = urlFor(image).auto(format).quality(quality)
+    const baseUrl = format === 'auto' 
+      ? urlFor(image).auto('format').quality(quality)
+      : urlFor(image).format(format).quality(quality)
     
     // Generate srcSet for responsive images
     const breakpoints = [320, 640, 768, 1024, 1280, 1600]
@@ -58,12 +60,9 @@ export function useSanityImage(
       : baseUrl.width(width).url()
 
     // Generate low-quality placeholder
-    const placeholder = urlFor(image)
-      .width(20)
-      .quality(20)
-      .blur(50)
-      .auto(format)
-      .url()
+    const placeholder = format === 'auto'
+      ? urlFor(image).width(20).quality(20).blur(50).auto('format').url()
+      : urlFor(image).width(20).quality(20).blur(50).format(format).url()
 
     setImageData({
       src: mainSrc,

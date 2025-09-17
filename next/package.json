@@ -4,11 +4,13 @@
   "private": true,
   "packageManager": "pnpm@8.15.4",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "type-gen": "next typegen",
+    "type-check": "tsc --noEmit && next typegen"
   },
   "dependencies": {
     "@portabletext/react": "^3.1.0",

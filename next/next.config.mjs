@@ -22,11 +22,11 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
-    // Enhanced timeout and quality settings for Sanity CDN issues
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    formats: ['image/webp'],
-    minimumCacheTTL: 60,
+    // High-quality photography configuration for Next.js 15.5+
+    formats: ['image/webp', 'image/avif'], // Modern formats with fallback
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512], // Added 512 for larger thumbnails
+    deviceSizes: [640, 828, 1200, 1920, 2048, 3840], // Optimized for photography display
+    minimumCacheTTL: 86400, // 24 hours cache for better performance
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },

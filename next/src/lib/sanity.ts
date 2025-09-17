@@ -93,15 +93,15 @@ export const queries = {
   }`
 }
 
-// High-performance fetch functions with Next.js 15.5 caching
+// High-performance fetch functions with Next.js 15.5+ optimized caching
 export async function getProjects(category?: string) {
   return client.fetch(
     queries.projects, 
     { category },
     { 
       next: { 
-        revalidate: 300, // 5 minutes cache
-        tags: ['projects', `category:${category || 'all'}`] 
+        revalidate: 600, // 10 minutes cache for better performance
+        tags: ['projects', `category:${category || 'all'}`, 'portfolio-content'] 
       }
     }
   )
@@ -113,8 +113,8 @@ export async function getProjectBySlug(slug: string, category: string) {
     { slug, category },
     { 
       next: { 
-        revalidate: 600, // 10 minutes cache
-        tags: [`project:${slug}`, `category:${category}`] 
+        revalidate: 1800, // 30 minutes cache for project details
+        tags: [`project:${slug}`, `category:${category}`, 'portfolio-content'] 
       }
     }
   )
