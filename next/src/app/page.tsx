@@ -30,13 +30,13 @@ export default function Home() {
     animate: {
       opacity: 1,
       transition: {
-        duration: 0.3,
+        duration: 0.15, // Faster for better FCP
       },
     },
     exit: {
       opacity: 1,
       transition: {
-        duration: 0.3,
+        duration: 0.15,
       },
     },
   }
@@ -51,7 +51,7 @@ export default function Home() {
         className="container mx-auto flex h-full items-center px-4 md:px-8"
       >
         <div className="grid w-full grid-cols-1 place-items-center gap-12 md:grid-cols-2 md:gap-8">
-          {/* Black & White Project */}
+          {/* Black & White Project - LCP candidate */}
           <ImageReveal
             src="cover-bw.jpg"
             alt="Photographie Noir et Blanc"
@@ -61,13 +61,13 @@ export default function Home() {
             fallbackSrc="/images/bw-cover.jpg"
             priority={true}
             onClick={() => handleNavigate('/black-and-white')}
-            delay={0.4}
+            delay={0.2}
             exitDelay={0}
             isExiting={isExiting}
             className="md:max-w-[70%]"
           />
 
-          {/* Early Color Project */}
+          {/* Early Color Project - Non-priority for better LCP */}
           <ImageReveal
             src="cover-color.jpg"
             alt="Photographie Couleur"
@@ -75,9 +75,9 @@ export default function Home() {
             height={975}
             folder="home"
             fallbackSrc="/images/color-cover.jpg"
-            priority={true}
+            priority={false}
             onClick={() => handleNavigate('/early-color')}
-            delay={0.6}
+            delay={0.4}
             exitDelay={0.2}
             isExiting={isExiting}
             className="md:max-w-[70%]"

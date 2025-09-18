@@ -57,15 +57,13 @@ export function useImageLoader({
     onLoad?.()
   }, [onLoad, clearImageTimeout])
 
-  const handleError = useCallback((error?: Event) => {
+  const handleError = useCallback(() => {
     clearImageTimeout()
     
-    // Console logging for debugging
-    console.warn(`Image loading failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, {
-      error: error?.type || 'timeout',
-      retryCount,
-      timestamp: new Date().toISOString()
-    })
+    // Only log errors in development to reduce console noise
+    if (process.env.NODE_ENV === 'development' && retryCount === maxRetries) {
+      console.warn(`Image loading failed after ${maxRetries + 1} attempts`)
+    }
     
     if (retryCount < maxRetries) {
       // Retry with progressive delay
