@@ -25,7 +25,7 @@ export function useTransitionNavigation({
 
     // Small delay to let animations start before navigation
     setTimeout(() => {
-      router.push(path)
+      router.push(path as `/black-and-white` | `/early-color` | `/${string}/${string}`) // Type assertion for typed routes compatibility
     }, navigationDelay)
   }, [router, setTransition, onClose, navigationDelay])
 

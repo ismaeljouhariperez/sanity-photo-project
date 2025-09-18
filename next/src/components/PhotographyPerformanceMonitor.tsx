@@ -31,7 +31,7 @@ export function PhotographyPerformanceMonitor() {
 
     try {
       observer.observe({ type: 'largest-contentful-paint', buffered: true })
-    } catch (error) {
+    } catch {
       // Fallback for older browsers
       console.log('Performance monitoring not supported')
     }

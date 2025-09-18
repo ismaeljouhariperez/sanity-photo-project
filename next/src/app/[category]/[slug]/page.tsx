@@ -11,6 +11,9 @@ interface ProjectPageProps {
 
 // Removed getCachedSettings - SEO now handled in Next.js for better performance
 
+// ISR: Revalidate project pages every hour for fresh content
+export const revalidate = 3600
+
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   try {
     const { category, slug } = await params

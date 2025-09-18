@@ -1,6 +1,52 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // HTTP headers optimization for photography portfolio
+  async headers() {
+    return [
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable', // 1 year cache for images
+          },
+        ],
+      },
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable', // 1 year cache for fonts
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          }
+        ],
+      },
+    ]
+  },
   outputFileTracingRoot: process.cwd(),
+  // TypeScript typed routes for compile-time route safety (moved out of experimental)
+  typedRoutes: true,
   experimental: {
     viewTransition: true,
     // Next.js 15.5 performance optimizations

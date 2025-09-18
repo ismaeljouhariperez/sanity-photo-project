@@ -28,6 +28,9 @@ function getDefaultImageProps(category: string) {
 
 // Removed getCachedSettings - SEO now handled in Next.js for better performance
 
+// ISR: Revalidate category pages every 2 hours (less frequent than individual projects)
+export const revalidate = 7200
+
 export async function generateMetadata({ params }: CategoryListPageProps): Promise<Metadata> {
   try {
     const { category } = await params

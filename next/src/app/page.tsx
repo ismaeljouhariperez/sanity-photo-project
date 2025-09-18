@@ -15,7 +15,7 @@ export default function Home() {
   const { setTransition } = useTransitionStore()
   const [isExiting, setIsExiting] = useState(false)
 
-  const handleNavigate = (path: string) => {
+  const handleNavigate = (path: '/black-and-white' | '/early-color') => {
     setIsExiting(true)
     setTransition(true, 'exiting')
 

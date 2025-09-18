@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 interface ProjectLinkProps {
-  href: string
+  href: string // Will be typed by Next.js typed routes
   children: React.ReactNode
   className?: string
   onMouseEnter?: () => void
@@ -41,7 +41,7 @@ export default function ProjectLink({
 
   return (
     <Link
-      href={href}
+      href={href as `/black-and-white` | `/early-color` | `/${string}/${string}`} // Type assertion for typed routes compatibility
       prefetch={enablePrefetch && shouldPrefetch ? true : false}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

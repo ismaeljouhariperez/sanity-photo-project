@@ -4,9 +4,19 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMobileOptimizations } from '@/hooks/useMobileOptimizations'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
-import GalleryOverlay from '../GalleryOverlay'
+
+// Lazy load GalleryOverlay - heavy component with animations
+const GalleryOverlay = dynamic(() => import('../GalleryOverlay'), {
+  loading: () => (
+    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+      <div className="animate-pulse text-white">Loading gallery...</div>
+    </div>
+  ),
+  ssr: false // Gallery interactions don't need SSR
+})
 import { useAnimationStore } from '@/store/animationStore'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
 import { useRouter } from 'next/navigation'
