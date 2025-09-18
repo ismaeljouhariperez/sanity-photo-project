@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { CATEGORIES, CategoryType, getCategoryFrenchLabel } from './constants'
 
 /**
  * SEO Configuration for Photography Portfolio
@@ -35,7 +36,7 @@ export const siteMetadata = {
 export interface ProjectData {
   title: string
   description?: string
-  category?: 'black-and-white' | 'early-color'
+  category?: CategoryType
   slug?: string
   coverImage?: string // Sanity image URL
 }
@@ -44,7 +45,7 @@ export interface ProjectData {
  * Generate metadata for project pages
  */
 export function generateProjectMetadata(project: ProjectData): Metadata {
-  const categoryLabel = getCategoryLabel(project.category)
+  const categoryLabel = project.category ? getCategoryFrenchLabel(project.category) : 'Photographie'
   const title = `${project.title} - ${categoryLabel} | ${siteMetadata.title}`
   
   const description = project.description 
@@ -54,7 +55,7 @@ export function generateProjectMetadata(project: ProjectData): Metadata {
   const keywords = [
     ...siteMetadata.keywords,
     categoryLabel.toLowerCase(),
-    project.category === 'black-and-white' ? 'photographie noir et blanc' : 'photographie couleur vintage'
+    project.category === CATEGORIES.MONOCHROME ? 'photographie noir et blanc' : 'photographie couleur vintage'
   ]
 
   const url = `${siteMetadata.siteUrl}/${project.category}/${project.slug}`
@@ -102,16 +103,16 @@ export function generateProjectMetadata(project: ProjectData): Metadata {
  * Generate metadata for category pages
  */
 export function generateCategoryMetadata(
-  category: 'black-and-white' | 'early-color'
+  category: CategoryType
 ): Metadata {
-  const categoryLabel = getCategoryLabel(category)
+  const categoryLabel = getCategoryFrenchLabel(category)
   const title = `Photographie ${categoryLabel} | ${siteMetadata.title}`
   const description = `Découvrez la collection ${categoryLabel.toLowerCase()} de photographie analogique. ${getCategoryDescription(category)}`
 
   const keywords = [
     ...siteMetadata.keywords,
     categoryLabel.toLowerCase(),
-    category === 'black-and-white' 
+    category === CATEGORIES.MONOCHROME 
       ? 'photographie noir et blanc'
       : 'photographie couleur vintage'
   ]
@@ -215,22 +216,12 @@ export function generateHomeMetadata(): Metadata {
 }
 
 // Helper functions
-function getCategoryLabel(category?: string): string {
-  switch (category) {
-    case 'black-and-white':
-      return 'Noir et Blanc'
-    case 'early-color':
-      return 'Early Color'
-    default:
-      return 'Photographie'
-  }
-}
 
 function getCategoryDescription(
-  category: 'black-and-white' | 'early-color'
+  category: CategoryType
 ): string {
   switch (category) {
-    case 'black-and-white':
+    case CATEGORIES.MONOCHROME:
       return "Une exploration intemporelle de la lumière, du contraste et de l'émotion à travers la photographie argentique noir et blanc."
     case 'early-color':
       return 'Découvrez la beauté nostalgique des premières techniques de photographie couleur et leur esthétique vintage unique.'

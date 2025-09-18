@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { getProjectBySlug, urlFor } from '@/lib/sanity'
 import { generateCategoryMetadata, generateProjectMetadata } from '@/lib/seo'
-import { isValidCategory } from '@/lib/constants'
+import { isValidCategory, CATEGORIES } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import ProjectSlider from '@/components/ui/media/ProjectSlider'
 
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     return generateCategoryMetadata(category)
   } catch (error) {
     console.error('Error generating metadata:', error)
-    return generateCategoryMetadata('black-and-white')
+    return generateCategoryMetadata(CATEGORIES.MONOCHROME)
   }
 }
 

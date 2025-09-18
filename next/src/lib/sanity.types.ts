@@ -1,3 +1,5 @@
+import { CategoryType } from './constants'
+
 // Base type for Sanity documents
 export interface SanityDocument {
   _id: string
@@ -72,7 +74,7 @@ export interface Project extends SanityDocument {
   slug: SanitySlug
   description?: string
   coverImage: SanityImage
-  category: 'black-and-white' | 'early-color'
+  category: CategoryType
   images?: ProjectImage[]
   featuredImage?: SanityImage
   order?: number

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { getProjects } from '@/lib/sanity'
 import { generateCategoryMetadata } from '@/lib/seo'
-import { isValidCategory } from '@/lib/constants'
+import { isValidCategory, CATEGORIES } from '@/lib/constants'
 import { notFound } from 'next/navigation'
 import CategoryClient from './CategoryClient'
 
@@ -11,7 +11,7 @@ interface CategoryListPageProps {
 
 // Category-specific default images helper
 function getDefaultImageProps(category: string) {
-  if (category === 'black-and-white') {
+  if (category === CATEGORIES.MONOCHROME) {
     return {
       src: 'projects-bw.jpg',
       alt: 'Projets Noir et Blanc',
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: CategoryListPageProps): Promi
     return generateCategoryMetadata(category)
   } catch (error) {
     console.error('Error generating metadata:', error)
-    return generateCategoryMetadata('black-and-white')
+    return generateCategoryMetadata(CATEGORIES.MONOCHROME)
   }
 }
 

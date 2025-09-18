@@ -7,6 +7,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
+import { CATEGORIES } from '@/lib/constants'
 
 // Lazy load GalleryOverlay - heavy component with animations
 const GalleryOverlay = dynamic(() => import('../GalleryOverlay'), {
@@ -34,7 +35,7 @@ const Header = memo(function Header() {
 
   // Define page type variables
   const isProjectPage =
-    pathname.includes('/black-and-white') || pathname.includes('/early-color')
+    pathname.includes(`/${CATEGORIES.MONOCHROME}`) || pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)
 
   // Check if we're on a project detail page (with slug)
   const isProjectDetailPage = isProjectPage && pathname.split('/').length === 3
@@ -96,7 +97,7 @@ const Header = memo(function Header() {
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
     const isInProjects =
-      pathname.includes('/black-and-white') || pathname.includes('/early-color')
+      pathname.includes(`/${CATEGORIES.MONOCHROME}`) || pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)
     setInProjectsSection(isInProjects)
 
     // Reset all overlay states on navigation
@@ -168,7 +169,7 @@ const Header = memo(function Header() {
 
   // Determine category title for index link
   let categoryTitle = ''
-  if (pathname.includes('/black-and-white')) {
+  if (pathname.includes(`/${CATEGORIES.MONOCHROME}`)) {
     categoryTitle = 'Black & White'
   } else if (pathname.includes('/early-color')) {
     categoryTitle = 'Early Color'

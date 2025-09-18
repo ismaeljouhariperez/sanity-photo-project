@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CATEGORIES, CategoryType } from '@/lib/constants'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useTransitionStore } from '@/store/transitionStore'
@@ -15,7 +16,7 @@ export default function Home() {
   const { setTransition } = useTransitionStore()
   const [isExiting, setIsExiting] = useState(false)
 
-  const handleNavigate = (path: '/black-and-white' | '/early-color') => {
+  const handleNavigate = (path: `/${CategoryType}`) => {
     setIsExiting(true)
     setTransition(true, 'exiting')
 
@@ -60,7 +61,7 @@ export default function Home() {
             folder="home"
             fallbackSrc="/images/bw-cover.jpg"
             priority={true}
-            onClick={() => handleNavigate('/black-and-white')}
+            onClick={() => handleNavigate(`/${CATEGORIES.MONOCHROME}`)}
             delay={0.2}
             exitDelay={0}
             isExiting={isExiting}

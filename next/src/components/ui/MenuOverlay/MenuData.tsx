@@ -1,4 +1,5 @@
 import { getProjects } from '@/lib/sanity'
+import { CATEGORIES } from '@/lib/constants'
 
 interface Project {
   _id: string
@@ -8,18 +9,18 @@ interface Project {
 }
 
 export interface MenuData {
-  blackAndWhiteProjects: Project[]
+  monochromeProjects: Project[]
   earlyColorProjects: Project[]
 }
 
 export async function getMenuData(): Promise<MenuData> {
-  const [blackAndWhiteProjects, earlyColorProjects] = await Promise.all([
-    getProjects('black-and-white'),
-    getProjects('early-color')
+  const [monochromeProjects, earlyColorProjects] = await Promise.all([
+    getProjects(CATEGORIES.MONOCHROME),
+    getProjects(CATEGORIES.EARLY_COLOR)
   ])
 
   return {
-    blackAndWhiteProjects,
+    monochromeProjects,
     earlyColorProjects
   }
 }

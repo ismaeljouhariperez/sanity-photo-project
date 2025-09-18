@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTransitionStore } from '@/store/transitionStore'
+import { CategoryType } from '@/lib/constants'
 
 interface UseTransitionNavigationProps {
   onClose?: () => void
@@ -25,7 +26,7 @@ export function useTransitionNavigation({
 
     // Small delay to let animations start before navigation
     setTimeout(() => {
-      router.push(path as `/black-and-white` | `/early-color` | `/${string}/${string}`) // Type assertion for typed routes compatibility
+      router.push(path as `/${CategoryType}` | `/${string}/${string}`) // Type assertion for typed routes compatibility
     }, navigationDelay)
   }, [router, setTransition, onClose, navigationDelay])
 

@@ -1,23 +1,24 @@
 import { MetadataRoute } from 'next'
 import { getProjects } from '@/lib/sanity'
 import type { Project } from '@/lib/sanity.types'
+import { CATEGORIES } from '@/lib/constants'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://ismaelperezleon.com'
 
   // Get all projects for dynamic routes
-  const blackAndWhiteProjects = await getProjects('black-and-white')
-  const earlyColorProjects = await getProjects('early-color')
+  const monochromeProjects = await getProjects(CATEGORIES.MONOCHROME)
+  const earlyColorProjects = await getProjects(CATEGORIES.EARLY_COLOR)
 
   const projectUrls = [
-    ...blackAndWhiteProjects.map((project: Project) => ({
-      url: `${baseUrl}/black-and-white/${project.slug}`,
+    ...monochromeProjects.map((project: Project) => ({
+      url: `${baseUrl}/${CATEGORIES.MONOCHROME}/${project.slug}`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
     ...earlyColorProjects.map((project: Project) => ({
-      url: `${baseUrl}/early-color/${project.slug}`,
+      url: `${baseUrl}/${CATEGORIES.EARLY_COLOR}/${project.slug}`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
@@ -32,13 +33,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${baseUrl}/black-and-white`,
+      url: `${baseUrl}/${CATEGORIES.MONOCHROME}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/early-color`,
+      url: `${baseUrl}/${CATEGORIES.EARLY_COLOR}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

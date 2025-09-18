@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { CategoryType } from '@/lib/constants'
 
 interface ProjectLinkProps {
   href: string // Will be typed by Next.js typed routes
@@ -41,7 +42,7 @@ export default function ProjectLink({
 
   return (
     <Link
-      href={href as `/black-and-white` | `/early-color` | `/${string}/${string}`} // Type assertion for typed routes compatibility
+      href={href as `/${CategoryType}` | `/${string}/${string}`} // Type assertion for typed routes compatibility
       prefetch={enablePrefetch && shouldPrefetch ? true : false}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

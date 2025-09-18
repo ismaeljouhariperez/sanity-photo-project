@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { MenuData } from './MenuData'
 import ProjectSection from './ProjectSection'
+import { CATEGORIES, getCategoryLabel } from '@/lib/constants'
 
 interface MenuContentProps {
   data: MenuData
@@ -93,18 +94,18 @@ export default function MenuContent({ data, onClose }: MenuContentProps) {
       >
         <div className="grid min-h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-16">
           <ProjectSection
-            title="Black and White"
-            projects={data.blackAndWhiteProjects}
-            category="black-and-white"
+            title={getCategoryLabel(CATEGORIES.MONOCHROME)}
+            projects={data.monochromeProjects}
+            category={CATEGORIES.MONOCHROME}
             itemVariants={itemVariants}
             listVariants={listVariants}
             onClose={onClose}
           />
 
           <ProjectSection
-            title="Early Color"
+            title={getCategoryLabel(CATEGORIES.EARLY_COLOR)}
             projects={data.earlyColorProjects}
-            category="early-color"
+            category={CATEGORIES.EARLY_COLOR}
             itemVariants={itemVariants}
             listVariants={listVariants}
             onClose={onClose}
