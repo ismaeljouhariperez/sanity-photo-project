@@ -58,5 +58,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
-  return <ProjectSlider project={project} />
+  return (
+    <main className="project-detail-layout container mx-auto flex items-center">
+      <ProjectSlider project={project} />
+    </main>
+  )
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { useTransitionStore } from '@/store/transitionStore'
+import { useTransitionStore } from '@/store/animationStore'
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

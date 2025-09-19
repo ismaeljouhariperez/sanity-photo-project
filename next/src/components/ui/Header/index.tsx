@@ -82,9 +82,7 @@ const Header = memo(function Header() {
       const pathSegments = pathname.split('/').filter(Boolean)
       if (pathSegments.length >= 2) {
         const category = pathSegments[0]
-        setTimeout(() => {
-          router.push(`/${category}`)
-        }, 300) // Allow time for overlay close animations
+        router.push(`/${category}`)
       }
     },
     [pathname, router, isGalleryOpen, isMenuOpen, isInfoOpen]
@@ -176,13 +174,11 @@ const Header = memo(function Header() {
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      {isGalleryOpen && (
-        <GalleryOverlay
-          isOpen={isGalleryOpen}
-          onClose={() => setIsGalleryOpen(false)}
-          project={currentProject}
-        />
-      )}
+      <GalleryOverlay
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        project={currentProject}
+      />
       <header className="px-safe-left pr-safe-right pt-safe-top container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-2 md:py-5">
         <AnimatePresence mode="wait">
           <motion.nav

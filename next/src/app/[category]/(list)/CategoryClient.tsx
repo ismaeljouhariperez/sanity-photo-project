@@ -96,12 +96,10 @@ export default function CategoryClient({
       setIsExiting(true)
       setClickedProjectId(project._id)
 
-      // Quick visual feedback, then navigate (Next.js handles view transition)
-      setTimeout(() => {
-        startTransition(() => {
-          router.push(`/${category}/${projectSlug}`)
-        })
-      }, 200) // Reduced delay for faster navigation
+      // Navigate immediately with React transition for optimal UX
+      startTransition(() => {
+        router.push(`/${category}/${projectSlug}`)
+      })
     },
     [isExiting, category, router]
   )

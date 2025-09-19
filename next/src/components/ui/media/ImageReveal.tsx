@@ -61,7 +61,7 @@ const ImageReveal = memo(function ImageReveal({
       clipPath: 'inset(0 0 100% 0)',
       opacity: 0,
       transition: {
-        duration: 0.8,
+        duration: 0.5, // Faster exit animation
         ease: [0.16, 1, 0.3, 1] as const,
         delay: exitDelay,
       },
@@ -76,6 +76,7 @@ const ImageReveal = memo(function ImageReveal({
       onClick={onClick}
       initial="hidden"
       animate={isExiting ? 'exit' : 'visible'}
+      exit="exit"
       variants={revealVariants}
       suppressHydrationWarning
     >

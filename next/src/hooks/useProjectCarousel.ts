@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
-import { useImageNavigationStore } from '@/store/imageNavigationStore'
+import { useImageNavigationStore } from '@/store/currentProjectStore'
 
 interface UseProjectCarouselOptions {
   onSlideChange?: (index: number) => void

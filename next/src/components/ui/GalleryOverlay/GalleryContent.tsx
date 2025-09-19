@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import type { Project } from '@/lib/sanity.types'
 import SanityImage from '@/components/ui/media/SanityImage'
-import { useImageNavigationStore } from '@/store/imageNavigationStore'
+import { useImageNavigationStore } from '@/store/currentProjectStore'
 
 interface GalleryContentProps {
   project: Project | null
@@ -18,10 +18,11 @@ export default function GalleryContent({
   const setTargetImage = useImageNavigationStore(
     (state) => state.setTargetImage
   )
-
+  
   const handleImageClick = (index: number) => {
     setTargetImage(index)
-    onClose() // Close gallery overlay
+    // Close gallery with animation - onClose will be called by parent AnimatePresence
+    onClose()
   }
 
   // Animation variants matching MenuOverlay for consistency
@@ -116,7 +117,7 @@ export default function GalleryContent({
         >
           {images.map((image, index) => (
             <motion.div
-              key={image._key || index}
+              key={image._key || `gallery-${index}-${image.asset._ref}`}
               variants={itemVariants}
               className="group relative aspect-square cursor-pointer touch-manipulation overflow-hidden"
               onClick={() => handleImageClick(index)}

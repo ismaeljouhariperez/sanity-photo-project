@@ -1,34 +1,32 @@
-import { useCallback } from 'react'
+import { useCallback, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTransitionStore } from '@/store/transitionStore'
-import { CategoryType } from '@/lib/constants'
+import { useTransitionStore } from '@/store/animationStore'
 
 interface UseTransitionNavigationProps {
   onClose?: () => void
-  navigationDelay?: number
 }
 
 export function useTransitionNavigation({ 
-  onClose, 
-  navigationDelay = 300 
+  onClose
 }: UseTransitionNavigationProps = {}) {
   const router = useRouter()
   const { setTransition } = useTransitionStore()
+  const [isPending, startTransition] = useTransition()
 
   const navigateWithTransition = useCallback((path: string) => {
-    // Set exiting transition state
-    setTransition(true, 'exiting')
-
-    // Close overlay/menu if provided
+    // Close overlay/menu immediately
     if (onClose) {
       onClose()
     }
 
-    // Small delay to let animations start before navigation
-    setTimeout(() => {
-      router.push(path as `/${CategoryType}` | `/${string}/${string}`) // Type assertion for typed routes compatibility
-    }, navigationDelay)
-  }, [router, setTransition, onClose, navigationDelay])
+    // Set exiting transition state
+    setTransition(true, 'exiting')
+
+    // Use React 18+ transition for smooth navigation
+    startTransition(() => {
+      router.push(path as any) // Type assertion for dynamic paths
+    })
+  }, [router, setTransition, onClose, startTransition])
 
   const navigateToProject = useCallback((category: string, slug: string) => {
     navigateWithTransition(`/${category}/${slug}`)
@@ -41,6 +39,7 @@ export function useTransitionNavigation({
   return {
     navigateWithTransition,
     navigateToProject,
-    navigateToCategory
+    navigateToCategory,
+    isPending
   }
 }

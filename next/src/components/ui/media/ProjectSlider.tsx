@@ -66,7 +66,7 @@ const ProjectSlider = memo(function ProjectSlider({
             {/* Image slides */}
             {images.map((image, index) => (
               <CarouselSlide
-                key={image._key || index}
+                key={image._key || `image-${index}-${image.asset._ref}`}
                 isActive={index === selectedIndex}
               >
                 <div className="relative h-full min-h-[50vh] w-full p-4 md:p-8">
