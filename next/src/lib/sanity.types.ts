@@ -92,6 +92,7 @@ export interface Project extends SanityDocument {
   featuredImage?: SanityImage
   order?: number
   normalizedSlug?: string // Version normalisée du slug pour les animations
+  imageCount?: number // Computed field from GROQ query
 }
 
 // Collection type

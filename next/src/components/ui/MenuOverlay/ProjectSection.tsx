@@ -2,13 +2,7 @@
 
 import { motion, Variants } from 'framer-motion'
 import { useTransitionNavigation } from '@/hooks/useTransitionNavigation'
-
-interface Project {
-  _id: string
-  title: string
-  slug: { current: string } | string
-  imageCount: number
-}
+import type { Project } from '@/lib/sanity.types'
 
 interface ProjectSectionProps {
   title: string

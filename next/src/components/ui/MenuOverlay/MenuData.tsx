@@ -1,12 +1,6 @@
 import { getProjects } from '@/lib/sanity'
 import { CATEGORIES } from '@/lib/constants'
-
-interface Project {
-  _id: string
-  title: string
-  slug: { current: string } | string
-  imageCount: number
-}
+import type { Project } from '@/lib/sanity.types'
 
 export interface MenuData {
   monochromeProjects: Project[]

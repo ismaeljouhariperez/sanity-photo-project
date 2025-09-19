@@ -1,6 +1,6 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
-import type { SanityImage } from './sanity.types'
+import type { SanityImage, Project, Collection, SiteSettings } from './sanity.types'
 import { cache } from 'react'
 
 // Sanity configuration
@@ -45,21 +45,30 @@ export function urlFor(source: SanityImage) {
   return cachedUrlFor(source)
 }
 
-// GROQ queries
+/**
+ * Optimized GROQ queries following 2025 best practices
+ * - Fetch only what you need
+ * - Shallow projections for performance
+ * - Consistent field selection
+ */
 export const queries = {
+  // Optimized projects list - minimal fields for listings
   projects: `*[_type == "project" && (!defined($category) || category == $category)] | order(order asc, _createdAt desc) {
     _id,
     title,
     slug,
-    description,
     category,
     order,
-    coverImage,
-    featuredImage,
-    _createdAt,
+    coverImage {
+      _type,
+      asset,
+      crop,
+      hotspot
+    },
     "imageCount": count(images)
   }`,
   
+  // Full project details with optimized image metadata
   projectBySlug: `*[_type == "project" && slug.current == $slug && category == $category][0] {
     _id,
     title,
@@ -67,91 +76,112 @@ export const queries = {
     description,
     category,
     order,
-    coverImage,
-    seo,
+    coverImage {
+      _type,
+      asset,
+      crop,
+      hotspot,
+      "alt": asset->altText,
+      "metadata": asset->metadata
+    },
     images[] {
-      ...,
+      _type,
+      _key,
+      asset,
+      crop,
+      hotspot,
       "alt": asset->altText,
       "title": asset->opt.media.title,
       "description": asset->opt.media.description,
       "tags": asset->opt.media.tags[]->name.current,
       "metadata": asset->metadata
-    },
-    _createdAt,
-    _updatedAt
+    }
   }`,
   
+  // Minimal site settings - only essential fields
   siteSettings: `*[_type == "siteSettings"][0] {
     title,
     description,
     keywords,
     author,
-    siteUrl,
-    seo,
-    logo
+    logo {
+      _type,
+      asset
+    }
   }`,
   
+  // Lightweight collections query
   collections: `*[_type == "collection"] | order(order asc) {
     _id,
     title,
-    slug,
-    description,
+    slug {
+      current
+    },
     order
   }`
 }
 
-// High-performance fetch functions with Next.js 15.5+ optimized caching and React cache() deduplication
-const cachedClientFetch = cache(client.fetch.bind(client))
-
-export async function getProjects(category?: string) {
-  return cachedClientFetch(
-    queries.projects, 
-    { category },
-    { 
-      next: { 
-        revalidate: 600, // 10 minutes cache for better performance
-        tags: ['projects', `category:${category || 'all'}`, 'portfolio-content'] 
-      }
-    }
-  )
+/**
+ * Modern Sanity integration following 2025 best practices
+ * Using sanityFetch for centralized fetch with automatic caching
+ */
+export async function sanityFetch<T = unknown>({
+  query,
+  params = {},
+  revalidate = 600, // 10 minutes default for photography portfolio
+  tags = [],
+}: {
+  query: string
+  params?: Record<string, unknown>
+  revalidate?: number | false
+  tags?: string[]
+}): Promise<T> {
+  return client.fetch<T>(query, params, {
+    cache: 'force-cache',
+    next: {
+      revalidate: tags.length ? false : revalidate,
+      tags,
+    },
+  })
 }
 
-export async function getProjectBySlug(slug: string, category: string) {
-  return cachedClientFetch(
-    queries.projectBySlug, 
-    { slug, category },
-    { 
-      next: { 
-        revalidate: 1800, // 30 minutes cache for project details
-        tags: [`project:${slug}`, `category:${category}`, 'portfolio-content'] 
-      }
-    }
-  )
+/**
+ * Modern fetch functions using sanityFetch with optimized caching
+ * Following 2025 best practices for photography portfolios
+ */
+export async function getProjects(category?: string): Promise<Project[]> {
+  return sanityFetch<Project[]>({
+    query: queries.projects,
+    params: { category },
+    revalidate: 600, // 10 minutes - good for project listings
+    tags: ['projects', `category:${category || 'all'}`, 'portfolio-content']
+  })
 }
 
-export async function getSiteSettings() {
-  return cachedClientFetch(
-    queries.siteSettings,
-    {},
-    { 
-      next: { 
-        revalidate: 3600, // 1 hour cache
-        tags: ['site-settings'] 
-      }
-    }
-  )
+export async function getProjectBySlug(slug: string, category: string): Promise<Project | null> {
+  return sanityFetch<Project | null>({
+    query: queries.projectBySlug,
+    params: { slug, category },
+    revalidate: 1800, // 30 minutes - project details change less frequently
+    tags: [`project:${slug}`, `category:${category}`, 'portfolio-content']
+  })
 }
 
-export async function getCollections() {
-  return client.fetch(
-    queries.collections,
-    {},
-    { 
-      next: { 
-        revalidate: 1800, // 30 minutes cache
-        tags: ['collections'] 
-      }
-    }
-  )
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  return sanityFetch<SiteSettings | null>({
+    query: queries.siteSettings,
+    params: {},
+    revalidate: 3600, // 1 hour - site settings rarely change
+    tags: ['site-settings']
+  })
+}
+
+export async function getCollections(): Promise<Collection[]> {
+  return sanityFetch<Collection[]>({
+    query: queries.collections,
+    params: {},
+    revalidate: 1800, // 30 minutes
+    tags: ['collections']
+  })
 }
 
