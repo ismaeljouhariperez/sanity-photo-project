@@ -75,10 +75,8 @@ const ImageLoader = ({
 
 // Error state component
 const ImageError = ({
-  onRetry,
   className,
 }: {
-  onRetry: () => void
   className?: string
 }) => (
   <div
@@ -187,7 +185,7 @@ export default function SanityImage({
 
   // Handle error state
   if (loader.hasError) {
-    return <ImageError onRetry={loader.resetLoader} className={className} />
+    return <ImageError className={className} />
   }
 
   return (

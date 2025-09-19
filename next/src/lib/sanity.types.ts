@@ -41,7 +41,13 @@ export interface SanityImage {
       height: number
       aspectRatio: number
     }
-    palette?: any
+    palette?: {
+      dominant?: {
+        background?: string
+        foreground?: string
+      }
+      [key: string]: unknown
+    }
     lqip?: string
   }
 }
