@@ -122,8 +122,13 @@ export default function GalleryContent({
               onClick={() => handleImageClick(index)}
             >
               <SanityImage
-                image={image.image}
-                alt={image.title || image.description || `${project?.title || 'Gallery'} - Image ${index + 1}`}
+                image={image}
+                alt={
+                  image.alt ||
+                  image.description ||
+                  image.title ||
+                  `${project?.title || 'Gallery'} - Image ${index + 1}`
+                }
                 width={300}
                 height={300}
                 className="h-full w-full object-contain transition-transform duration-300"

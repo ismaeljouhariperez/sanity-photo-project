@@ -42,6 +42,13 @@ export default async function RootLayout({
           href="/apple-touch-icon.png"
         />
         <link rel="manifest" href="/manifest.json" />
+        {/* Preload LCP image for faster loading */}
+        <link
+          rel="preload"
+          href="/images/bw-cover.jpg"
+          as="image"
+          fetchPriority="high"
+        />
       </head>
       <body className="bg-cream lg:pt-header" suppressHydrationWarning>
         <ClientLayout menuData={menuData}>{children}</ClientLayout>

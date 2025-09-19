@@ -50,7 +50,7 @@
 }
 
 /* Optimize image transitions for photography portfolio */
-[data-view-transition="hero-image"] {
+[data-view-transition='hero-image'] {
   view-transition-name: hero-image;
 }
 
@@ -75,7 +75,7 @@
 }
 
 /* Project titles smooth transition */
-[data-view-transition="project-title"] {
+[data-view-transition='project-title'] {
   view-transition-name: project-title;
 }
 
@@ -86,7 +86,7 @@
 }
 
 /* Navigation transitions */
-[data-view-transition="main-nav"] {
+[data-view-transition='main-nav'] {
   view-transition-name: main-nav;
 }
 

@@ -8,20 +8,15 @@ import dynamic from 'next/dynamic'
 import InfoOverlay from '../InfoOverlay'
 import MenuOverlay from '../MenuOverlay'
 import { CATEGORIES } from '@/lib/constants'
-
-// Lazy load GalleryOverlay - heavy component with animations
-const GalleryOverlay = dynamic(() => import('../GalleryOverlay'), {
-  loading: () => (
-    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-      <div className="animate-pulse text-white">Loading gallery...</div>
-    </div>
-  ),
-  ssr: false // Gallery interactions don't need SSR
-})
 import { useAnimationStore } from '@/store/animationStore'
 import { useCurrentProjectStore } from '@/store/currentProjectStore'
 import { useRouter } from 'next/navigation'
 import s from './styles.module.css'
+
+// Lazy load GalleryOverlay - only when needed
+const GalleryOverlay = dynamic(() => import('../GalleryOverlay'), {
+  ssr: false, // Gallery interactions don't need SSR
+})
 
 const Header = memo(function Header() {
   const [isInfoOpen, setIsInfoOpen] = useState(false)
@@ -35,7 +30,8 @@ const Header = memo(function Header() {
 
   // Define page type variables
   const isProjectPage =
-    pathname.includes(`/${CATEGORIES.MONOCHROME}`) || pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)
+    pathname.includes(`/${CATEGORIES.MONOCHROME}`) ||
+    pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)
 
   // Check if we're on a project detail page (with slug)
   const isProjectDetailPage = isProjectPage && pathname.split('/').length === 3
@@ -97,7 +93,8 @@ const Header = memo(function Header() {
   // Surveille les changements de pathname pour mettre à jour l'état
   useEffect(() => {
     const isInProjects =
-      pathname.includes(`/${CATEGORIES.MONOCHROME}`) || pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)
+      pathname.includes(`/${CATEGORIES.MONOCHROME}`) ||
+      pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)
     setInProjectsSection(isInProjects)
 
     // Reset all overlay states on navigation
@@ -170,8 +167,8 @@ const Header = memo(function Header() {
   // Determine category title for index link
   let categoryTitle = ''
   if (pathname.includes(`/${CATEGORIES.MONOCHROME}`)) {
-    categoryTitle = 'Black & White'
-  } else if (pathname.includes('/early-color')) {
+    categoryTitle = 'Monochrome'
+  } else if (pathname.includes(`/${CATEGORIES.EARLY_COLOR}`)) {
     categoryTitle = 'Early Color'
   }
 
@@ -179,11 +176,13 @@ const Header = memo(function Header() {
     <>
       <InfoOverlay isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      <GalleryOverlay
-        isOpen={isGalleryOpen}
-        onClose={() => setIsGalleryOpen(false)}
-        project={currentProject}
-      />
+      {isGalleryOpen && (
+        <GalleryOverlay
+          isOpen={isGalleryOpen}
+          onClose={() => setIsGalleryOpen(false)}
+          project={currentProject}
+        />
+      )}
       <header className="px-safe-left pr-safe-right pt-safe-top container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-center py-2 md:py-5">
         <AnimatePresence mode="wait">
           <motion.nav

@@ -62,7 +62,7 @@ export default function Home() {
             fallbackSrc="/images/bw-cover.jpg"
             priority={true}
             onClick={() => handleNavigate(`/${CATEGORIES.MONOCHROME}`)}
-            delay={0.2}
+            delay={0} // No delay for LCP optimization
             exitDelay={0}
             isExiting={isExiting}
             className="md:max-w-[70%]"
@@ -77,7 +77,7 @@ export default function Home() {
             folder="home"
             fallbackSrc="/images/color-cover.jpg"
             priority={false}
-            onClick={() => handleNavigate('/early-color')}
+            onClick={() => handleNavigate(`/${CATEGORIES.EARLY_COLOR}`)}
             delay={0.4}
             exitDelay={0.2}
             isExiting={isExiting}

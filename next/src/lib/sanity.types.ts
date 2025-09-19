@@ -12,6 +12,7 @@ export interface SanityDocument {
 // Base type for Sanity images
 export interface SanityImage {
   _type: 'image'
+  _key?: string
   asset: {
     _ref: string
     _type: 'reference'
@@ -29,6 +30,19 @@ export interface SanityImage {
     width: number
     x: number
     y: number
+  }
+  alt?: string
+  title?: string
+  description?: string
+  tags?: string[]
+  metadata?: {
+    dimensions?: {
+      width: number
+      height: number
+      aspectRatio: number
+    }
+    palette?: any
+    lqip?: string
   }
 }
 
@@ -58,14 +72,7 @@ export interface Photo extends SanityDocument {
   }
 }
 
-// Project Image type (for images within a project)
-export interface ProjectImage {
-  _key: string
-  image: SanityImage
-  title?: string
-  description?: string
-  order?: number
-}
+// Project images are now simple SanityImage arrays (simplified schema)
 
 // Project type
 export interface Project extends SanityDocument {
@@ -75,7 +82,7 @@ export interface Project extends SanityDocument {
   description?: string
   coverImage: SanityImage
   category: CategoryType
-  images?: ProjectImage[]
+  images?: SanityImage[]
   featuredImage?: SanityImage
   order?: number
   normalizedSlug?: string // Version normalisée du slug pour les animations

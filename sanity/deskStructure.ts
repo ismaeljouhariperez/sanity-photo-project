@@ -35,7 +35,7 @@ export const structure = (S: StructureBuilder) =>
                 .child(
                   S.documentList()
                     .title('Projets Noir et Blanc')
-                    .filter('_type == "project" && category == "black-and-white"')
+                    .filter('_type == "project" && category == "monochrome"')
                     .defaultOrdering([{field: '_createdAt', direction: 'desc'}]),
                 ),
               S.listItem()

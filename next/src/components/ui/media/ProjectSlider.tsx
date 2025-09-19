@@ -23,7 +23,7 @@ const ProjectSlider = memo(function ProjectSlider({
   // Set current project in store for other components
   const setProject = useCurrentProjectStore((state) => state.setProject)
 
-  const images = project.images || []
+  const images = (project.images || []).filter((img) => img && img.asset)
   const totalSlides = images.length + 1 // Images + text slide
 
   // Custom carousel hook with all Embla logic
@@ -42,10 +42,7 @@ const ProjectSlider = memo(function ProjectSlider({
 
   if (images.length === 0) {
     return (
-      <div
-        className="bg-cream flex w-full items-center justify-center"
-        style={{ height: 'calc(100dvh - var(--header-height))' }}
-      >
+      <div className="flex w-full items-center justify-center">
         <div className="text-gray-500">Aucune photo à afficher</div>
       </div>
     )
@@ -72,10 +69,14 @@ const ProjectSlider = memo(function ProjectSlider({
                 key={image._key || index}
                 isActive={index === selectedIndex}
               >
-                <div className="relative h-full w-full p-4 md:p-8 min-h-[50vh]">
+                <div className="relative h-full min-h-[50vh] w-full p-4 md:p-8">
                   <SanityImage
-                    image={image.image}
-                    alt={`Image ${index + 1}`}
+                    image={image}
+                    alt={
+                      image.alt ||
+                      image.description ||
+                      `${project.title} - Image ${index + 1}`
+                    }
                     fill
                     priority={index <= 1}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"

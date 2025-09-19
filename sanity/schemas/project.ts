@@ -40,7 +40,7 @@ export const project = {
       type: 'string',
       options: {
         list: [
-          {title: 'Noir et Blanc', value: 'black-and-white'},
+          {title: 'Noir et Blanc', value: 'monochrome'},
           {title: 'Couleur', value: 'early-color'},
         ],
       },
@@ -53,63 +53,38 @@ export const project = {
       type: 'array',
       of: [
         {
-          type: 'object',
-          fields: [
-            {
-              name: 'image',
-              title: 'Image',
-              type: 'image',
-              options: {
-                hotspot: true,
-                metadata: ['lqip', 'dimensions', 'palette'], // Extract useful metadata
-              },
-              validation: (Rule: any) => Rule.required().custom(async (image: any, context: any) => {
-                if (!image?.asset) return 'Image required'
-                
-                // Get image dimensions for photography validation
-                const asset = await context.getClient({}).fetch(
-                  '*[_id == $assetId][0].metadata.dimensions',
-                  { assetId: image.asset._ref }
-                )
-                
-                if (asset && (asset.width < 1200 || asset.height < 800)) {
-                  return 'Image too small for photography portfolio (minimum 1200x800px)'
-                }
-                
-                return true
-              }),
-            },
-            {
-              name: 'title',
-              title: 'Titre',
-              type: 'string',
-            },
-            {
-              name: 'description',
-              title: 'Description',
-              type: 'text',
-              rows: 2,
-            },
-            {
-              name: 'altDescription',
-              title: 'Description alternative (accessibilité)',
-              type: 'string',
-              description: 'Description précise pour les lecteurs d’écran et l’accessibilité',
-              validation: (Rule: any) => Rule.required().min(10).max(200),
-            },
-          ],
-          preview: {
-            select: {
-              title: 'title',
-              media: 'image',
-            },
-            prepare({title, media}: {title?: string; media?: any}) {
-              return {
-                title: title || 'Image sans titre',
-                media,
-              }
-            },
+          type: 'image',
+          options: {
+            hotspot: true,
+            metadata: ['lqip', 'dimensions', 'palette'], // Extract useful metadata
           },
+          validation: (Rule: any) => Rule.required().custom(async (image: any, context: any) => {
+            if (!image?.asset) return 'Image required'
+            
+            // Get image metadata for web-optimized photography validation
+            const asset = await context.getClient({ apiVersion: '2023-05-03' }).fetch(
+              '*[_id == $assetId][0]{metadata}',
+              { assetId: image.asset._ref }
+            )
+            
+            if (asset?.metadata) {
+              const { dimensions, size } = asset.metadata
+              
+              // Minimum dimensions for quality photography display
+              if (dimensions && (dimensions.width < 1200 || dimensions.height < 800)) {
+                return 'Image too small for photography portfolio (minimum 1200x800px)'
+              }
+              
+              // Maximum file size for web performance (4MB = 4,194,304 bytes)
+              if (size && size > 4194304) {
+                return 'Image too large for web (maximum 4MB). Please compress with ImageMagick before uploading.'
+              }
+            }
+            
+            return true
+          }),
+          // sanity-media-plugin handles metadata (title, alt text, description) 
+          // but we keep the validation for photography quality standards
         },
       ],
     },
@@ -125,7 +100,7 @@ export const project = {
     prepare({title, media, category}: {title?: string; media?: any; category?: string}) {
       return {
         title,
-        subtitle: category === 'black-and-white' ? 'Noir et Blanc' : 'Couleur',
+        subtitle: category === 'monochrome' ? 'Noir et Blanc' : 'Couleur',
         media,
       }
     },

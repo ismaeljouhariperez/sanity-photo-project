@@ -35,7 +35,7 @@ export default function CategoryClient({
 
   const [hasEntered, setHasEntered] = useState(false)
   const [hoveredProject, setHoveredProject] = useState<string | null>(null)
-  
+
   // Debounced hover handler to prevent excessive URL generation
   const debouncedSetHoveredProject = useDebounce(setHoveredProject, 150)
   const [isExiting, setIsExiting] = useState(false)
@@ -157,10 +157,7 @@ export default function CategoryClient({
             )}
           </AnimatePresence>
 
-          <motion.div
-            style={{ y: veilY }}
-            className="bg-cream absolute inset-0 z-10"
-          />
+          <motion.div style={{ y: veilY }} className="absolute inset-0 z-10" />
         </motion.div>
 
         <nav
@@ -176,10 +173,7 @@ export default function CategoryClient({
                 key={project._id}
                 className="max-w-[280px] overflow-hidden text-center text-3xl md:max-w-none md:text-left lg:text-5xl"
                 animate={{
-                  opacity:
-                    shouldFadeOut
-                      ? 0
-                      : 1,
+                  opacity: shouldFadeOut ? 0 : 1,
                   y: shouldFadeOut ? -10 : 0,
                 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}

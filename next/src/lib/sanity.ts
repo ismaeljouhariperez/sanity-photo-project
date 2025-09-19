@@ -70,11 +70,12 @@ export const queries = {
     coverImage,
     seo,
     images[] {
-      _key,
-      image,
-      title,
-      description,
-      order
+      ...,
+      "alt": asset->altText,
+      "title": asset->opt.media.title,
+      "description": asset->opt.media.description,
+      "tags": asset->opt.media.tags[]->name.current,
+      "metadata": asset->metadata
     },
     _createdAt,
     _updatedAt

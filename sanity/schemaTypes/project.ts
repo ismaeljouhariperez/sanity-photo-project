@@ -29,7 +29,7 @@ export const project = {
       type: 'string',
       options: {
         list: [
-          {title: 'Black & White', value: 'bw'},
+          {title: 'Monochrome', value: 'bw'},
           {title: 'Early Color', value: 'color'},
         ],
       },

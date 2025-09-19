@@ -23,7 +23,7 @@ interface UseImageLoaderReturn {
 
 export function useImageLoader({
   priority = false,
-  maxRetries = 2,
+  maxRetries = 1, // Reduced retries for photography - avoid excessive loading
   timeoutMs,
   onLoad,
   onError
@@ -35,10 +35,11 @@ export function useImageLoader({
   const [showPlaceholder, setShowPlaceholder] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout>()
 
-  // Calculate timeout based on priority and retry count - less aggressive timeouts
+  // Calculate timeout based on priority and retry count - photography-optimized timeouts
   const getTimeoutDuration = useCallback(() => {
     if (timeoutMs) return timeoutMs
-    return priority ? 3000 : 5000 + (retryCount * 1000)
+    // Much longer timeouts for photography images (they're larger)
+    return priority ? 8000 : 12000 + (retryCount * 2000) // 8s priority, 12s+ normal
   }, [priority, retryCount, timeoutMs])
 
   const clearImageTimeout = useCallback(() => {
