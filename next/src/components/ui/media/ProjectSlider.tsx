@@ -80,7 +80,7 @@ const ProjectSlider = memo(function ProjectSlider({
                     fill
                     priority={index <= 1}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1600px"
-                    maxRetries={2}
+                    maxRetries={3}
                     emblaOptimized={true}
                     timeoutMs={index <= 1 ? 800 : 1200}
                     quality={index <= 1 ? 90 : 80}

@@ -18,7 +18,7 @@ export default function GalleryContent({
   const setTargetImage = useImageNavigationStore(
     (state) => state.setTargetImage
   )
-  
+
   const handleImageClick = (index: number) => {
     setTargetImage(index)
     // Close gallery with animation - onClose will be called by parent AnimatePresence
@@ -109,7 +109,7 @@ export default function GalleryContent({
         onClick={(e) => e.stopPropagation()}
       >
         <motion.div
-          className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-6 xl:grid-cols-10 2xl:grid-cols-10"
+          className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10"
           variants={listVariants}
           initial="hidden"
           animate="visible"
@@ -135,7 +135,7 @@ export default function GalleryContent({
                 className="h-full w-full object-contain transition-transform duration-300"
                 sizes="(max-width: 768px) 150px, (max-width: 1024px) 200px, 250px"
                 quality={75}
-                maxRetries={1}
+                maxRetries={2}
                 timeoutMs={600}
                 galleryMode={true}
                 priority={index < 6} // Only prioritize first 6 images
